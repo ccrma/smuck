@@ -118,12 +118,12 @@ fun void gametrak()
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-@import {"../src/smuck.ck"}
+@import {"../../src/smuck.ck"}
 
 ezScore score;
 score.setTempo(128);
 score.setTimeSig(4, 4);
-score.importMIDI("data/sonata01-1.mid");
+score.importMIDI("../data/sonata01-1.mid");
 
 ScorePlayer sp(score);
 

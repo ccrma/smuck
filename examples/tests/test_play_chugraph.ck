@@ -117,9 +117,9 @@ fun void gametrak()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-@import {"../src/smuck.ck"}
+@import {"../../src/smuck.ck"}
 
-ezScore score("data/sonata01-1.mid", 128, [4,4]);
+ezScore score("../data/sonata01-1.mid", 128, [4,4]);
 
 ScorePlayer sp(score);
 
