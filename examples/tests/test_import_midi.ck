@@ -1,6 +1,6 @@
-@import {"../src/smuck.ck"}
+@import {"../../src/smuck.ck"}
 ezScore score;
-score.importMIDI("data/bwv772.mid");
+score.importMIDI("../data/bwv772.mid");
 <<< score.parts.size() >>>;
 <<< score.parts[0].measures.size() >>>;
 <<< score.parts[1].measures[0].notes.size() >>>;
