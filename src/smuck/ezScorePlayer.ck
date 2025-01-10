@@ -1,68 +1,91 @@
 @import {"ezNote.ck", "ezMeasure.ck", "ezPart.ck", "ezScore.ck", "ezNoteEvent.ck", "ezPreviewInst.ck", "ezInstrument.ck"}
 
-public class ScorePlayer
+public class ezScorePlayer
 {
+    // data structures
     ezScore score;
     ezPart parts[];
     NoteEvent nextNotes[];
+    ezInstrument instruments[];
+    // int voice_to_midi[][];       // "voice" - an individual ugen in the overall voice array a voice
+    //                              // -1 if voice is not in use (free), otherwise has the current midi pitch number it is being used for
 
-    ezInstrument graphs[];
+    int voice_in_use[][];
 
-    // set up sound for preview
-    // defaultVoice previewGraphs[];
-    // Gain previewGain;
-    // previewGain.gain(0.0);
-    // previewGain => dac;
-    
-
-    // "subvoice" - an individual ugen in the overall voice array a subvoice
-    int subvoice_to_midi[][];       // -1 if subvoice is not in use (free), otherwise has the current midi pitch number it is being used for
-
-    1 => float rate;
+    // parameters
     1::ms => dur tick;
-    dur tatum;
+    1 => float rate;
+    false => int loop;
+
+    // playback
+    tick => dur tatum;
     dur playhead;
+    false => int playing;
+    dur end_of_score;
 
+    fun ezScorePlayer() {}
 
-    fun ScorePlayer(ezScore s)
+    fun ezScorePlayer(ezScore s)
     {
+        setScore(s);
+    }
+
+    fun void setScore(ezScore s)
+    {
+        if (playing) stop();
+        
         s @=> score;
         s.parts @=> parts;
         <<<parts.size(), "parts processed">>>;
         // create note events for broadcasting (might not need this)
-        new NoteEvent[parts.size()] @=> nextNotes;
+        new NoteEvent[score.numParts()] @=> nextNotes;
 
-        // create chugraphs
-        new ezInstrument[parts.size()] @=> graphs;
-        // create default voices for preview playback
-        // new defaultVoice[parts.size()] @=> previewGraphs;
+        // create instruments
+        new ezInstrument[score.numParts()] @=> instruments;
 
-        for(int i; i < parts.size(); i++)
+        for(int i; i < score.numParts(); i++)
         {
             // check contents of imported parts, assign polyphony to chugraph voices
             cherr <= "part " <= i <= " has " <= parts[i].measures[0].notes.size() <= " notes, and max polyphony of " <= parts[i].maxPolyphony <= IO.newline();
-            parts[i].maxPolyphony => graphs[i].n_voices;
-
-            // set up preview voice polyphony and connect to gain
-            // parts[i].maxPolyphony => previewGraphs[i].n_voices;
-            // previewGraphs[i] => previewGain;
+            // parts[i].maxPolyphony => instruments[i].n_voices;
         }
         
-        // keep track of which subvoices are currently in use
-        new int[parts.size()][0] @=> subvoice_to_midi;
+        // keep track of which voices are currently in use
+        // new int[parts.size()][0] @=> voice_to_midi;
+        new int[parts.size()][0] @=> voice_in_use;
 
-        spork ~ tickDriver();
+        score.get_ending_beat() => float end_of_score_beats;
+        (end_of_score_beats * 60000 / score.bpm)::ms => end_of_score;
     }
 
-    // fun void start()
-    // {
-    //     spork~tickDriver();
-    // }
+    fun void play()
+    {
+        <<< "ezScorePlayer: play()" >>>;
+        if (!playing)
+        {
+            true => playing;
+            spork ~ tickDriver();
+        }
+    }
+
+    fun void pause()
+    {
+        <<< "ezScorePlayer: pause()" >>>;
+        false => playing;
+        flushNotes();
+    }
+
+    fun void stop()
+    {
+        <<< "ezScorePlayer: stop()" >>>;
+        false => playing;
+        pos(0);
+    }
 
     fun void tickDriver()
     {
         // 5::second => now;   // DELETE THIS
-        while(true)
+        while (playing)
         {
             tick * rate => tatum;
             tatum +=> playhead;
@@ -72,8 +95,16 @@ public class ScorePlayer
                 getNotesAtPlayhead(i);
             }
             tick => now;
+
+            if (playhead > end_of_score)
+            {
+                if (loop) pos(0);
+                else stop();
+            }
         }
     }
+
+    
 
     fun void pos(dur timePosition)
     {
@@ -103,21 +134,21 @@ public class ScorePlayer
     {
         for(int part; part < parts.size(); part++)
         {
-            for(int subvoice; subvoice < graphs[part].n_voices; subvoice++)
+            for(int voice; voice < instruments[part].n_voices; voice++)
             {
-                graphs[part].noteOff(subvoice);
-                release_subvoice(part, subvoice);
+                instruments[part].noteOff(voice);
+                release_voice(part, voice);
             }
         }
     }
 
-    fun void setVoice(int part, ezInstrument voice)
+    fun void setInstrument(int part, ezInstrument instrument)
     {
-        parts[part].maxPolyphony => voice.n_voices;
-        voice @=> graphs[part];
+        instrument @=> instruments[part];
         
-        // keep track of which subvoices are currently in use
-        new int[voice.n_voices] @=> subvoice_to_midi[part];
+        // keep track of which voices are currently in use
+        // new int[instrument.n_voices] @=> voice_to_midi[part];
+        new int[instrument.n_voices] @=> voice_in_use[part];
     }
 
     fun void getNotesAtPlayhead(int partIndex)
@@ -160,8 +191,8 @@ public class ScorePlayer
 
     fun void playNoteWrapper(int partIndex, ezNote theNote)
     {
-        allocate_subvoice(partIndex, theNote) => int which_subvoice;
-        graphs[partIndex].noteOn(which_subvoice, theNote);
+        allocate_voice(partIndex, theNote) => int which_voice;
+        instruments[partIndex].noteOn(theNote, which_voice);
 
         playhead/ms => float onset_ms;
         60000 / score.bpm => float ms_per_beat;
@@ -173,39 +204,34 @@ public class ScorePlayer
             tick => now;
         }
 
-        graphs[partIndex].noteOff(which_subvoice);
-        release_subvoice(partIndex, which_subvoice);
+        instruments[partIndex].noteOff(which_voice);
+        release_voice(partIndex, which_voice);
     }
 
-    // Returns index of currently in-use subvoice for note. If the note doesn't have a subvoice, allocates a new one and returns the index. 
-    fun int allocate_subvoice(int partIndex, ezNote theNote)
+    // Allocates a new voice for the note and returns the index. 
+    fun int allocate_voice(int partIndex, ezNote theNote)
     {
-        // If the note already has a subvoice in use, return that subvoice (only known case: reversal of playback)
-        graphs[partIndex].n_voices => int num_subvoices_for_part;
-        for (int subvoice_index; subvoice_index < num_subvoices_for_part; subvoice_index++)
+        // Get the first available voice for the note
+        get_free_voice(partIndex) => int new_voice_index;
+
+        // If there are no free voices, steal one
+        if (new_voice_index == -1)
         {
-            subvoice_to_midi[partIndex][subvoice_index] => int pitch;
-            if (pitch == theNote.pitch) return subvoice_index;
+            steal_voice(partIndex) => new_voice_index;
         }
 
-        // If the note doesn't have a subvoice, allocate one!
-        get_free_subvoice(partIndex) => int free_subvoice_index;                // find a free subvoice for the note
-        if (free_subvoice_index == -1)      // if there are no free subvoices, free one at random
-        {
-            Math.random2(0, graphs[partIndex].n_voices - 1) => free_subvoice_index;
-            release_subvoice(partIndex, free_subvoice_index);
-        }
-        theNote.pitch => subvoice_to_midi[partIndex][free_subvoice_index];                // marking the new subvoice as in use by the note
-        return free_subvoice_index;
+        // Mark the voice as in use
+        true => voice_in_use[partIndex][new_voice_index];
+        
+        return new_voice_index;
     }
 
-    // Helper for grab_subvoice(). Returns the lowest index of a free subvoice for a given part (or random index if there are no free subvoices).
-    fun int get_free_subvoice(int partIndex)
+    // Helper for allocate_voice(). Returns the lowest index of a free voice for a given part (or random index if there are no free voices).
+    fun int get_free_voice(int partIndex)
     {
-        graphs[partIndex].n_voices => int n_voices;
-        int free_subvoice_index;
+        instruments[partIndex].n_voices => int n_voices;
         for (int i; i < n_voices; i++) {
-            if (subvoice_to_midi[partIndex][i] == -1)       // if subvoice i is free
+            if (!voice_in_use[partIndex][i])       // if voice i is free
             {
                 return i;
             }
@@ -214,24 +240,32 @@ public class ScorePlayer
         return -1;
     }
 
-    // Releases the subvoice that was in use for a specific note
-    fun void release_subvoice(int partIndex, int subvoice_index)
+    // Helper for allocate_voice(). Steals a random voice and returns its index
+    fun int steal_voice(int partIndex)
     {
-        // <<< "part index:", partIndex, "| n_voices:", graphs[partIndex].n_voices, "| num subvoices", subvoice_to_midi[partIndex].size(), "| subvoice index:", subvoice_index >>>;
-        -1 => subvoice_to_midi[partIndex][subvoice_index];
+        Math.random2(0, instruments[partIndex].n_voices - 1) => int stolen_voice_index;
+        release_voice(partIndex, stolen_voice_index);
+        return stolen_voice_index;
+    }
+
+    // Releases the voice that was in use for a specific note
+    fun void release_voice(int partIndex, int voice_index)
+    {
+        // <<< "part index:", partIndex, "| n_voices:", instruments[partIndex].n_voices, "| num voices", voice_to_midi[partIndex].size(), "| voice index:", voice_index >>>;
+        false => voice_in_use[partIndex][voice_index];
     }
 
     fun void preview()
     {
-        // new defaultVoice[parts.size()] @=> graphs;
+        // new defaultVoice[parts.size()] @=> instruments;
         for(int i; i < parts.size(); i++)
         {
             defaultVoice tempVoice;
-            setVoice(i, tempVoice);
-            parts[i].maxPolyphony => graphs[i].n_voices;
-            // graphs[i] => previewGain;
+            setInstrument(i, tempVoice);
+            // instruments[i] => previewGain;
         }
         pos(0.0);
+        play();
         // previewGain.gain(1.0);
         // spork ~ tickDriver();
     }

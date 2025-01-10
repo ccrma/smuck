@@ -2,15 +2,15 @@
 
 public class ezInstrument extends Chugraph
 {
-    // define sound chain
+    // define the sound chain
     int n_voices;
 
-    fun void noteOn(int which, ezNote theNote)
+    fun void noteOn(ezNote theNote, int voice)
     {
         // <<<"implement NoteOn function">>>;
     }
 
-    fun void noteOff(int which)
+    fun void noteOff(int voice)
     {
         // <<<"implement NoteOff function">>>;
     }

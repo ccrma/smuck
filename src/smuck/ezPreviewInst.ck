@@ -3,7 +3,7 @@
 public class defaultVoice extends ezInstrument
 {
     // define sound chain
-    8 => n_voices;
+    20 => n_voices;
     SinOsc oscs[n_voices]; 
     ADSR envs[n_voices]; 
     Gain g => NRev rev => dac;
