@@ -139,7 +139,6 @@ public class ezScore
             {
                 parts << part;
             }
-
         }
     }
 
@@ -148,8 +147,8 @@ public class ezScore
         return parts.size();
     }
 
-    // returns the final note's "offset" (release point) in beats
-    fun float get_ending_beat()
+    // returns the end of the score in beats (the last note's release point)
+    fun float getScoreEnd()
     {
         float last_note_offset;
         for (int i; i < numParts(); i++)
@@ -157,11 +156,13 @@ public class ezScore
             parts[i] @=> ezPart part;
             for (int j; j < part.numMeasures(); j++)
             {
-                // check if last note in measure j is later than our current final note
                 part.measures[j] @=> ezMeasure measure;
-                measure.notes[measure.numNotes() - 1] @=> ezNote note;                
-                note.onset + note.beats => float offset;
-                if (offset > last_note_offset) offset => last_note_offset;
+                for (int k; k < measure.numNotes(); k++)
+                {
+                    measure.notes[k] @=> ezNote note;
+                    note.onset + note.beats => float offset;
+                    if (offset > last_note_offset) offset => last_note_offset;
+                }
             }
         }
         return last_note_offset;
