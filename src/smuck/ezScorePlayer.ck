@@ -43,20 +43,35 @@ public class ezScorePlayer
         // create instruments
         new ezInstrument[score.numParts()] @=> instruments;
 
-        for(int i; i < score.numParts(); i++)
-        {
-            // check contents of imported parts, assign polyphony to chugraph voices
-            cherr <= "part " <= i <= " has " <= parts[i].measures[0].notes.size() <= " notes, and max polyphony of " <= parts[i].maxPolyphony <= IO.newline();
-            // parts[i].maxPolyphony => instruments[i].n_voices;
-        }
-        
         // keep track of which voices are currently in use
-        // new int[parts.size()][0] @=> voice_to_midi;
         new int[parts.size()][0] @=> voice_in_use;
 
-        score.get_ending_beat() => float end_of_score_beats;
-        (end_of_score_beats * 60000 / score.bpm)::ms => end_of_score;
+        // remember the end position of the score
+        setEnd(-1);
     }
+
+    fun void setEnd(float beat)
+    {
+        if (beat > score.getScoreEnd())
+        {
+            <<< "ezScorePlayer: setScoreEnd() - provided beat is after the score end. beat:", beat, "| score end:", score.getScoreEnd() >>>;
+            return;
+        }
+        if (beat == -1)
+        {
+            score.getScoreEnd() => beat;
+        }
+        (beat * 60000 / score.bpm)::ms => end_of_score;     // convert to dur, so playhead can be compared to it
+    }
+
+    // fun void setStart(float beat)
+    // {
+    //     if (beat < 0)
+    //     {
+    //         return;
+    //     }
+    //     (beat * 60000 / score.bpm)::ms => start_of_score;
+    // }
 
     fun void play()
     {
@@ -87,24 +102,23 @@ public class ezScorePlayer
         // 5::second => now;   // DELETE THIS
         while (playing)
         {
-            tick * rate => tatum;
-            tatum +=> playhead;
-            // <<< playhead/ms >>>;
-            for(int i; i < parts.size(); i++)
-            {
-                getNotesAtPlayhead(i);
-            }
-            tick => now;
-
             if (playhead > end_of_score)
             {
                 if (loop) pos(0);
                 else stop();
             }
+            
+            for(int i; i < parts.size(); i++)
+            {
+                getNotesAtPlayhead(i);
+            }
+
+            // <<< playhead/ms >>>;
+            tick * rate => tatum;
+            tatum +=> playhead;
+            tick => now;
         }
     }
-
-    
 
     fun void pos(dur timePosition)
     {
@@ -136,19 +150,25 @@ public class ezScorePlayer
         {
             for(int voice; voice < instruments[part].n_voices; voice++)
             {
-                instruments[part].noteOff(voice);
                 release_voice(part, voice);
             }
         }
     }
 
-    fun void setInstrument(int part, ezInstrument instrument)
+    fun void setInstrument(int partIndex, ezInstrument instrument)
     {
-        instrument @=> instruments[part];
+        instrument @=> instruments[partIndex];
         
         // keep track of which voices are currently in use
-        // new int[instrument.n_voices] @=> voice_to_midi[part];
-        new int[instrument.n_voices] @=> voice_in_use[part];
+        new int[instrument.n_voices] @=> voice_in_use[partIndex];
+    }
+
+    fun void setInstrument(ezInstrument insts[])
+    {
+        for(int i; i < insts.size(); i++)
+        {
+            setInstrument(i, insts[i]);
+        }
     }
 
     fun void getNotesAtPlayhead(int partIndex)
@@ -167,11 +187,8 @@ public class ezScorePlayer
                 theMeasure.notes[j] @=> ezNote theNote;
                 theNote.onset * ms_per_beat => float theNote_onset;
                 
-
                 if(Math.fabs(theNote_onset - playhead/ms) < Math.fabs(tatum/ms))        // take abs of tatum too!!!
                 {
-                    //<<< "abs(onset-playhead) =",  Math.fabs(theNote_onset - playhead/ms)>>>;
-                    //<<< "added note to currentNotes:", theNote_onset >>>;
                     currentNotes << theNote;
                 }
             }
@@ -191,8 +208,8 @@ public class ezScorePlayer
 
     fun void playNoteWrapper(int partIndex, ezNote theNote)
     {
-        allocate_voice(partIndex, theNote) => int which_voice;
-        instruments[partIndex].noteOn(theNote, which_voice);
+        allocate_voice(partIndex, theNote) => int voice_index;
+        instruments[partIndex].noteOn(theNote, voice_index);
 
         playhead/ms => float onset_ms;
         60000 / score.bpm => float ms_per_beat;
@@ -204,8 +221,7 @@ public class ezScorePlayer
             tick => now;
         }
 
-        instruments[partIndex].noteOff(which_voice);
-        release_voice(partIndex, which_voice);
+        release_voice(partIndex, voice_index);
     }
 
     // Allocates a new voice for the note and returns the index. 
@@ -251,8 +267,11 @@ public class ezScorePlayer
     // Releases the voice that was in use for a specific note
     fun void release_voice(int partIndex, int voice_index)
     {
-        // <<< "part index:", partIndex, "| n_voices:", instruments[partIndex].n_voices, "| num voices", voice_to_midi[partIndex].size(), "| voice index:", voice_index >>>;
-        false => voice_in_use[partIndex][voice_index];
+        if (voice_in_use[partIndex][voice_index])
+        {
+            instruments[partIndex].noteOff(voice_index);
+            false => voice_in_use[partIndex][voice_index];
+        }
     }
 
     fun void preview()
