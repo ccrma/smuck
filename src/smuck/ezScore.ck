@@ -104,8 +104,7 @@ public class ezScore
                     accumulated_time_ms / ms_per_beat => float onset_time_beats;
                     ezNote tempNote(onset_time_beats, 0, pitch, velocity);           // 0 as temporary duration, will update when the note ends
                     current_measure.notes << tempNote;
-                    // <<<"Current # of measures:", part.measures.size()>>>;
-                    // <<<"# of notes in the measure: ", current_measure.notes.size()>>>;
+                    
                     // 3. Store the index in the measure for that pitch, so we can find it's associated note when we need to update duration
                     current_measure.notes.size() - 1 => note_index[pitch];
 
@@ -129,22 +128,47 @@ public class ezScore
                     (accumulated_time_ms - note_on_time[pitch]) / ms_per_beat => float note_duration_beats;
 
                     // 2. Update the duration of the relevant note
-                    // <<< "note index at pitch", note_index[pitch] >>>;
-                    // <<<"Current # of measures:", part.measures.size()>>>;
-                    // <<<"# of notes in the measure (after noteoff): ", current_measure.notes.size()>>>;
                     note_duration_beats => current_measure.notes[note_index[pitch]].beats;
 
                     // decrease polyphony count by 1;
                     1 -=> currPolyCount;
                 }
             }
-            // parts << part;
+
             if(part.maxPolyphony > 0)
             {
                 parts << part;
-                //<<< "part added!" >>>;
             }
 
         }
+    }
+
+    fun int numParts()
+    {
+        return parts.size();
+    }
+
+    // returns the final note's "offset" (release point) in beats
+    fun float get_ending_beat()
+    {
+        float last_note_offset;
+        for (int i; i < numParts(); i++)
+        {
+            parts[i] @=> ezPart part;
+            for (int j; j < part.numMeasures(); j++)
+            {
+                // check if last note in measure j is later than our current final note
+                part.measures[j] @=> ezMeasure measure;
+                measure.notes[measure.numNotes() - 1] @=> ezNote note;                
+                note.onset + note.beats => float offset;
+                if (offset > last_note_offset) offset => last_note_offset;
+            }
+        }
+        return last_note_offset;
+    }
+
+    fun int maxPolyphony(int part)
+    {
+        return parts[part].maxPolyphony;
     }
 }
