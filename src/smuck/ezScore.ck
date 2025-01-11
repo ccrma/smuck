@@ -168,6 +168,11 @@ public class ezScore
         return last_note_offset;
     }
 
+    fun dur getScoreDuration()
+    {
+        return (getScoreEnd() * 60000 / bpm)::ms;
+    }
+
     fun int maxPolyphony(int part)
     {
         return parts[part].maxPolyphony;
