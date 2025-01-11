@@ -155,7 +155,7 @@ public class ezScorePlayer
         }
     }
 
-    fun void setInstrument(int partIndex, ezInstrument instrument)
+    fun void setInstrument(int partIndex, ezInstrument @ instrument)
     {
         instrument @=> instruments[partIndex];
         
@@ -163,8 +163,14 @@ public class ezScorePlayer
         new int[instrument.n_voices] @=> voice_in_use[partIndex];
     }
 
-    fun void setInstrument(ezInstrument insts[])
+    fun void setInstrument(ezInstrument @ insts[])
     {
+        if (insts.size() != parts.size())
+        {
+            <<< "ezScorePlayer: setInstrument() - provided instrument array size does not match the number of parts. size:", insts.size(), "| parts size:", parts.size() >>>;
+            return;
+        }
+
         for(int i; i < insts.size(); i++)
         {
             setInstrument(i, insts[i]);
@@ -187,7 +193,7 @@ public class ezScorePlayer
                 theMeasure.notes[j] @=> ezNote theNote;
                 theNote.onset * ms_per_beat => float theNote_onset;
                 
-                if(Math.fabs(theNote_onset - playhead/ms) < Math.fabs(tatum/ms))        // take abs of tatum too!!!
+                if(Math.fabs(theNote_onset - playhead/ms) <= Math.fabs(tatum/ms)/2.0)        // take abs of tatum too!!!
                 {
                     currentNotes << theNote;
                 }
@@ -200,7 +206,7 @@ public class ezScorePlayer
             // <<< "current notes size:", currentNotes.size()>>>;
             for(int i; i < currentNotes.size(); i++)
             {
-                spork ~playNoteWrapper(partIndex, currentNotes[i]);
+                spork ~ playNoteWrapper(partIndex, currentNotes[i]);
             }
             //nextNotes[partIndex].broadcast();
         }
@@ -210,6 +216,10 @@ public class ezScorePlayer
     {
         allocate_voice(partIndex, theNote) => int voice_index;
         instruments[partIndex].noteOn(theNote, voice_index);
+        // if (partIndex == 9)
+        // {
+        //     <<< "PLAYING NOTE", theNote.pitch, "ON VOICE", voice_index, "FOR PART", partIndex >>>;
+        // }
 
         playhead/ms => float onset_ms;
         60000 / score.bpm => float ms_per_beat;
