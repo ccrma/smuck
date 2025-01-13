@@ -9,4 +9,9 @@ public class ezPart
     {
         return measures.size();
     }
+
+    fun void add_measure(ezMeasure measure)
+    {
+        measures << measure;
+    }
 }

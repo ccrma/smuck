@@ -57,6 +57,8 @@ public class ezScore
         denominator => time_sig_denominator;
     }
 
+    
+    // Import MIDI file
     fun void importMIDI(string filename) {
         MidiFileIn min;
         MidiMsg msg;
