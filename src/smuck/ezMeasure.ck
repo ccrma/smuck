@@ -8,4 +8,9 @@ public class ezMeasure
     {
         return notes.size();
     }
+
+    fun void add_note(ezNote note)
+    {
+        notes << note;
+    }
 }

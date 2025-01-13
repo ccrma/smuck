@@ -216,10 +216,8 @@ public class ezScorePlayer
     {
         allocate_voice(partIndex, theNote) => int voice_index;
         instruments[partIndex].noteOn(theNote, voice_index);
-        // if (partIndex == 9)
-        // {
-        //     <<< "PLAYING NOTE", theNote.pitch, "ON VOICE", voice_index, "FOR PART", partIndex >>>;
-        // }
+
+        chout <= "playing note " <= theNote.pitch <= " on voice " <= voice_index <= " for part " <= partIndex <= " at time " <= playhead/ms <= "ms" <= IO.newline();
 
         playhead/ms => float onset_ms;
         60000 / score.bpm => float ms_per_beat;
