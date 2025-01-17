@@ -247,6 +247,63 @@ public class smUtils
         return expand_tokens(expand_sequences(input));
     }
 
+    // Pad pitch array to match length
+    fun static int[][] pad_length(int array[][], int length, int pad_value[])
+    {
+        int output[0][0];
+
+        for(int i; i < length; i++)
+        {
+            if(array.size() > i)
+            {
+                output << array[i];
+            }
+            else
+            {
+                output << pad_value;
+            }
+        }
+        return output;
+    }
+
+    // Pad rhythm array to match length
+    fun static float[] pad_length(float array[], int length, float pad_value)
+    {
+        float output[0];
+
+        for(int i; i < length; i++)
+        {
+            if(array.size() > i)
+            {
+                output << array[i];
+            }
+            else
+            {
+                output << pad_value;
+            }
+        }
+        return output;
+    }
+
+    // Pad velocity array to match length
+    fun static int[] pad_length(int array[], int length, int pad_value)
+    {
+        int output[0];
+
+        for(int i; i < length; i++)
+        {
+            if(array.size() > i)
+            {
+                output << array[i];
+            }
+            else
+            {
+                output << pad_value;
+            }
+        }
+        return output;
+    }
+
     //--------------------------------------------------------
     // Pitch related functions
     //--------------------------------------------------------

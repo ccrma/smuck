@@ -17,10 +17,15 @@ public class ezMeasure
 
     fun ezMeasure(string input)
     {
-        parse_smuckish(input);
+        parse_smuckish(input, 0);
     }
 
-    fun void parse_smuckish(string input)
+    fun ezMeasure(string input, int pad_mode)
+    {
+        parse_smuckish(input, pad_mode);
+    }
+
+    fun void parse_smuckish(string input, int pad_mode)
     {
         int pitches[0][0];
         float rhythms[0];
@@ -38,43 +43,67 @@ public class ezMeasure
             return;
         }
 
-        if(score.pitches.size() != 0)
-        {
-            float onset;
+        score.max_length() => int max_length;
+        <<<"max_length: ", max_length>>>;
 
-            for(int i; i < score.pitches.size(); i++)
-            {
-                for(int j; j < score.pitches[i].size(); j++)
-                {
-                    ezNote note;
-                    note.set_pitch(score.pitches[i][j]);
-                    if(score.rhythms.size() > i)
-                    {
-                        note.set_beats(score.rhythms[i]);
-                        note.set_onset(onset + score.rhythms[i]);
-                    }
-                    if(score.velocities.size() > i)
-                    {
-                        note.set_velocity(score.velocities[i]);
-                    }
-                    add_note(note);
-                }
-                if(score.rhythms.size() > i)
-                {
-                    score.rhythms[i] +=> onset;
-                }
-                else
-                {
-                    1 +=> onset;
-                }
-            }
-            <<<"parsed ", notes.size(), " notes">>>;
-            return;
+        if(!pad_mode)
+        {
+            [60] @=> int temp[];
+            smUtils.pad_length(score.pitches, max_length, temp) @=> pitches;
+            smUtils.pad_length(score.rhythms, max_length, 1) @=> rhythms;
+            smUtils.pad_length(score.velocities, max_length, 100) @=> velocities;
         }
         else
         {
-            <<<"ERROR: No pitches found in input">>>;
-            return;
+            if(score.pitches.size() != 0)
+            {
+                smUtils.pad_length(score.pitches, max_length, score.pitches[-1]) @=> pitches;
+            }
+            else
+            {
+                [60] @=> int temp[];
+                smUtils.pad_length(score.pitches, max_length, temp) @=> pitches;
+            }
+            if(score.rhythms.size() != 0)
+            {
+                smUtils.pad_length(score.rhythms, max_length, score.rhythms[-1]) @=> rhythms;
+            }
+            else
+            {
+                smUtils.pad_length(score.rhythms, max_length, 1) @=> rhythms;
+            }
+            if(score.velocities.size() != 0)
+            {
+                smUtils.pad_length(score.velocities, max_length, score.velocities[-1]) @=> velocities;
+            }
+            else
+            {
+                smUtils.pad_length(score.velocities, max_length, 100) @=> velocities;
+            }
+        }
+
+        <<<"pitches (padded): ", pitches.size()>>>;
+        <<<"rhythms (padded): ", rhythms.size()>>>;
+        <<<"velocities (padded): ", velocities.size()>>>;
+
+        // Create notes
+        float onset;
+
+        for(int i; i < max_length; i++)
+        {
+            ezNote note;
+            for(int j; j < pitches[i].size(); j++)
+            {
+                if(pitches[i][j] > 0)
+                {
+                    note.set_pitch(pitches[i][j]);
+                    note.set_beats(rhythms[i]);
+                    note.set_onset(onset);
+                    note.set_velocity(velocities[i]);
+                    add_note(note);
+                }
+            }
+            rhythms[i] +=> onset;
         }
     }
 }

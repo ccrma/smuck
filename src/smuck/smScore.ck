@@ -116,6 +116,32 @@ public class smScore
         smVelocity.parse_tokens(velocity_tokens) @=> velocities;
     }
 
+    fun int max_length()
+    {
+        if(pitches.size() > rhythms.size())
+        {
+            if(pitches.size() > velocities.size())
+            {
+                return pitches.size();
+            }
+            else
+            {
+                return velocities.size();
+            }
+        }
+        else
+        {
+            if(rhythms.size() > velocities.size())
+            {
+                return rhythms.size();
+            }
+            else
+            {
+                return velocities.size();
+            }
+        }
+    }
+
     // fun ezScore to_ezScore()
     // {
     //     ezScore score;
