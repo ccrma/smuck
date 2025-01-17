@@ -100,7 +100,10 @@ public class smPitch
         {
             if(!keySig.isInMap(copy.substring(0,1)))
             {
-                <<<"ERROR: Cannot get accidental. First character must represent a valid pitch step e.g. 'a', 'b', 'c' and not a rest 'r'.">>>;
+                if(copy.substring(0,1) != "r")
+                {
+                    <<<"ERROR: Cannot get accidental. First character must represent a valid pitch step e.g. 'a', 'b', 'c'">>>;
+                }
                 return 0;
             }
             else
@@ -204,6 +207,50 @@ public class smPitch
         }
 
         return octave;
+    }
+    fun static int[][] parse_tokens(string tokens[])
+    {
+        int output[0][0];
+
+        // Contextual variables
+        // ----------------------------------------
+        // key signature (can be set multiple times). Defaults to no accidentals.
+        int keyVector[7];
+        // octave can be set explicitly, or inferred by proximity to last note. Defaults to octave 4.
+        4 => int oct_cxt;
+        // last note parsed. Initialized to 999 for proximity calculation
+        999 => int last_pitch;
+
+        for(auto token : tokens)
+        {
+            // Parse key signature
+            if(token.find("k") != -1)
+            {
+                getKeyVector(token) @=> keyVector;
+                continue;
+            }
+            
+            // Each token is processed as a chord even if it only has one note
+            int chord[0];
+            smUtils.split(token, ":") @=> string chord_notes[];
+            for(auto note : chord_notes)
+            {
+                get_step(note.substring(0,1)) => int step;
+                get_alter(note, keyVector) => int alter;
+                get_octave(note, oct_cxt, step + alter, last_pitch) => int octave;
+
+                if(step >= 0)
+                {
+                    step + alter => last_pitch;
+                    octave => oct_cxt;
+                }
+
+                step + alter + 12 * (octave) => int current_note;
+                chord << current_note;
+            }
+            output << chord;
+        }
+        return output;
     }
 
     fun static int[][] parse_pitches(string input)

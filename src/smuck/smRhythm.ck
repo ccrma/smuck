@@ -71,6 +71,26 @@ public class smRhythm
 
     }
 
+    fun static float[] parse_tokens(string tokens[])
+    {
+        float output[0];
+
+        for(int i; i < tokens.size(); i++)
+        {
+            // handle ties -- add to previous duration
+            if(tokens[i].find("_") != -1)
+            {
+                parse_duration(tokens[i].substring(1)) +=> output[-1];
+            }
+            // add to rhythm array
+            else
+            {
+                output << parse_duration(tokens[i]);
+            }
+        }
+        return output;
+    }
+
     // Parse a SMuCkish rhythm string into an array of float values representing beats
     fun static float[] parse_rhythm(string input)
     {
