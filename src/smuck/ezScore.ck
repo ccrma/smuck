@@ -143,6 +143,10 @@ public class ezScore
             }
         }
     }
+    fun void add_part(ezPart part)
+    {
+        parts << part;
+    }
 
     fun int numParts()
     {

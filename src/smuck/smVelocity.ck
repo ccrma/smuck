@@ -48,6 +48,18 @@ public class smVelocity
         return 0;
     }
 
+    fun static int[] parse_tokens(string tokens[])
+    {
+        int output[0];
+
+        for(int i; i < tokens.size(); i++)
+        {
+            output << parse_velocity(tokens[i]);
+        }
+
+        return output;
+    }
+    
     fun static int[] parse_velocities(string input)
     {
         int output[0];

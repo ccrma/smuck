@@ -270,4 +270,51 @@ public class smUtils
         }
     }
 
+    fun static int isPitchToken(string input)
+    {
+        for(int i; i < input.length(); i++)
+        {
+            if("abcdefg0123456789udfsb#r".find(input.substring(i, 1).lower()) == -1)
+            {
+                return 0;
+            }
+        }
+        return 1;
+    }
+
+    fun static int isRhythmToken(string input)
+    {
+        for(int i; i < input.length(); i++)
+        {
+            if("seqhwt0123456789/.".find(input.substring(i, 1).lower()) == -1)
+            {
+                return 0;
+            }
+        }
+        return 1;
+    }
+
+    fun static int isVelocityToken(string input)
+    {
+        for(int i; i < input.length(); i++)
+        {
+            if("pfmv0123456789".find(input.substring(i, 1).lower()) == -1)
+            {
+                return 0;
+            }
+        }
+        return 1;
+    }
+
+    fun static int isCCToken(string input)
+    {
+        for(int i; i < input.length(); i++)
+        {
+            if("c0123456789:".find(input.substring(i, 1).lower()) == -1)
+            {
+                return 0;
+            }
+        }
+        return 1;
+    }
 }
