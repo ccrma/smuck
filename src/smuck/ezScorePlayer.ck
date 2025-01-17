@@ -94,6 +94,7 @@ public class ezScorePlayer
     {
         <<< "ezScorePlayer: stop()" >>>;
         false => playing;
+
         pos(0);
     }
 
@@ -118,6 +119,8 @@ public class ezScorePlayer
             tatum +=> playhead;
             tick => now;
         }
+
+
     }
 
     fun void pos(dur timePosition)
@@ -217,7 +220,7 @@ public class ezScorePlayer
         allocate_voice(partIndex, theNote) => int voice_index;
         instruments[partIndex].noteOn(theNote, voice_index);
 
-        chout <= "playing note " <= theNote.pitch <= " on voice " <= voice_index <= " for part " <= partIndex <= " at time " <= playhead/ms <= "ms, for " <= theNote.beats <= " beats, with velocity " <= theNote.velocity <= IO.newline();
+        chout <= "playing note " <= theNote.pitch <= " on voice " <= voice_index <= " for part " <= partIndex <= " at time " <= playhead/ms <= "ms," <= " at beat onset " <= theNote.onset <= " for " <= theNote.beats <= " beats, with velocity " <= theNote.velocity <= IO.newline();
 
         playhead/ms => float onset_ms;
         60000 / score.bpm => float ms_per_beat;
