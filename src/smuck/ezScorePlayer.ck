@@ -193,8 +193,10 @@ public class ezScorePlayer
 
             for(int j; j < theMeasure.notes.size(); j++)
             {
+                theMeasure.onset * ms_per_beat => float theMeasure_onset;
+
                 theMeasure.notes[j] @=> ezNote theNote;
-                theNote.onset * ms_per_beat => float theNote_onset;
+                theMeasure_onset + theNote.onset * ms_per_beat => float theNote_onset;
                 
                 if(Math.fabs(theNote_onset - playhead/ms) <= Math.fabs(tatum/ms)/2.0)        // take abs of tatum too!!!
                 {

@@ -10,8 +10,16 @@ public class ezPart
         return measures.size();
     }
 
-    fun void add_measure(ezMeasure measure)
+    fun void append_measure(ezMeasure @ measure)
     {
+        if(measures.size() == 0)
+        {
+            0 => measure.onset;
+        }
+        else
+        {
+            measures[-1].length + measures[-1].onset => measure.onset;
+        }
         measures << measure;
     }
 }

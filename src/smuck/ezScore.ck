@@ -165,8 +165,9 @@ public class ezScore
                 part.measures[j] @=> ezMeasure measure;
                 for (int k; k < measure.numNotes(); k++)
                 {
+                    
                     measure.notes[k] @=> ezNote note;
-                    note.onset + note.beats => float offset;
+                    measure.onset + note.onset + note.beats => float offset;
                     if (offset > last_note_offset) offset => last_note_offset;
                 }
             }
