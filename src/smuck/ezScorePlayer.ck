@@ -96,7 +96,13 @@ public class ezScorePlayer
     {
         <<< "ezScorePlayer: stop()" >>>;
         false => playing;
+        spork ~ stop_listener();
+    }
+
+    fun void stop_listener()
+    {
         tick_driver_end => now;
+        <<<"BANG" >>>;
         pos(0);
     }
 
@@ -150,10 +156,12 @@ public class ezScorePlayer
 
     fun void flushNotes()
     {
+        <<<"flushing notes">>>;
         for(int part; part < parts.size(); part++)
         {
             for(int voice; voice < instruments[part].n_voices; voice++)
             {
+                <<<"releasing voice", voice, "for part", part>>>;
                 release_voice(part, voice);
             }
         }
