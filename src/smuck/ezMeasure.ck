@@ -4,6 +4,8 @@
 public class ezMeasure
 {
     ezNote notes[0];
+    float length;
+    float onset;
 
     fun int numNotes()
     {
@@ -101,6 +103,7 @@ public class ezMeasure
                     note.set_onset(onset);
                     note.set_velocity(velocities[i]);
                     add_note(note);
+                    rhythms[i] +=> length;
                 }
             }
             rhythms[i] +=> onset;

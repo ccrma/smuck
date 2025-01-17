@@ -253,6 +253,7 @@ public class smPitch
         return output;
     }
 
+    // Parse a string of pitches into a 2D array of integers
     fun static int[][] parse_pitches(string input)
     {
         int output[0][0];
