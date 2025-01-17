@@ -22,6 +22,7 @@ public class ezScorePlayer
     dur playhead;
     false => int playing;
     dur end_of_score;
+    Event tick_driver_end;
 
     fun ezScorePlayer() {}
 
@@ -87,6 +88,7 @@ public class ezScorePlayer
     {
         <<< "ezScorePlayer: pause()" >>>;
         false => playing;
+        tick_driver_end => now;
         flushNotes();
     }
 
@@ -94,7 +96,7 @@ public class ezScorePlayer
     {
         <<< "ezScorePlayer: stop()" >>>;
         false => playing;
-
+        tick_driver_end => now;
         pos(0);
     }
 
@@ -119,8 +121,7 @@ public class ezScorePlayer
             tatum +=> playhead;
             tick => now;
         }
-
-
+        tick_driver_end.signal();
     }
 
     fun void pos(dur timePosition)
