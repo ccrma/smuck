@@ -327,11 +327,80 @@ public class smUtils
         }
     }
 
+    fun static int str2mid(string note)
+    {
+
+        int step;
+        int alter;
+        int octave;
+
+        [0, 2, 4, 5, 7, 9, 11] @=> int steps[];
+        ["c", "d", "e", "f", "g", "a", "b"] @=> string names[];
+        int pitch_map[0];
+
+        for(int i; i < names.size(); i++)
+        {
+            steps[i] => pitch_map[names[i]];
+        }
+
+        if(note.length() == 0)
+        {
+            <<<"ERROR: empty input given">>>;
+            return 0;
+        }
+        if(!pitch_map.isInMap(note.substring(0,1).lower()))
+        {
+            <<<"ERROR: First character must be a valid pitch step (e.g. 'a', 'b', 'c')">>>;
+            return 0;
+        }
+        else
+        {
+            pitch_map[note.substring(0,1)] => step;
+        }
+        if(note.length() <= 1)
+        {
+            return step;
+        }
+        else
+        {
+            note.substring(1) => string suffix;
+
+            // Accidental handling
+            if(suffix.find("s") != -1 || suffix.find("#") != -1)
+            {
+                count_substring(suffix, "s") => int num_s;
+                count_substring(suffix, "#") => int num_sharp;
+
+                num_s + num_sharp => alter;
+            }
+            if(suffix.find("f") != -1 || suffix.find("b") != -1)
+            {
+                count_substring(suffix, "f") => int num_f;
+                count_substring(suffix, "b") => int num_flat;
+
+                -1 * (num_f + num_flat) => alter;
+            }
+            if(suffix.find("n") != -1)
+            {
+                0 => alter;
+            }
+
+            // Octave handling
+            if(findInt(suffix) != -1)
+            {
+                find_int_from_index(suffix, findInt(suffix)) => octave;
+            }
+
+            return step + alter + 12 * (octave + 1);
+        }
+        
+    }
+
     fun static int isPitchToken(string input)
     {
         for(int i; i < input.length(); i++)
         {
-            if("abcdefg0123456789udfsb#r".find(input.substring(i, 1).lower()) == -1)
+            if("abcdefg0123456789udfsb#rk".find(input.substring(i, 1).lower()) == -1)
             {
                 return 0;
             }

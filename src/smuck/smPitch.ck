@@ -201,13 +201,14 @@ public class smPitch
         {
             octave--;
         }
-        if(pitch - last <= -6)
+        if(pitch - last <= -6 && last != 999)
         {
             octave++;
         }
 
         return octave;
     }
+    
     fun static int[][] parse_tokens(string tokens[])
     {
         int output[0][0];
@@ -246,7 +247,15 @@ public class smPitch
                 }
 
                 step + alter + 12 * (octave) => int current_note;
-                chord << current_note;
+
+                if(current_note < 0)
+                {
+                    chord << -999;
+                }
+                else
+                {
+                    chord << current_note;
+                }
             }
             output << chord;
         }

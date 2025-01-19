@@ -3,9 +3,23 @@
 
 public class ezMeasure
 {
+    int pitches[0][0];
+    float rhythms[0];
+    int velocities[0];
+
     ezNote notes[0];
     float length;
     float onset;
+
+    fun ezMeasure(string input)
+    {
+        set_interleaved(input);
+    }
+
+    fun ezMeasure(string input, int fill_mode)
+    {
+        set_interleaved(input, fill_mode);
+    }
 
     fun int numNotes()
     {
@@ -17,96 +31,244 @@ public class ezMeasure
         notes << note;
     }
 
-    fun ezMeasure(string input)
+    fun void set_pitches(string input)
     {
-        parse_smuckish(input, 0);
+        smPitch.parse_pitches(input) @=> pitches;
+        compile_notes(pitches, rhythms, velocities, 1);
     }
 
-    fun ezMeasure(string input, int pad_mode)
+    fun void set_rhythms(string input)
     {
-        parse_smuckish(input, pad_mode);
+        smRhythm.parse_rhythms(input) @=> rhythms;
+        compile_notes(pitches, rhythms, velocities, 1);
     }
 
-    fun void parse_smuckish(string input, int pad_mode)
+    fun void set_velocities(string input)
     {
-        int pitches[0][0];
-        float rhythms[0];
-        int velocities[0];
+        smVelocity.parse_velocities(input) @=> velocities;
+        compile_notes(pitches, rhythms, velocities, 1);
+    }
 
+    fun void set_interleaved(string input)
+    {
         smScore score;
         score.parse_interleaved(input);
-        <<<"pitches: ", score.pitches.size()>>>;
-        <<<"rhythms: ", score.rhythms.size()>>>;
-        <<<"velocities: ", score.velocities.size()>>>;
+        compile_notes(score.pitches, score.rhythms, score.velocities, 1);
+    }
 
-        if(score.pitches.size() == 0 && score.rhythms.size() == 0 && score.velocities.size() == 0)
+    fun void set_pitches(string input, int fill_mode)
+    {
+        smPitch.parse_pitches(input) @=> pitches;
+        compile_notes(pitches, rhythms, velocities, fill_mode);
+    }
+
+    fun void set_rhythms(string input, int fill_mode)
+    {
+        smRhythm.parse_rhythms(input) @=> rhythms;
+        compile_notes(pitches, rhythms, velocities, fill_mode);
+    }
+
+    fun void set_velocities(string input, int fill_mode)
+    {
+        smVelocity.parse_velocities(input) @=> velocities;
+        compile_notes(pitches, rhythms, velocities, fill_mode);
+    }
+
+    fun void set_interleaved(string input, int fill_mode)
+    {
+        smScore score;
+        score.parse_interleaved(input);
+        compile_notes(score.pitches, score.rhythms, score.velocities, fill_mode);
+    }
+
+    fun void compile_notes(int new_pitches[][], float new_rhythms[], int new_velocities[], int fill_mode)
+    {
+        ezNote new_notes[0];
+
+        int temp_pitches[0][0];
+        float temp_rhythms[0];
+        int temp_velocities[0];
+
+        60 => int current_pitch;
+        1.0 => float current_rhythm;
+        100 => int current_velocity;
+        0.0 => float current_onset;
+
+        Math.max(new_pitches.size(), Math.max(new_rhythms.size(), new_velocities.size())) => int max_length;
+
+        if(max_length == 0)
         {
             <<<"ERROR: No pitches, rhythms, or velocities found in input">>>;
             return;
         }
 
-        score.max_length() => int max_length;
-        <<<"max_length: ", max_length>>>;
-
-        if(!pad_mode)
-        {
-            [60] @=> int temp[];
-            smUtils.pad_length(score.pitches, max_length, temp) @=> pitches;
-            smUtils.pad_length(score.rhythms, max_length, 1) @=> rhythms;
-            smUtils.pad_length(score.velocities, max_length, 100) @=> velocities;
-        }
-        else
-        {
-            if(score.pitches.size() != 0)
-            {
-                smUtils.pad_length(score.pitches, max_length, score.pitches[-1]) @=> pitches;
-            }
-            else
-            {
-                [60] @=> int temp[];
-                smUtils.pad_length(score.pitches, max_length, temp) @=> pitches;
-            }
-            if(score.rhythms.size() != 0)
-            {
-                smUtils.pad_length(score.rhythms, max_length, score.rhythms[-1]) @=> rhythms;
-            }
-            else
-            {
-                smUtils.pad_length(score.rhythms, max_length, 1) @=> rhythms;
-            }
-            if(score.velocities.size() != 0)
-            {
-                smUtils.pad_length(score.velocities, max_length, score.velocities[-1]) @=> velocities;
-            }
-            else
-            {
-                smUtils.pad_length(score.velocities, max_length, 100) @=> velocities;
-            }
-        }
-
-        <<<"pitches (padded): ", pitches.size()>>>;
-        <<<"rhythms (padded): ", rhythms.size()>>>;
-        <<<"velocities (padded): ", velocities.size()>>>;
-
-        // Create notes
-        float onset;
-
         for(int i; i < max_length; i++)
         {
-            ezNote note;
-            for(int j; j < pitches[i].size(); j++)
+            if(new_pitches.size() > i)
             {
-                if(pitches[i][j] > 0)
+                int temp_chord[0];
+                for(int j; j < new_pitches[i].size(); j++)
                 {
-                    note.set_pitch(pitches[i][j]);
-                    note.set_beats(rhythms[i]);
-                    note.set_onset(onset);
-                    note.set_velocity(velocities[i]);
-                    add_note(note);
-                    rhythms[i] +=> length;
+                    ezNote note;
+
+                    if(new_pitches[i][j] > 0)
+                    {
+                        // Set the pitch
+                        note.set_pitch(new_pitches[i][j]);
+                        new_pitches[i][j] => current_pitch;
+                        // Set the onset
+                        note.set_onset(current_onset);
+
+                        // If rhythm token present for this index, set the rhythm
+                        if(new_rhythms.size() > i)
+                        {
+                            note.set_beats(new_rhythms[i]);
+                            new_rhythms[i] => current_rhythm;
+                        }
+                        // otherwise, fill the rhythm
+                        else
+                        {
+                            // If fill mode is 1, fill the rhythm with the last recorded rhythm
+                            if(fill_mode == 1)
+                            {
+                                note.set_beats(current_rhythm);
+                            }
+                            // otherwise, fill with default rhythm of 1.0
+                            else
+                            {
+                                note.set_beats(1.0);
+                                1.0 => current_rhythm;
+                            }
+                        }
+
+                        // If velocity token present for this index, set the velocity
+                        if(new_velocities.size() > i)
+                        {
+                            note.set_velocity(new_velocities[i]);
+                            new_velocities[i] => current_velocity;
+                        }
+                        // otherwise, fill the velocity
+                        else
+                        {
+                            // If fill mode is 1, fill the velocity with the last recorded velocity
+                            if(fill_mode == 1)
+                            {
+                                note.set_velocity(current_velocity);
+                            }
+                            // otherwise, fill with default velocity of 100
+                            else
+                            {
+                                note.set_velocity(100);
+                                100 => current_velocity;
+                            }
+                        }
+
+                        temp_chord << note.pitch;
+                        // Add the note to the list
+                        new_notes << note;
+                    }
                 }
+
+                // Add the parsed elements to the temp arrays
+                temp_pitches << temp_chord;
+                temp_rhythms << current_rhythm;
+                temp_velocities << current_velocity;
+
+                // Increment the onset
+                current_rhythm +=> current_onset;
             }
-            rhythms[i] +=> onset;
+            // If no pitch token present for this index, try to create note using last recorded pitch (or default pitch if none)
+            else
+            {
+                // The new note to be added
+                ezNote note;
+
+                // Temporary array to hold the new pitch
+                int temp_chord[0];
+                temp_chord << current_pitch;
+
+                // Set the pitch
+                note.set_pitch(current_pitch);
+                // Set the onset
+                note.set_onset(current_onset);
+
+                // If rhythm token present for this index, set the rhythm
+                if(new_rhythms.size() > i)
+                {
+                    note.set_beats(new_rhythms[i]);
+                    new_rhythms[i] => current_rhythm;
+                }
+                // otherwise, fill the rhythm
+                else
+                {
+                    // If fill mode is 1, fill the rhythm with the last recorded rhythm
+                    if(fill_mode == 1)
+                    {
+                        note.set_beats(current_rhythm);
+                    }
+                    // otherwise, fill with default rhythm of 1.0
+                    else
+                    {
+                        note.set_beats(1.0);
+                        1.0 => current_rhythm;
+                    }
+                }
+
+                // If velocity token present for this index, set the velocity
+                if(new_velocities.size() > i)
+                {
+                    note.set_velocity(new_velocities[i]);
+                    new_velocities[i] => current_velocity;
+                }
+                // otherwise, fill the velocity
+                else
+                {
+                    // If fill mode is 1, fill the velocity with the last recorded velocity
+                    if(fill_mode == 1)
+                    {
+                        note.set_velocity(current_velocity);
+                    }
+                    // otherwise, fill with default velocity of 100
+                    else
+                    {
+                        note.set_velocity(100);
+                        100 => current_velocity;
+                    }
+                }
+
+                // Add the note to the list
+                new_notes << note;
+
+                // Add the parsed elements to the temp arrays
+                temp_pitches << temp_chord;
+                temp_rhythms << current_rhythm;
+                temp_velocities << current_velocity;
+
+                // Increment the onset
+                current_rhythm +=> current_onset;
+            }
+        }
+
+        // Copy the new notes to the notes array
+        new_notes @=> notes;
+
+        // Copy the temp arrays to the global arrays
+        temp_pitches @=> pitches;
+        temp_rhythms @=> rhythms;
+        temp_velocities @=> velocities;
+
+    }
+
+    fun void print_notes()
+    {
+        chout <= "There are " <= notes.size() <= " notes in this measure:" <= IO.newline();
+        for(int i; i < notes.size(); i++)
+        {
+            chout <= "Note " <= i <= ": ";
+            chout <= "onset = " <= notes[i].onset <= ", ";
+            chout <= "beats = " <= notes[i].beats <= ", ";
+            chout <= "pitch = " <= smUtils.mid2str(notes[i].pitch) <= ", ";
+            chout <= "velocity = " <= notes[i].velocity <= IO.newline();
         }
     }
 }
