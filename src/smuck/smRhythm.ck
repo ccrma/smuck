@@ -41,9 +41,9 @@ public class smRhythm
                 {
                     1 => isTriplet;
                 }
-                if(curr == "/" &&  Std.atoi(input.substring((i+1,1))) != 0)
+                if(curr == "/" &&  Std.atoi(input.substring((i+1))) != 0)
                 {
-                    Std.atoi(input.substring((i+1,1))) => tupletDenom;
+                    Std.atoi(input.substring((i+1))) => tupletDenom;
                 }        
                 if(curr == ".")
                 {
@@ -92,7 +92,7 @@ public class smRhythm
     }
 
     // Parse a SMuCkish rhythm string into an array of float values representing beats
-    fun static float[] parse_rhythm(string input)
+    fun static float[] parse_rhythms(string input)
     {
         float output[0];
 
