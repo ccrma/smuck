@@ -187,8 +187,15 @@ public class ezMeasure
                 int temp_chord[0];
                 temp_chord << current_pitch;
 
-                // Set the pitch
-                note.set_pitch(current_pitch);
+                if(fill_mode == 1)
+                {
+                    note.set_pitch(current_pitch);
+                }
+                else
+                {
+                    note.set_pitch(60);
+                    60 => current_pitch;
+                }
                 // Set the onset
                 note.set_onset(current_onset);
 
