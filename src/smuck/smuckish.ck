@@ -1,4 +1,4 @@
-@import {"smUtils.ck", "smPitch.ck", "smRhythm.ck", "smVelocity.ck", "smScore.ck", "smChord.ck"}
+@import {"smUtils.ck", "smPitch.ck", "smRhythm.ck", "smVelocity.ck", "smScore.ck", "smChord.ck", "smScale.ck"}
 
 public class smuckish
 {
@@ -27,5 +27,23 @@ public class smuckish
     {
         smChord chord(input, octave);
         return chord.notes;
+    }
+
+    fun static int[] scale(string name)
+    {
+        smScale scale(name);
+        return scale.notes;
+    }
+
+    fun static int[] scale(string name, int root)
+    {
+        smScale scale(name, root);
+        return scale.notes;
+    }
+
+    fun static int[] scale(string name, string rootName)
+    {
+        smScale scale(name, smUtils.str2mid(rootName));
+        return scale.notes;
     }
 }
