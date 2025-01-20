@@ -2,27 +2,24 @@
 
 public class ezScorePlayer
 {
-    // data structures
+    // public member variables
     ezScore score;
     ezPart parts[];
-    NoteEvent nextNotes[];
     ezInstrument instruments[];
-    // int voice_to_midi[][];       // "voice" - an individual ugen in the overall voice array a voice
-    //                              // -1 if voice is not in use (free), otherwise has the current midi pitch number it is being used for
-
-    int voice_in_use[][];
-
-    // parameters
-    1::ms => dur tick;
-    1 => float rate;
     false => int loop;
+    1 => float rate;
 
-    // playback
+    // private member variables
+    1::ms => dur tick;
     tick => dur tatum;
     dur playhead;
+    
     false => int playing;
     dur end_of_score;
+    int voice_in_use[][];
     Event tick_driver_end;
+
+    // Constructors
 
     fun ezScorePlayer() {}
 
@@ -31,6 +28,8 @@ public class ezScorePlayer
         setScore(s);
     }
 
+    // Public functions
+
     fun void setScore(ezScore s)
     {
         if (playing) stop();
@@ -38,8 +37,6 @@ public class ezScorePlayer
         s @=> score;
         s.parts @=> parts;
         <<<parts.size(), "parts processed">>>;
-        // create note events for broadcasting (might not need this)
-        new NoteEvent[score.numParts()] @=> nextNotes;
 
         // create instruments
         new ezInstrument[score.numParts()] @=> instruments;
@@ -51,29 +48,43 @@ public class ezScorePlayer
         setEnd(-1);
     }
 
-    fun void setEnd(float beat)
+    fun void setInstrument(int partIndex, ezInstrument @ instrument)
     {
-        if (beat > score.getScoreEnd())
-        {
-            <<< "ezScorePlayer: setScoreEnd() - provided beat is after the score end. beat:", beat, "| score end:", score.getScoreEnd() >>>;
-            return;
-        }
-        if (beat == -1)
-        {
-            score.getScoreEnd() => beat;
-        }
-        (beat * 60000 / score.bpm)::ms => end_of_score;     // convert to dur, so playhead can be compared to it
+        instrument @=> instruments[partIndex];
+        
+        // keep track of which voices are currently in use
+        new int[instrument.n_voices] @=> voice_in_use[partIndex];
     }
 
-    // fun void setStart(float beat)
-    // {
-    //     if (beat < 0)
-    //     {
-    //         return;
-    //     }
-    //     (beat * 60000 / score.bpm)::ms => start_of_score;
-    // }
+    fun void setInstrument(ezInstrument @ insts[])
+    {
+        if (insts.size() != parts.size())
+        {
+            <<< "ezScorePlayer: setInstrument() - provided instrument array size does not match the number of parts. size:", insts.size(), "| parts size:", parts.size() >>>;
+            return;
+        }
 
+        for(int i; i < insts.size(); i++)
+        {
+            setInstrument(i, insts[i]);
+        }
+    }
+
+    fun void preview()
+    {
+        // new defaultVoice[parts.size()] @=> instruments;
+        for(int i; i < parts.size(); i++)
+        {
+            defaultVoice tempVoice;
+            setInstrument(i, tempVoice);
+            // instruments[i] => previewGain;
+        }
+        pos(0.0);
+        play();
+        // previewGain.gain(1.0);
+        // spork ~ tickDriver();
+    }
+    
     fun void play()
     {
         <<< "ezScorePlayer: play()" >>>;
@@ -99,35 +110,18 @@ public class ezScorePlayer
         spork ~ stop_listener();
     }
 
-    fun void stop_listener()
+    fun void setEnd(float beat)
     {
-        tick_driver_end => now;
-        <<<"BANG" >>>;
-        pos(0);
-    }
-
-    fun void tickDriver()
-    {
-        // 5::second => now;   // DELETE THIS
-        while (playing)
+        if (beat > score.getScoreEnd())
         {
-            if (playhead > end_of_score)
-            {
-                if (loop) pos(0);
-                else stop();
-            }
-            
-            for(int i; i < parts.size(); i++)
-            {
-                getNotesAtPlayhead(i);
-            }
-
-            // <<< playhead/ms >>>;
-            tick * rate => tatum;
-            tatum +=> playhead;
-            tick => now;
+            <<< "ezScorePlayer: setScoreEnd() - provided beat is after the score end. beat:", beat, "| score end:", score.getScoreEnd() >>>;
+            return;
         }
-        tick_driver_end.signal();
+        if (beat == -1)
+        {
+            score.getScoreEnd() => beat;
+        }
+        (beat * 60000 / score.bpm)::ms => end_of_score;     // convert to dur, so playhead can be compared to it
     }
 
     fun void pos(dur timePosition)
@@ -154,6 +148,38 @@ public class ezScorePlayer
         (measures * (ms_per_beat * score.time_sig_numerator * (4 / score.time_sig_denominator)) + beats * ms_per_beat)::ms => playhead;
     }
 
+    // Private functions
+
+    fun void tickDriver()
+    {
+        while (playing)
+        {
+            if (playhead > end_of_score)
+            {
+                if (loop) pos(0);
+                else stop();
+            }
+            
+            for(int i; i < parts.size(); i++)
+            {
+                getNotesAtPlayhead(i);
+            }
+
+            // <<< playhead/ms >>>;
+            tick * rate => tatum;
+            tatum +=> playhead;
+            tick => now;
+        }
+        tick_driver_end.signal();
+    }
+
+    fun void stop_listener()
+    {
+        tick_driver_end => now;
+        <<<"BANG" >>>;
+        pos(0);
+    }
+
     fun void flushNotes()
     {
         <<<"flushing notes">>>;
@@ -164,28 +190,6 @@ public class ezScorePlayer
                 <<<"releasing voice", voice, "for part", part>>>;
                 release_voice(part, voice);
             }
-        }
-    }
-
-    fun void setInstrument(int partIndex, ezInstrument @ instrument)
-    {
-        instrument @=> instruments[partIndex];
-        
-        // keep track of which voices are currently in use
-        new int[instrument.n_voices] @=> voice_in_use[partIndex];
-    }
-
-    fun void setInstrument(ezInstrument @ insts[])
-    {
-        if (insts.size() != parts.size())
-        {
-            <<< "ezScorePlayer: setInstrument() - provided instrument array size does not match the number of parts. size:", insts.size(), "| parts size:", parts.size() >>>;
-            return;
-        }
-
-        for(int i; i < insts.size(); i++)
-        {
-            setInstrument(i, insts[i]);
         }
     }
 
@@ -215,14 +219,11 @@ public class ezScorePlayer
         }
         if(currentNotes.size() > 0)
         {
-            // <<< "playing", currentNotes.size(), "note(s) at time", playhead/ms >>>;
-            currentNotes @=> nextNotes[partIndex].notes;
             // <<< "current notes size:", currentNotes.size()>>>;
             for(int i; i < currentNotes.size(); i++)
             {
                 spork ~ playNoteWrapper(partIndex, currentNotes[i]);
             }
-            //nextNotes[partIndex].broadcast();
         }
     }
 
@@ -295,21 +296,5 @@ public class ezScorePlayer
             false => voice_in_use[partIndex][voice_index];
         }
     }
-
-    fun void preview()
-    {
-        // new defaultVoice[parts.size()] @=> instruments;
-        for(int i; i < parts.size(); i++)
-        {
-            defaultVoice tempVoice;
-            setInstrument(i, tempVoice);
-            // instruments[i] => previewGain;
-        }
-        pos(0.0);
-        play();
-        // previewGain.gain(1.0);
-        // spork ~ tickDriver();
-    }
-
 }
 
