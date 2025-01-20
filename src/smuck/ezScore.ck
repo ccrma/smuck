@@ -8,11 +8,17 @@ public class ezScore
     4 => int time_sig_denominator;
     128 => float bpm;
 
-    fun ezScore(string filename)
+    // Constructors
+    // --------------------------------------------------------------------------
+    fun ezScore(string input)
     {
-        if(filename.substring(filename.length() - 4,4) == ".mid")
+        if(input.length() > 4 && input.substring(input.length() - 4,4) == ".mid")
         {
-            importMIDI(filename);
+            importMIDI(input);
+        }
+        else
+        {
+            set_part(input);
         }
     }
 
@@ -46,6 +52,8 @@ public class ezScore
         }
     }
 
+    // API 
+    // --------------------------------------------------------------------------
     fun void setTempo(float newBpm)
     {
         newBpm => bpm;
@@ -57,8 +65,148 @@ public class ezScore
         denominator => time_sig_denominator;
     }
 
+    fun int numParts()
+    {
+        return parts.size();
+    }
+
+    fun void add_part(ezPart part)
+    {
+        parts << part;
+    }
+
+    // returns the end of the score in beats (the last note's release point)
+    fun float getScoreEnd()
+    {
+        float last_note_offset;
+        for (int i; i < numParts(); i++)
+        {
+            parts[i] @=> ezPart part;
+            for (int j; j < part.numMeasures(); j++)
+            {
+                part.measures[j] @=> ezMeasure measure;
+                for (int k; k < measure.numNotes(); k++)
+                {
+                    
+                    measure.notes[k] @=> ezNote note;
+                    measure.onset + note.onset + note.beats => float offset;
+                    if (offset > last_note_offset) offset => last_note_offset;
+                }
+            }
+        }
+        return last_note_offset;
+    }
+
+    fun dur getScoreDuration()
+    {
+        return (getScoreEnd() * 60000 / bpm)::ms;
+    }
+
+    fun int maxPolyphony(int part)
+    {
+        return parts[part].maxPolyphony;
+    }
     
+    // SMucKish input
+    // --------------------------------------------------------------------------
+    fun void set_part(string input)
+    {
+        ezPart part(input);
+        add_part(part);
+    }
+
+    fun void set_part(string input, int fill_mode)
+    {
+        ezPart part(input, fill_mode);
+        add_part(part);
+    }
+
+    fun void set_pitches(string input)
+    {
+        if(parts.size() == 0)
+        {
+            ezPart part;
+            part.set_pitches(input);
+            add_part(part);
+        }
+        else
+        {
+            parts[-1].set_pitches(input);
+        }
+    }
+
+    fun void set_pitches(string input, int fill_mode)
+    {
+        if(parts.size() == 0)
+        {
+            ezPart part;
+            part.set_pitches(input, fill_mode);
+            add_part(part);
+        }
+        else
+        {
+            parts[-1].set_pitches(input, fill_mode);
+        }
+    }
+
+    fun void set_rhythms(string input)
+    {
+        if(parts.size() == 0)
+        {
+            ezPart part;
+            part.set_rhythms(input);
+            add_part(part);
+        }
+        else
+        {
+            parts[-1].set_rhythms(input);
+        }
+    }
+    
+    fun void set_rhythms(string input, int fill_mode)
+    {
+        if(parts.size() == 0)
+        {
+            ezPart part;
+            part.set_rhythms(input, fill_mode);
+            add_part(part);
+        }
+        else
+        {
+            parts[-1].set_rhythms(input, fill_mode);
+        }
+    }
+
+    fun void set_velocities(string input)
+    {
+        if(parts.size() == 0)
+        {
+            ezPart part;
+            part.set_velocities(input);
+            add_part(part);
+        }
+        else
+        {
+            parts[-1].set_velocities(input);
+        }
+    }
+
+    fun void set_velocities(string input, int fill_mode)
+    {
+        if(parts.size() == 0)
+        {
+            ezPart part;
+            part.set_velocities(input, fill_mode);
+            add_part(part);
+        }
+        else
+        {
+            parts[-1].set_velocities(input, fill_mode);
+        }
+    }
+
     // Import MIDI file
+    // --------------------------------------------------------------------------
     fun void importMIDI(string filename) {
         MidiFileIn min;
         MidiMsg msg;
@@ -142,46 +290,5 @@ public class ezScore
                 parts << part;
             }
         }
-    }
-    fun void add_part(ezPart part)
-    {
-        parts << part;
-    }
-
-    fun int numParts()
-    {
-        return parts.size();
-    }
-
-    // returns the end of the score in beats (the last note's release point)
-    fun float getScoreEnd()
-    {
-        float last_note_offset;
-        for (int i; i < numParts(); i++)
-        {
-            parts[i] @=> ezPart part;
-            for (int j; j < part.numMeasures(); j++)
-            {
-                part.measures[j] @=> ezMeasure measure;
-                for (int k; k < measure.numNotes(); k++)
-                {
-                    
-                    measure.notes[k] @=> ezNote note;
-                    measure.onset + note.onset + note.beats => float offset;
-                    if (offset > last_note_offset) offset => last_note_offset;
-                }
-            }
-        }
-        return last_note_offset;
-    }
-
-    fun dur getScoreDuration()
-    {
-        return (getScoreEnd() * 60000 / bpm)::ms;
-    }
-
-    fun int maxPolyphony(int part)
-    {
-        return parts[part].maxPolyphony;
     }
 }
