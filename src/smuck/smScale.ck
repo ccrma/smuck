@@ -20,8 +20,8 @@ public class smScale
     // major/minor
     [0, 2, 4, 5, 7, 9, 11] @=> scaleDict["major"];
     [0, 2, 3, 5, 7, 8, 10] @=> scaleDict["minor"];
-    [0, 2, 3, 5, 7, 9, 11] @=> scaleDict["melodicminor"];
-    [0, 2, 3, 5, 7, 8, 11] @=> scaleDict["harmoniccminor"];
+    [0, 2, 3, 5, 7, 9, 11] @=> scaleDict["melodic_minor"];
+    [0, 2, 3, 5, 7, 8, 11] @=> scaleDict["harmonic_cminor"];
 
     // greek modes
     [0, 2, 4, 5, 7, 9, 11] @=> scaleDict["ionian"];
@@ -34,35 +34,35 @@ public class smScale
 
     // symmetric
     [0, 2, 4, 6, 8, 10] @=> scaleDict["wholetone"];
-    [0, 3, 4, 7, 8, 11] @=> scaleDict["aug"];
-    [0, 1, 3, 4, 6, 7, 9, 10] @=> scaleDict["halfwhole"];
-    [0, 2, 3, 5, 6, 8, 9, 11] @=> scaleDict["wholehalf"];
+    [0, 3, 4, 7, 8, 11] @=> scaleDict["augmented"];
+    [0, 1, 3, 4, 6, 7, 9, 10] @=> scaleDict["half_whole"];
+    [0, 2, 3, 5, 6, 8, 9, 11] @=> scaleDict["whole_half"];
 
     // penta/hexa
     [0, 3, 5, 6, 7, 10] @=> scaleDict["blues"];
-    [0, 2, 4, 7, 9] @=> scaleDict["maj_pent"];
-    [0, 3, 5, 7, 10] @=> scaleDict["min_pent"];
-    [0, 2, 4, 7, 9, 11] @=> scaleDict["maj_hex"];
-    [0, 2, 3, 5, 7, 10] @=> scaleDict["min_hex"];
+    [0, 2, 4, 7, 9] @=> scaleDict["major_pentatonic"];
+    [0, 3, 5, 7, 10] @=> scaleDict["minor_pentatonic"];
+    [0, 2, 4, 7, 9, 11] @=> scaleDict["major_hexatonic"];
+    [0, 2, 3, 5, 7, 10] @=> scaleDict["minor_hexatonic"];
 
     // altered modes
-    [0, 2, 4, 5, 7, 8, 11] @=> scaleDict["maj_harm"];
-    [0, 2, 3, 5, 7, 8, 11] @=> scaleDict["min_harm"];
-    [0, 1, 4, 5, 7, 8, 10] @=> scaleDict["phry_dom"];
-    [0, 2, 4, 6, 7, 9, 10] @=> scaleDict["lyd_dom"];
-    [0, 2, 4, 6, 8, 9, 11] @=> scaleDict["lyd_aug"];
-    [0, 2, 4, 5, 6, 8, 10] @=> scaleDict["maj_loc"];
-    [0, 1, 3, 4, 6, 8, 10] @=> scaleDict["supraloc"];
-    [0, 1, 3, 5, 7, 9, 11] @=> scaleDict["nea_maj"];
-    [0, 1, 3, 5, 7, 8, 11] @=> scaleDict["nea_min"];
-    [0, 2, 3, 5, 6, 8, 10] @=> scaleDict["half_dim"];
+    [0, 2, 4, 5, 7, 8, 11] @=> scaleDict["major_harmonic"];
+    [0, 2, 3, 5, 7, 8, 11] @=> scaleDict["minor_harmonic"];
+    [0, 1, 4, 5, 7, 8, 10] @=> scaleDict["phrygian_dominant"];
+    [0, 2, 4, 6, 7, 9, 10] @=> scaleDict["lydian_dominant"];
+    [0, 2, 4, 6, 8, 9, 11] @=> scaleDict["lydian_augmented"];
+    [0, 2, 4, 5, 6, 8, 10] @=> scaleDict["major_locrian"];
+    [0, 1, 3, 4, 6, 8, 10] @=> scaleDict["supralocrian"];
+    [0, 1, 3, 5, 7, 9, 11] @=> scaleDict["neapolitan_major"];
+    [0, 1, 3, 5, 7, 8, 11] @=> scaleDict["neapolitan_minor"];
+    [0, 2, 3, 5, 6, 8, 10] @=> scaleDict["half_diminished"];
 
     // "exotic"
-    [0, 1, 4, 5, 7, 8, 11] @=> scaleDict["dbl_harm"];
+    [0, 1, 4, 5, 7, 8, 11] @=> scaleDict["double_harmonic"];
     [0, 1, 4, 6, 8, 10, 11] @=> scaleDict["enigmatic"];
     [0, 2, 3, 6, 7, 8, 10] @=> scaleDict["gypsy"];
-    [0, 2, 3, 6, 7, 8, 11] @=> scaleDict["min_hung"];
-    [0, 3, 4, 6, 7, 9, 10] @=> scaleDict["maj_hung"];
+    [0, 2, 3, 6, 7, 8, 11] @=> scaleDict["hungarian_minor"];
+    [0, 3, 4, 6, 7, 9, 10] @=> scaleDict["hungarian_major"];
     [0, 1, 4, 5, 6, 8, 11] @=> scaleDict["persian"];
     [0, 2, 4, 6, 9, 10] @=> scaleDict["prometheus"];
     [0, 1, 5, 7, 8] @=> scaleDict["in"];
