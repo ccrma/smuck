@@ -146,7 +146,7 @@ public class ezScorePlayer
         (beatPosition * ms_per_beat)::ms => playhead;
     }
 
-    fun void pos(int measures, float beats)
+    fun void pos(int measures, float beats) // CHANGE THIS TO USE ACTUAL MEASURES AND BEATS
     {
         flushNotes();
         <<<"moving playhead to position (measure, beats):", measures, beats>>>;
