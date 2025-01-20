@@ -96,6 +96,7 @@ public class smPitch
             <<<"ERROR: Empty input token">>>;
             return 0;
         }
+        
         if(copy.length() == 1)
         {
             if(!keySig.isInMap(copy.substring(0,1)))
@@ -140,10 +141,8 @@ public class smPitch
     fun static int get_octave(string token, int oct_cxt, int pitch, int last)
     {
         token => string copy;
-
         oct_cxt => int octave;
         
-
         if(copy.length() > 1)
         {
             copy.substring(1) => string suffix;
@@ -154,58 +153,37 @@ public class smPitch
                 return smUtils.find_int_from_index(copy, smUtils.findInt(copy));
             }
 
+            // Use proximity from last note to determine octave
+            if(pitch - last > 6)
+            {
+                octave--;
+            }
+            if(pitch - last <= -6 && last != 999)
+            {
+                octave++;
+            }
+
             // If direction flags 'd'/'u' present, use those
-            if(smUtils.count_substring(suffix, "d") != -1)
+            for(int i; i < smUtils.count_substring(suffix, "d"); i++)
             {
-                smUtils.count_substring(suffix, "d") => int num_d;
-
-                if(pitch - last > -6)
-                {
-                    for(int i; i < num_d; i++)
-                    {
-                        octave--;
-                    }
-                }
-                else
-                {
-                    for(int i; i < num_d - 1; i++)
-                    {
-                        octave--;
-                    }
-                }
-                return octave;
+                octave--;
             }
-            if(smUtils.count_substring(suffix, "u") != -1)
+            for(int i; i < smUtils.count_substring(suffix, "u"); i++)
             {
-                smUtils.count_substring(suffix, "u") => int num_u;
-                if(pitch - last <= 6)
-                {
-                    for(int i; i < num_u; i++)
-                    {
-                        octave++;
-                    }
-                }
-                else
-                {
-                    for(int i; i < num_u - 1; i++)
-                    {
-                        octave++;
-                    }
-                }
-                return octave;
+                octave++;
             }
         }
-
-        // Otherwise, use proximity from last note to determine octave
-        if(pitch - last > 6)
+        else
         {
-            octave--;
+            if(pitch - last > 6)
+            {
+                octave--;
+            }
+            if(pitch - last <= -6 && last != 999)
+            {
+                octave++;
+            }
         }
-        if(pitch - last <= -6 && last != 999)
-        {
-            octave++;
-        }
-
         return octave;
     }
     
