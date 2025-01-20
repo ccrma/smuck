@@ -5,12 +5,7 @@ public class ezPart
     ezMeasure measures[0];
     int maxPolyphony;
 
-    fun int numMeasures()
-    {
-        return measures.size();
-    }
-
-    fun void append_measure(ezMeasure @ measure)
+    fun void add_measure(ezMeasure @ measure)
     {
         if(measures.size() == 0)
         {
@@ -26,13 +21,13 @@ public class ezPart
     fun ezPart(string input)
     {
         ezMeasure measure(input);
-        append_measure(measure);
+        add_measure(measure);
     }
 
     fun ezPart(string input, int fill_mode)
     {
         ezMeasure measure(input, fill_mode);
-        append_measure(measure);
+        add_measure(measure);
     }
 
     fun void set_pitches(string input)
@@ -41,7 +36,7 @@ public class ezPart
         {
             ezMeasure measure;
             measure.set_pitches(input);
-            append_measure(measure);
+            add_measure(measure);
         }
         else
         {
@@ -55,7 +50,7 @@ public class ezPart
         {
             ezMeasure measure;
             measure.set_pitches(input, fill_mode);
-            append_measure(measure);
+            add_measure(measure);
         }
         else
         {
@@ -69,7 +64,7 @@ public class ezPart
         {
             ezMeasure measure;
             measure.set_rhythms(input);
-            append_measure(measure);
+            add_measure(measure);
         }
         else
         {
@@ -83,7 +78,7 @@ public class ezPart
         {
             ezMeasure measure;
             measure.set_rhythms(input, fill_mode);
-            append_measure(measure);
+            add_measure(measure);
         }
         else
         {
@@ -97,7 +92,7 @@ public class ezPart
         {
             ezMeasure measure;
             measure.set_velocities(input);
-            append_measure(measure);
+            add_measure(measure);
         }
         else
         {
@@ -111,7 +106,7 @@ public class ezPart
         {
             ezMeasure measure;
             measure.set_velocities(input, fill_mode);
-            append_measure(measure);
+            add_measure(measure);
         }
         else
         {

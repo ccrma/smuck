@@ -4,10 +4,10 @@ public class ezScore
 {
     ezPart parts[0];
 
+    120 => float bpm;
     4 => int time_sig_numerator;
     4 => int time_sig_denominator;
-    128 => float bpm;
-
+    
     // Constructors
     // --------------------------------------------------------------------------
     fun ezScore(string input)
@@ -26,27 +26,7 @@ public class ezScore
     {
         newBpm => bpm;
 
-        if(filename.substring(filename.length() - 4,4) == ".mid")
-        {
-            importMIDI(filename);
-        }
-    }
-
-    fun ezScore(string filename, float newBpm, int timeSig[])
-    {
-        newBpm => bpm;
-
-        if(timeSig.size() != 2)
-        {
-            <<<"timeSig must be an array of size 2">>>;
-        }   
-        else
-        {
-            timeSig[0] => time_sig_numerator;
-            timeSig[1] => time_sig_denominator;
-        }
-
-        if(filename.substring(filename.length() - 4,4) == ".mid")
+        if(filename.length() > 4 && filename.substring(filename.length() - 4,4) == ".mid")
         {
             importMIDI(filename);
         }
@@ -82,10 +62,10 @@ public class ezScore
         for (int i; i < numParts(); i++)
         {
             parts[i] @=> ezPart part;
-            for (int j; j < part.numMeasures(); j++)
+            for (int j; j < part.measures.size(); j++)
             {
                 part.measures[j] @=> ezMeasure measure;
-                for (int k; k < measure.numNotes(); k++)
+                for (int k; k < measure.notes.size(); k++)
                 {
                     
                     measure.notes[k] @=> ezNote note;
@@ -222,9 +202,7 @@ public class ezScore
             int note_index[128];       // stores the latest index a note was added to
             
             0 => float accumulated_time_ms;
-
             60000 / bpm => float ms_per_beat;
-            time_sig_numerator * ms_per_beat => float measure_length_ms;
             
             ezMeasure measure1;
             part.measures << measure1;
@@ -232,13 +210,6 @@ public class ezScore
             while (min.read(msg, track)) {
                 // update the accumulated time for the measure to present moment
                 accumulated_time_ms + msg.when/ms => accumulated_time_ms;
-
-                // if (accumulated_time_ms > measure_length_ms) {
-                //     ezMeasure new_measure;
-                //     part.measures << new_measure;
-                //     0 => accumulated_time_ms;       // accumulated time is reset to 0 with each new measure
-                // }
-
                 part.measures[-1] @=> ezMeasure current_measure;
 
                 // Note On

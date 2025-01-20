@@ -21,11 +21,6 @@ public class ezMeasure
         set_interleaved(input, fill_mode);
     }
 
-    fun int numNotes()
-    {
-        return notes.size();
-    }
-
     fun void add_note(ezNote note)
     {
         notes << note;
