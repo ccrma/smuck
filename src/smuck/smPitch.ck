@@ -20,19 +20,19 @@ public class smPitch
                 <<<"ERROR: Not a valid key signature--must have at most 7 sharps/flats">>>;
                 return keyVector;
             }
-            if(type != "s" && type != "f")
+            if(type != "s" && type != "f" && type != "b" && type != "#")
             {
-                <<<"ERROR: Not a valid key signature--signature type must be either 'f' (flats) or 's' (sharps)">>>;
+                <<<"ERROR: Not a valid key signature--signature type must be either 'f' / 'b' (flats) or 's' / '#' (sharps)">>>;
                 return keyVector;
             }
-            if(type == "s")
+            if(type == "s" || type == "#")
             {
                 for(int i; i < n; i++)
                 {
                     1 => keyVector[i];
                 }
             }
-            if(type == "f")
+            if(type == "f" || type == "b")
             {
                 for(6 => int i; i > (6-n); i--)
                 {
@@ -42,7 +42,7 @@ public class smPitch
         }
         else
         {
-            <<<"ERROR: Not a valid key signature. Token must be 3 characters long, e.g. 'k3f'">>>;
+            <<<"ERROR: Not a valid key signature. Token must be 3 characters long, e.g. 'k3f' or 'k1#'">>>;
         }
 
         return keyVector;
@@ -218,21 +218,21 @@ public class smPitch
                 get_alter(note, keyVector) => int alter;
                 get_octave(note, oct_cxt, step + alter, last_pitch) => int octave;
 
+                // If an actual pitch and not a rest
                 if(step >= 0)
                 {
+                    // set context variables
                     step + alter => last_pitch;
                     octave => oct_cxt;
-                }
 
-                step + alter + 12 * (octave) => int current_note;
-
-                if(current_note < 0)
-                {
-                    chord << -999;
+                    // calculate current pitch and add to chord
+                    Math.max(0, step + alter + 12 * (octave)) => int current_note;
+                    chord << current_note;
                 }
+                // Otherwise, add a rest
                 else
                 {
-                    chord << current_note;
+                    chord << -999;
                 }
             }
             output << chord;
@@ -277,14 +277,22 @@ public class smPitch
                 get_alter(note, keyVector) => int alter;
                 get_octave(note, oct_cxt, step + alter, last_pitch) => int octave;
 
+                // If an actual pitch and not a rest
                 if(step >= 0)
                 {
+                    // set context variables
                     step + alter => last_pitch;
                     octave => oct_cxt;
-                }
 
-                step + alter + 12 * (octave) => int current_note;
-                chord << current_note;
+                    // calculate current pitch and add to chord
+                    Math.max(0, step + alter + 12 * (octave)) => int current_note;
+                    chord << current_note;
+                }
+                // Otherwise, add a rest
+                else
+                {
+                    chord << -999;
+                }
             }
             output << chord;
         }
