@@ -49,9 +49,13 @@ public class smScore
         smUtils.split(expanded) @=> string tokens[];
 
         // Tokenized input
-        string pitch_tokens[tokens.size()];
-        string rhythm_tokens[tokens.size()];
-        string velocity_tokens[tokens.size()];
+        // string pitch_tokens[tokens.size()];
+        // string rhythm_tokens[tokens.size()];
+        // string velocity_tokens[tokens.size()];
+
+        string pitch_tokens[0];
+        string rhythm_tokens[0];
+        string velocity_tokens[0];
 
         // Set current values, to be updated at each step
         "c4" => string current_pitch;
@@ -116,13 +120,16 @@ public class smScore
                 }
 
             }
-            // <<<"Adding pitch token: ", current_pitch>>>;
-            // <<<"Adding rhythm token: ", current_rhythm>>>;
-            // <<<"Adding velocity token: ", current_velocity>>>;
-            current_pitch => pitch_tokens[i];
-            current_rhythm => rhythm_tokens[i];
-            current_velocity => velocity_tokens[i];
+            current_pitch => string temp_pitch;
+            current_rhythm => string temp_rhythm;
+            current_velocity => string temp_velocity;
 
+            pitch_tokens << temp_pitch;
+            if(!smUtils.isKeySigToken(temp_pitch))
+            {
+                rhythm_tokens << temp_rhythm;
+                velocity_tokens << temp_velocity;
+            }
         }
 
         smPitch.parse_tokens(pitch_tokens) @=> pitches;

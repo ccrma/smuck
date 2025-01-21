@@ -396,11 +396,23 @@ public class smUtils
         
     }
 
+    fun static int isKeySigToken(string input)
+    {
+        if(input.length() == 3 && input.substring(0, 1) == "k")
+        {
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
     fun static int isPitchToken(string input)
     {
         for(int i; i < input.length(); i++)
         {
-            if("abcdefg0123456789udfsb#rk".find(input.substring(i, 1).lower()) == -1)
+            if("abcdefg0123456789udfsb#nrk:".find(input.substring(i, 1).lower()) == -1)
             {
                 return 0;
             }

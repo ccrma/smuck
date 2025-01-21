@@ -259,6 +259,8 @@ public class ezMeasure
         temp_rhythms @=> rhythms;
         temp_velocities @=> velocities;
 
+        notes[-1].onset + notes[-1].beats => length;
+
     }
 
     fun void print_notes()

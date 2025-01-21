@@ -15,12 +15,12 @@ public class ezScorePlayer
     dur playhead;
     
     false => int playing;
+    dur start_of_score;
     dur end_of_score;
     int voice_in_use[][];
     Event tick_driver_end;
 
     // Constructors
-
     fun ezScorePlayer() {}
 
     fun ezScorePlayer(ezScore s)
@@ -29,14 +29,13 @@ public class ezScorePlayer
     }
 
     // Public functions
-
     fun void setScore(ezScore s)
     {
         if (playing) stop();
         
         s @=> score;
         s.parts @=> parts;
-        <<<parts.size(), "parts processed">>>;
+        // <<<parts.size(), "parts processed">>>;
 
         // create instruments
         new ezInstrument[score.numParts()] @=> instruments;
@@ -84,10 +83,10 @@ public class ezScorePlayer
         // previewGain.gain(1.0);
         // spork ~ tickDriver();
     }
-    
+
     fun void play()
     {
-        <<< "ezScorePlayer: play()" >>>;
+        // <<< "ezScorePlayer: play()" >>>;
         if (!playing)
         {
             true => playing;
@@ -97,7 +96,7 @@ public class ezScorePlayer
 
     fun void pause()
     {
-        <<< "ezScorePlayer: pause()" >>>;
+        // <<< "ezScorePlayer: pause()" >>>;
         false => playing;
         tick_driver_end => now;
         flushNotes();
@@ -105,7 +104,7 @@ public class ezScorePlayer
 
     fun void stop()
     {
-        <<< "ezScorePlayer: stop()" >>>;
+        // <<< "ezScorePlayer: stop()" >>>;
         false => playing;
         spork ~ stop_listener();
     }
@@ -127,14 +126,14 @@ public class ezScorePlayer
     fun void pos(dur timePosition)
     {
         flushNotes();
-        <<<"moving playhead to position (ms):", timePosition/ms>>>;
+        // <<<"moving playhead to position (ms):", timePosition/ms>>>;
         timePosition => playhead;
     }
 
     fun void pos(float beatPosition)
     {
         flushNotes();
-        <<<"moving playhead to position (beats):", beatPosition>>>;
+        // <<<"moving playhead to position (beats):", beatPosition>>>;
         60000 / score.bpm => float ms_per_beat;
         ms_per_beat * (4 / score.time_sig_denominator) => ms_per_beat;
         (beatPosition * ms_per_beat)::ms => playhead;
@@ -143,13 +142,12 @@ public class ezScorePlayer
     fun void pos(int measures, float beats) // CHANGE THIS TO USE ACTUAL MEASURES AND BEATS
     {
         flushNotes();
-        <<<"moving playhead to position (measure, beats):", measures, beats>>>;
+        // <<<"moving playhead to position (measure, beats):", measures, beats>>>;
         60000 / score.bpm => float ms_per_beat;
         (measures * (ms_per_beat * score.time_sig_numerator * (4 / score.time_sig_denominator)) + beats * ms_per_beat)::ms => playhead;
     }
 
     // Private functions
-
     fun void tickDriver()
     {
         while (playing)
@@ -157,6 +155,11 @@ public class ezScorePlayer
             if (playhead > end_of_score)
             {
                 if (loop) pos(0);
+                else stop();
+            }
+            if (playhead < start_of_score)
+            {
+                if (loop) pos(end_of_score);
                 else stop();
             }
             
@@ -176,18 +179,17 @@ public class ezScorePlayer
     fun void stop_listener()
     {
         tick_driver_end => now;
-        <<<"BANG" >>>;
         pos(0);
     }
 
     fun void flushNotes()
     {
-        <<<"flushing notes">>>;
+        // <<<"flushing notes">>>;
         for(int part; part < parts.size(); part++)
         {
             for(int voice; voice < instruments[part].n_voices; voice++)
             {
-                <<<"releasing voice", voice, "for part", part>>>;
+                // <<<"releasing voice", voice, "for part", part>>>;
                 release_voice(part, voice);
             }
         }
@@ -232,7 +234,7 @@ public class ezScorePlayer
         allocate_voice(partIndex, theNote) => int voice_index;
         instruments[partIndex].noteOn(theNote, voice_index);
 
-        chout <= "playing note " <= theNote.pitch <= " on voice " <= voice_index <= " for part " <= partIndex <= " at time " <= playhead/ms <= "ms," <= " at beat onset " <= theNote.onset <= " for " <= theNote.beats <= " beats, with velocity " <= theNote.velocity <= IO.newline();
+        //chout <= "playing note " <= theNote.pitch <= " on voice " <= voice_index <= " for part " <= partIndex <= " at time " <= playhead/ms <= "ms," <= " at beat onset " <= theNote.onset <= " for " <= theNote.beats <= " beats, with velocity " <= theNote.velocity <= IO.newline();
 
         playhead/ms => float onset_ms;
         60000 / score.bpm => float ms_per_beat;
