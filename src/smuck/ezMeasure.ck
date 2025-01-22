@@ -26,21 +26,66 @@ public class ezMeasure
         notes << note;
     }
 
+    // Set pitches from a single string
     fun void set_pitches(string input)
     {
         smPitch.parse_pitches(input) @=> pitches;
         compile_notes(pitches, rhythms, velocities, 1);
     }
+    
+    // Set pitches from an array of individual string tokens
+    fun void set_pitches(string input[])
+    {
+        smPitch.parse_tokens(input) @=> pitches;
+        compile_notes(pitches, rhythms, velocities, 1);
+    }
 
+    // Set pitches directly from an a 2D array of ints
+    fun void set_pitches(int input[][])
+    {
+        input @=> pitches;
+        compile_notes(pitches, rhythms, velocities, 1);
+    }
+
+    // Set rhythms from a single string
     fun void set_rhythms(string input)
     {
         smRhythm.parse_rhythms(input) @=> rhythms;
         compile_notes(pitches, rhythms, velocities, 1);
     }
 
+    // Set rhythms from an array of individual string tokens
+    fun void set_rhythms(string input[])
+    {
+        smRhythm.parse_tokens(input) @=> rhythms;
+        compile_notes(pitches, rhythms, velocities, 1);
+    }
+
+    // Set rhythms from an array of floats
+    fun void set_rhythms(float input[])
+    {
+        input @=> rhythms;
+        compile_notes(pitches, rhythms, velocities, 1);
+    }
+
+    // Set velocities from a single string
     fun void set_velocities(string input)
     {
         smVelocity.parse_velocities(input) @=> velocities;
+        compile_notes(pitches, rhythms, velocities, 1);
+    }
+
+    // Set velocities from an array of individual string tokens
+    fun void set_velocities(string input[])
+    {
+        smVelocity.parse_tokens(input) @=> velocities;
+        compile_notes(pitches, rhythms, velocities, 1);
+    }
+
+    // Set velocities from an array of ints
+    fun void set_velocities(int input[])
+    {
+        input @=> velocities;
         compile_notes(pitches, rhythms, velocities, 1);
     }
 
