@@ -92,13 +92,13 @@ public class ezScore
     fun void set_part(string input)
     {
         ezPart part(input);
-        add_part(part);
+        addPart(part);
     }
 
     fun void set_part(string input, int fill_mode)
     {
         ezPart part(input, fill_mode);
-        add_part(part);
+        addPart(part);
     }
 
     fun void set_pitches(string input)
@@ -107,7 +107,7 @@ public class ezScore
         {
             ezPart part;
             part.set_pitches(input);
-            add_part(part);
+            addPart(part);
         }
         else
         {
@@ -121,7 +121,7 @@ public class ezScore
         {
             ezPart part;
             part.set_pitches(input);
-            add_part(part);
+            addPart(part);
         }
     }
 
@@ -131,7 +131,7 @@ public class ezScore
         {
             ezPart part;
             part.set_pitches(input);
-            add_part(part);
+            addPart(part);
         }
     }
 
@@ -141,7 +141,7 @@ public class ezScore
         {
             ezPart part;
             part.set_pitches(input, fill_mode);
-            add_part(part);
+            addPart(part);
         }
         else
         {
@@ -155,7 +155,7 @@ public class ezScore
         {
             ezPart part;
             part.set_rhythms(input);
-            add_part(part);
+            addPart(part);
         }
         else
         {
@@ -169,7 +169,7 @@ public class ezScore
         {
             ezPart part;
             part.set_rhythms(input);
-            add_part(part);
+            addPart(part);
         }
     }
 
@@ -179,7 +179,7 @@ public class ezScore
         {
             ezPart part;
             part.set_rhythms(input);
-            add_part(part);
+            addPart(part);
         }
     }
     
@@ -189,7 +189,7 @@ public class ezScore
         {
             ezPart part;
             part.set_rhythms(input, fill_mode);
-            add_part(part);
+            addPart(part);
         }
         else
         {
@@ -203,7 +203,7 @@ public class ezScore
         {
             ezPart part;
             part.set_velocities(input);
-            add_part(part);
+            addPart(part);
         }
         else
         {
@@ -217,7 +217,7 @@ public class ezScore
         {
             ezPart part;
             part.set_velocities(input);
-            add_part(part);
+            addPart(part);
         }
     }
 
@@ -227,7 +227,7 @@ public class ezScore
         {
             ezPart part;
             part.set_velocities(input);
-            add_part(part);
+            addPart(part);
         }
     }
 
@@ -237,7 +237,7 @@ public class ezScore
         {
             ezPart part;
             part.set_velocities(input, fill_mode);
-            add_part(part);
+            addPart(part);
         }
         else
         {
