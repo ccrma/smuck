@@ -50,7 +50,7 @@ public class ezScore
         return parts.size();
     }
 
-    fun void add_part(ezPart part)
+    fun void addPart(ezPart part)
     {
         parts << part;
     }
