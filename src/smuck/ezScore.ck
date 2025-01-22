@@ -115,6 +115,26 @@ public class ezScore
         }
     }
 
+    fun void set_pitches(string input[])
+    {
+        if(parts.size() == 0)
+        {
+            ezPart part;
+            part.set_pitches(input);
+            add_part(part);
+        }
+    }
+
+    fun void set_pitches(int input[][])
+    {
+        if(parts.size() == 0)
+        {
+            ezPart part;
+            part.set_pitches(input);
+            add_part(part);
+        }
+    }
+
     fun void set_pitches(string input, int fill_mode)
     {
         if(parts.size() == 0)
@@ -140,6 +160,26 @@ public class ezScore
         else
         {
             parts[-1].set_rhythms(input);
+        }
+    }
+
+    fun void set_rhythms(string input[])
+    {
+        if(parts.size() == 0)
+        {
+            ezPart part;
+            part.set_rhythms(input);
+            add_part(part);
+        }
+    }
+
+    fun void set_rhythms(float input[])
+    {
+        if(parts.size() == 0)
+        {
+            ezPart part;
+            part.set_rhythms(input);
+            add_part(part);
         }
     }
     
@@ -168,6 +208,26 @@ public class ezScore
         else
         {
             parts[-1].set_velocities(input);
+        }
+    }
+
+    fun void set_velocities(string input[])
+    {
+        if(parts.size() == 0)
+        {
+            ezPart part;
+            part.set_velocities(input);
+            add_part(part);
+        }
+    }
+
+    fun void set_velocities(int input[])
+    {
+        if(parts.size() == 0)
+        {
+            ezPart part;
+            part.set_velocities(input);
+            add_part(part);
         }
     }
 
