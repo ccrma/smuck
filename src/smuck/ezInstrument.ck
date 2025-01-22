@@ -7,7 +7,7 @@ public class ezInstrument extends Chugraph
 
     fun void noteOn(ezNote theNote, int voice)
     {
-        <<<"implement NoteOn function">>>;
+        // <<<"implement NoteOn function">>>;
     }
 
     fun void noteOff(int voice)
