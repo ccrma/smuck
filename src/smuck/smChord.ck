@@ -2,7 +2,7 @@
 // EZchord : Chord parser
 // ------------------------------------------------------------------
 // Enter chords as string, get MIDI note numbers out!
-// Initialize the smChord object with a chord name (string)
+// Initialize the EZChord object with a chord name (string)
 // parsing is done automatically upon initialization
 // then, access member variables to get info about the chord. Most importantly,
 // can get the MIDI note values for chord tones
@@ -117,14 +117,14 @@ public class smChord
         int alter;
 
         raw.substring(0,1) => string first;
-        if(pitch_dict.isInMap(first))
+        if(pitch_dict.isInMap(first.upper()))
         {
             pitch_dict[first] => root_temp;
             first => rootName;
         }
         else
         {
-            <<<"Invalid root note (did you forget uppercase?)">>>;
+            <<<"Invalid root note">>>;
             -999 => root_temp;
         }
         raw.erase(0, 1);
@@ -234,25 +234,49 @@ public class smChord
                 alter_dict[first] => alter;
                 input.erase(0,1);
             }
+            if(triadType == "min" && input.length() >= 3)
+            {
+                if(input.substring(0,3) == "7b5")
+                {
+                    // <<<"min7b5">>>;
+                    "dim" => triadType;
+                    triad_dict[triadType] @=> triad;
+                    ans << seventh_dict["min"];
+                    input.erase(0,3);
+                }
+                if (input.substring(0,3) == "9b5")
+                {
+                    // <<<"min9b5">>>;
+                    "dim" => triadType;
+                    triad_dict[triadType] @=> triad;
+                    ans << seventh_dict["min"];
+                    ans << 14;
+                    input.erase(0,3);
+                }
+            }
             // special case -- maj7 explicitly specified 
             if(input.length() >= 4 && input.substring(0,4) == "Maj7")
             {
+                // <<<"maj7">>>;
                 ans << seventh_dict["maj"];
                 input.erase(0,4);
             }
             // 6th defaults to major 6th above root
-            if(first == "6")
+            if(input.length() > 0 && input.substring(0,1) == "6")
             {
+                // <<<"6">>>;
                 ans << 9 + alter;
+                input.erase(0,1);
             }
             // 7th added depending on triad type
-            if(first == "7")
+            if(input.length() > 0 && input.substring(0,1) == "7")
             {
+                // <<<"7">>>;
                 ans << seventh_dict[triadType];
                 input.erase(0,1);
             }
             // 9th added; if no 7th was specified, adds implicit 7th based on triad
-            if(first == "9")
+            if(input.length() > 0 && input.substring(0,1) == "9")
             {
                 if(ans.size() == 0)
                 {
