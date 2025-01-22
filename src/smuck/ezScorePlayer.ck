@@ -6,6 +6,8 @@ public class ezScorePlayer
     ezScore score;
     ezPart parts[];
     ezInstrument instruments[];
+    Gain previewGain => dac;
+
     false => int loop;
     1 => float rate;
 
@@ -19,6 +21,9 @@ public class ezScorePlayer
     dur end_of_score;
     int voice_in_use[][];
     Event tick_driver_end;
+
+    // Preview
+    ezPreviewInst previewInsts[];
 
     // Constructors
     fun ezScorePlayer() {}
@@ -39,6 +44,14 @@ public class ezScorePlayer
 
         // create instruments
         new ezInstrument[score.numParts()] @=> instruments;
+
+        // create preview instrument
+        new ezPreviewInst[score.numParts()] @=> previewInsts;
+        for(int i; i < score.numParts(); i++)
+        {
+            ezPreviewInst tempInst;
+            tempInst @=> previewInsts[i];
+        }
 
         // keep track of which voices are currently in use
         new int[parts.size()][0] @=> voice_in_use;
@@ -71,17 +84,8 @@ public class ezScorePlayer
 
     fun void preview()
     {
-        // new defaultVoice[parts.size()] @=> instruments;
-        for(int i; i < parts.size(); i++)
-        {
-            defaultVoice tempVoice;
-            setInstrument(i, tempVoice);
-            // instruments[i] => previewGain;
-        }
-        pos(0.0);
+        setInstrument(previewInsts);
         play();
-        // previewGain.gain(1.0);
-        // spork ~ tickDriver();
     }
 
     fun void play()
@@ -234,7 +238,7 @@ public class ezScorePlayer
         allocate_voice(partIndex, theNote) => int voice_index;
         instruments[partIndex].noteOn(theNote, voice_index);
 
-        //chout <= "playing note " <= theNote.pitch <= " on voice " <= voice_index <= " for part " <= partIndex <= " at time " <= playhead/ms <= "ms," <= " at beat onset " <= theNote.onset <= " for " <= theNote.beats <= " beats, with velocity " <= theNote.velocity <= IO.newline();
+        chout <= "playing note " <= theNote.pitch <= " on voice " <= voice_index <= " for part " <= partIndex <= " at time " <= playhead/ms <= "ms," <= " at beat onset " <= theNote.onset <= " for " <= theNote.beats <= " beats, with velocity " <= theNote.velocity <= IO.newline();
 
         playhead/ms => float onset_ms;
         60000 / score.bpm => float ms_per_beat;
