@@ -10,10 +10,12 @@ public class ezScorePlayer
 
     false => int loop;
     1 => float rate;
+    false => int log_playback;
 
     // private member variables
     1::ms => dur tick;
     tick => dur tatum;
+    dur previous_playhead;
     dur playhead;
     
     false => int playing;
@@ -132,6 +134,7 @@ public class ezScorePlayer
         flushNotes();
         // <<<"moving playhead to position (ms):", timePosition/ms>>>;
         timePosition => playhead;
+        playhead => previous_playhead;
     }
 
     fun void pos(float beatPosition)
@@ -141,6 +144,7 @@ public class ezScorePlayer
         60000 / score.bpm => float ms_per_beat;
         ms_per_beat * (4 / score.time_sig_denominator) => ms_per_beat;
         (beatPosition * ms_per_beat)::ms => playhead;
+        playhead => previous_playhead;
     }
 
     fun void pos(int measures, float beats) // CHANGE THIS TO USE ACTUAL MEASURES AND BEATS
@@ -149,6 +153,7 @@ public class ezScorePlayer
         // <<<"moving playhead to position (measure, beats):", measures, beats>>>;
         60000 / score.bpm => float ms_per_beat;
         (measures * (ms_per_beat * score.time_sig_numerator * (4 / score.time_sig_denominator)) + beats * ms_per_beat)::ms => playhead;
+        playhead => previous_playhead;
     }
 
     // Private functions
@@ -174,6 +179,7 @@ public class ezScorePlayer
 
             // <<< playhead/ms >>>;
             tick * rate => tatum;
+            playhead => previous_playhead;
             tatum +=> playhead;
             tick => now;
         }
@@ -199,6 +205,45 @@ public class ezScorePlayer
         }
     }
 
+    // fun void getNotesAtPlayhead(int partIndex)
+    // {
+    //     parts[partIndex] @=> ezPart thePart;
+    //     60000 / score.bpm => float ms_per_beat;
+
+    //     ezNote currentNotes[0];
+
+    //     for(int i; i < thePart.measures.size(); i++)
+    //     {
+    //         thePart.measures[i] @=> ezMeasure theMeasure;
+
+    //         for(int j; j < theMeasure.notes.size(); j++)
+    //         {
+    //             theMeasure.onset * ms_per_beat => float theMeasure_onset_ms;
+
+    //             theMeasure.notes[j] @=> ezNote theNote;
+    //             theMeasure_onset_ms + theNote.onset * ms_per_beat => float theNote_onset_ms;
+                
+    //             if(Math.fabs(theNote_onset_ms - playhead/ms) <= Math.fabs(tatum/ms)/2.0)        // take abs of tatum too!!!
+    //             {
+    //                 currentNotes << theNote;
+    //             }
+    //         }
+    //     }
+    //     if(currentNotes.size() > 0)
+    //     {
+    //         // <<< "current notes size:", currentNotes.size()>>>;
+    //         for(int i; i < currentNotes.size(); i++)
+    //         {
+    //             spork ~ playNoteWrapper(partIndex, currentNotes[i]);
+    //         }
+    //     }
+    // }
+
+    fun int playheadPassedTime(float timestamp)
+    {
+        return (Math.min(previous_playhead/ms, playhead/ms) <= timestamp && timestamp <= Math.max(previous_playhead/ms, playhead/ms));
+    }
+
     fun void getNotesAtPlayhead(int partIndex)
     {
         parts[partIndex] @=> ezPart thePart;
@@ -212,12 +257,11 @@ public class ezScorePlayer
 
             for(int j; j < theMeasure.notes.size(); j++)
             {
-                theMeasure.onset * ms_per_beat => float theMeasure_onset;
-
+                theMeasure.onset * ms_per_beat => float theMeasure_onset_ms;
                 theMeasure.notes[j] @=> ezNote theNote;
-                theMeasure_onset + theNote.onset * ms_per_beat => float theNote_onset;
+                theMeasure_onset_ms + theNote.onset * ms_per_beat => float theNote_onset_ms;
                 
-                if(Math.fabs(theNote_onset - playhead/ms) <= Math.fabs(tatum/ms)/2.0)        // take abs of tatum too!!!
+                if(playheadPassedTime(theNote_onset_ms))
                 {
                     currentNotes << theNote;
                 }
@@ -225,7 +269,6 @@ public class ezScorePlayer
         }
         if(currentNotes.size() > 0)
         {
-            // <<< "current notes size:", currentNotes.size()>>>;
             for(int i; i < currentNotes.size(); i++)
             {
                 spork ~ playNoteWrapper(partIndex, currentNotes[i]);
@@ -238,7 +281,10 @@ public class ezScorePlayer
         allocate_voice(partIndex, theNote) => int voice_index;
         instruments[partIndex].noteOn(theNote, voice_index);
 
-        // chout <= "playing note " <= theNote.pitch <= " on voice " <= voice_index <= " for part " <= partIndex <= " at time " <= playhead/ms <= "ms," <= " at beat onset " <= theNote.onset <= " for " <= theNote.beats <= " beats, with velocity " <= theNote.velocity <= IO.newline();
+        if(log_playback)
+        {
+            chout <= "playing note " <= theNote.pitch <= " on voice " <= voice_index <= " for part " <= partIndex <= " at time " <= playhead/ms <= "ms," <= " at beat onset " <= theNote.onset <= " for " <= theNote.beats <= " beats, with velocity " <= theNote.velocity <= IO.newline();
+        }
 
         playhead/ms => float onset_ms;
         60000 / score.bpm => float ms_per_beat;

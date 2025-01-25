@@ -1,14 +1,14 @@
 @import {"../../src/smuck.ck"}
 
-ezScore score("../data/sonata01-1.mid", 128, [4,4]);
-ScorePlayer sp(score);
+ezScore score("../data/sonata01-1.mid");
+score.setTempo(128);
+ezScorePlayer sp(score);
 
-MyVoice v1;
-MyVoice v2;
-sp.setVoice(0, v1);
-sp.setVoice(1, v2);
-
-// sp.preview();
+1::ms => sp.tick;
+1.0 => sp.rate;
+// sp.pos(20::second);
+1 => sp.loop;
+sp.preview();
 
 while(true)
 {
