@@ -1,9 +1,9 @@
 @import "ezInstrument.ck"
 
-public class ezPreviewInst extends ezInstrument
+public class ezDefaultInst extends ezInstrument
 {
     // define sound chain
-    20 => n_voices;
+    20 => int n_voices;
     SinOsc oscs[n_voices]; 
     ADSR envs[n_voices]; 
     Gain g => NRev rev => dac;
@@ -15,6 +15,8 @@ public class ezPreviewInst extends ezInstrument
         envs[i].set(4::ms, 7000::ms, 0.0, 200::ms);
     }
 
+    setNumVoices(n_voices);
+
     fun void noteOn(ezNote theNote, int which)
     {
         Std.mtof(theNote.pitch) => oscs[which].freq;
@@ -22,7 +24,7 @@ public class ezPreviewInst extends ezInstrument
         envs[which].keyOn();
     }
 
-    fun void noteOff(int which)
+    fun void noteOff(ezNote theNote, int which)
     {
         envs[which].keyOff();
     }
