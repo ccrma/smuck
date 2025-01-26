@@ -1,4 +1,4 @@
-@import {"ezNote.ck", "ezMeasure.ck", "ezPart.ck", "ezScore.ck", "ezNoteEvent.ck", "ezPreviewInst.ck", "ezInstrument.ck"}
+@import {"ezNote.ck", "ezMeasure.ck", "ezPart.ck", "ezScore.ck", "ezNoteEvent.ck", "ezDefaultInst.ck", "ezInstrument.ck"}
 
 public class ezScorePlayer
 {
@@ -25,7 +25,7 @@ public class ezScorePlayer
     Event tick_driver_end;
 
     // Preview
-    ezPreviewInst previewInsts[];
+    ezDefaultInst previewInsts[];
 
     // Constructors
     fun ezScorePlayer() {}
@@ -48,10 +48,10 @@ public class ezScorePlayer
         new ezInstrument[score.numParts()] @=> instruments;
 
         // create preview instrument
-        new ezPreviewInst[score.numParts()] @=> previewInsts;
+        new ezDefaultInst[score.numParts()] @=> previewInsts;
         for(int i; i < score.numParts(); i++)
         {
-            ezPreviewInst tempInst;
+            ezDefaultInst tempInst;
             tempInst @=> previewInsts[i];
         }
 
@@ -67,7 +67,7 @@ public class ezScorePlayer
         instrument @=> instruments[partIndex];
         
         // keep track of which voices are currently in use
-        new int[instrument.n_voices] @=> voice_in_use[partIndex];
+        new int[instrument._n_voices] @=> voice_in_use[partIndex];
     }
 
     fun void setInstrument(ezInstrument @ insts[])
@@ -197,51 +197,17 @@ public class ezScorePlayer
         // <<<"flushing notes">>>;
         for(int part; part < parts.size(); part++)
         {
-            for(int voice; voice < instruments[part].n_voices; voice++)
+            for(int voice; voice < instruments[part]._n_voices; voice++)
             {
                 // <<<"releasing voice", voice, "for part", part>>>;
-                release_voice(part, voice);
+                instruments[part].release_voice(voice);
             }
         }
     }
 
-    // fun void getNotesAtPlayhead(int partIndex)
-    // {
-    //     parts[partIndex] @=> ezPart thePart;
-    //     60000 / score.bpm => float ms_per_beat;
-
-    //     ezNote currentNotes[0];
-
-    //     for(int i; i < thePart.measures.size(); i++)
-    //     {
-    //         thePart.measures[i] @=> ezMeasure theMeasure;
-
-    //         for(int j; j < theMeasure.notes.size(); j++)
-    //         {
-    //             theMeasure.onset * ms_per_beat => float theMeasure_onset_ms;
-
-    //             theMeasure.notes[j] @=> ezNote theNote;
-    //             theMeasure_onset_ms + theNote.onset * ms_per_beat => float theNote_onset_ms;
-                
-    //             if(Math.fabs(theNote_onset_ms - playhead/ms) <= Math.fabs(tatum/ms)/2.0)        // take abs of tatum too!!!
-    //             {
-    //                 currentNotes << theNote;
-    //             }
-    //         }
-    //     }
-    //     if(currentNotes.size() > 0)
-    //     {
-    //         // <<< "current notes size:", currentNotes.size()>>>;
-    //         for(int i; i < currentNotes.size(); i++)
-    //         {
-    //             spork ~ playNoteWrapper(partIndex, currentNotes[i]);
-    //         }
-    //     }
-    // }
-
     fun int playheadPassedTime(float timestamp)
     {
-        return (Math.min(previous_playhead/ms, playhead/ms) <= timestamp && timestamp <= Math.max(previous_playhead/ms, playhead/ms));
+        return (Math.min(previous_playhead/ms, playhead/ms) <= timestamp && timestamp < Math.max(previous_playhead/ms, playhead/ms));
     }
 
     fun void getNotesAtPlayhead(int partIndex)
@@ -271,14 +237,14 @@ public class ezScorePlayer
         {
             for(int i; i < currentNotes.size(); i++)
             {
-                spork ~ playNoteWrapper(partIndex, currentNotes[i]);
+                spork ~ playNote(partIndex, currentNotes[i]);
             }
         }
     }
 
-    fun void playNoteWrapper(int partIndex, ezNote theNote)
+    fun void playNote(int partIndex, ezNote theNote)
     {
-        allocate_voice(partIndex, theNote) => int voice_index;
+        instruments[partIndex].allocate_voice(theNote) => int voice_index;
         instruments[partIndex].noteOn(theNote, voice_index);
 
         if(log_playback)
@@ -296,57 +262,7 @@ public class ezScorePlayer
             tick => now;
         }
 
-        release_voice(partIndex, voice_index);
-    }
-
-    // Allocates a new voice for the note and returns the index. 
-    fun int allocate_voice(int partIndex, ezNote theNote)
-    {
-        // Get the first available voice for the note
-        get_free_voice(partIndex) => int new_voice_index;
-
-        // If there are no free voices, steal one
-        if (new_voice_index == -1)
-        {
-            steal_voice(partIndex) => new_voice_index;
-        }
-
-        // Mark the voice as in use
-        true => voice_in_use[partIndex][new_voice_index];
-        
-        return new_voice_index;
-    }
-
-    // Helper for allocate_voice(). Returns the lowest index of a free voice for a given part (or random index if there are no free voices).
-    fun int get_free_voice(int partIndex)
-    {
-        instruments[partIndex].n_voices => int n_voices;
-        for (int i; i < n_voices; i++) {
-            if (!voice_in_use[partIndex][i])       // if voice i is free
-            {
-                return i;
-            }
-        }
-        // if none are free return -1
-        return -1;
-    }
-
-    // Helper for allocate_voice(). Steals a random voice and returns its index
-    fun int steal_voice(int partIndex)
-    {
-        Math.random2(0, instruments[partIndex].n_voices - 1) => int stolen_voice_index;
-        release_voice(partIndex, stolen_voice_index);
-        return stolen_voice_index;
-    }
-
-    // Releases the voice that was in use for a specific note
-    fun void release_voice(int partIndex, int voice_index)
-    {
-        if (voice_in_use[partIndex][voice_index])
-        {
-            instruments[partIndex].noteOff(voice_index);
-            false => voice_in_use[partIndex][voice_index];
-        }
+        instruments[partIndex].release_voice(voice_index);
     }
 }
 
