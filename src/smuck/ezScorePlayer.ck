@@ -21,7 +21,6 @@ public class ezScorePlayer
     false => int playing;
     dur start_of_score;
     dur end_of_score;
-    int voice_in_use[][];
     Event tick_driver_end;
 
     // Preview
@@ -55,19 +54,18 @@ public class ezScorePlayer
             tempInst @=> previewInsts[i];
         }
 
-        // keep track of which voices are currently in use
-        new int[parts.size()][0] @=> voice_in_use;
-
         // remember the end position of the score
         setEnd(-1);
+    }
+
+    fun void setBpm(float bpm)
+    {
+        bpm / score.bpm => rate;
     }
 
     fun void setInstrument(int partIndex, ezInstrument @ instrument)
     {
         instrument @=> instruments[partIndex];
-        
-        // keep track of which voices are currently in use
-        new int[instrument._n_voices] @=> voice_in_use[partIndex];
     }
 
     fun void setInstrument(ezInstrument @ insts[])
@@ -181,6 +179,7 @@ public class ezScorePlayer
             tick * rate => tatum;
             playhead => previous_playhead;
             tatum +=> playhead;
+
             tick => now;
         }
         tick_driver_end.signal();
