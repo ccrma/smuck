@@ -4,9 +4,7 @@ public class ezMidiInst extends ezInstrument
     MidiOut mout;
     int _channel;
     int _device;
-
-    // Public variables 
-    false => int log_output;
+    false => int _logOutput;
 
     // Constructors
     fun ezMidiInst()
@@ -25,29 +23,44 @@ public class ezMidiInst extends ezInstrument
         device => _device;
         mout.open(device);
     }
+
+    fun int device()
+    {
+        return _device;
+    }
     
     fun void channel(int channel)
     {
         channel => _channel;
     }
 
+    fun int channel()
+    {
+        return _channel;
+    }
+
+    fun void logOutput(int log)
+    {
+        log => _logOutput;
+    }
+
     // User-overriden functions
 
     fun void noteOn(ezNote note, int voice)
     {
-        mout.noteOn(_channel, note.pitch, note.velocity);
-        if(log_output)
+        mout.noteOn(_channel, note.pitch(), note.velocity());
+        if(_logOutput)
         {
-            <<< "noteOn: pitch = ", note.pitch, " velocity = ", note.velocity >>>;
+            <<< "noteOn: pitch = ", note.pitch(), " velocity = ", note.velocity() >>>;
         }
     }
     
     fun void noteOff(ezNote note, int voice)
     {
-        mout.noteOff(_channel, note.pitch, 0);
-        if(log_output)
+        mout.noteOff(_channel, note.pitch(), 0);
+        if(_logOutput)
         {
-            <<<"noteOff: pitch = ", note.pitch >>>;
+            <<<"noteOff: pitch = ", note.pitch() >>>;
         }
     }
 }

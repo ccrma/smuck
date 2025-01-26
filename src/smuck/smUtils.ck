@@ -64,7 +64,7 @@ public class smUtils
     }
 
     // Count the number of occurences of target substring in string
-    fun static int count_substring(string input, string target)
+    fun static int countSubstring(string input, string target)
     {
         input => string copy;
         0 => int index;
@@ -102,7 +102,7 @@ public class smUtils
     }
 
     // Get longest valid integer in string starting at given index
-    fun static int find_int_from_index(string input, int index)
+    fun static int findIntFromIndex(string input, int index)
     {
         input => string copy;
         1 => int len;
@@ -157,7 +157,7 @@ public class smUtils
         right_bound - left_bound - 1 => int seq_length;
         copy.substring(left_bound + 1, seq_length) => string sequence;
 
-        find_int_from_index(copy, right_bound + 2) => int n_repeats;
+        findIntFromIndex(copy, right_bound + 2) => int n_repeats;
 
         // check that there is an 'x' immediately after ']'
         if(copy.substring(right_bound + 1, 1) != "x")
@@ -189,14 +189,14 @@ public class smUtils
     {
         input => string copy;
 
-        if(count_substring(copy, "[") == 0 && count_substring(copy, "]") == 0)
+        if(countSubstring(copy, "[") == 0 && countSubstring(copy, "]") == 0)
         {
             return copy;
         }
         else
         {
             // Check to see if left/right bracket counts match
-            if(count_substring(copy, "[") != count_substring(copy, "]"))
+            if(countSubstring(copy, "[") != countSubstring(copy, "]"))
             {
                 <<< "ERROR: number of left brackets '[' and right brackets ']' must be same" >>>;
                 return copy;
@@ -215,7 +215,7 @@ public class smUtils
     {
         input => string copy;
 
-        if(count_substring(copy, "x") == 0)
+        if(countSubstring(copy, "x") == 0)
         {
             return copy;
         }
@@ -226,7 +226,7 @@ public class smUtils
             prefix.rfind(" ") => int left_bound;
             copy.substring(left_bound + 1, idx - left_bound - 1) => string token;
 
-            find_int_from_index(copy, idx + 1) => int n_repeats;
+            findIntFromIndex(copy, idx + 1) => int n_repeats;
 
             // Repeat the bracketed sequence n times
             " " => string output;
@@ -368,15 +368,15 @@ public class smUtils
             // Accidental handling
             if(suffix.find("s") != -1 || suffix.find("#") != -1)
             {
-                count_substring(suffix, "s") => int num_s;
-                count_substring(suffix, "#") => int num_sharp;
+                countSubstring(suffix, "s") => int num_s;
+                countSubstring(suffix, "#") => int num_sharp;
 
                 num_s + num_sharp => alter;
             }
             if(suffix.find("f") != -1 || suffix.find("b") != -1)
             {
-                count_substring(suffix, "f") => int num_f;
-                count_substring(suffix, "b") => int num_flat;
+                countSubstring(suffix, "f") => int num_f;
+                countSubstring(suffix, "b") => int num_flat;
 
                 -1 * (num_f + num_flat) => alter;
             }
@@ -388,7 +388,7 @@ public class smUtils
             // Octave handling
             if(findInt(suffix) != -1)
             {
-                find_int_from_index(suffix, findInt(suffix)) => octave;
+                findIntFromIndex(suffix, findInt(suffix)) => octave;
             }
 
             return step + alter + 12 * (octave + 1);

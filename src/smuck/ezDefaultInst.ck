@@ -15,12 +15,12 @@ public class ezDefaultInst extends ezInstrument
         envs[i].set(4::ms, 7000::ms, 0.0, 200::ms);
     }
 
-    setNumVoices(n_voices);
+    numVoices(n_voices);
 
     fun void noteOn(ezNote theNote, int which)
     {
-        Std.mtof(theNote.pitch) => oscs[which].freq;
-        (theNote.velocity / 127.0) => oscs[which].gain;
+        Std.mtof(theNote.pitch()) => oscs[which].freq;
+        (theNote.velocity() / 127.0) => oscs[which].gain;
         envs[which].keyOn();
     }
 
