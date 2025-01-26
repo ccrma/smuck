@@ -1,4 +1,4 @@
-@import {"../../src/smuck.ck"}
+@import {"../../../src/smuck.ck"}
 ezScore score;
 score.importMIDI("../data/bwv772.mid");
 <<< score.parts.size() >>>;
