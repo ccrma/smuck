@@ -17,6 +17,8 @@ public class ezScorePlayer
     tick => dur tatum;
     dur previous_playhead;
     dur playhead;
+
+    float _bpm;
     
     false => int playing;
     dur start_of_score;
@@ -41,6 +43,8 @@ public class ezScorePlayer
         
         s @=> score;
         s.parts @=> parts;
+        s.bpm => _bpm;
+
         // <<<parts.size(), "parts processed">>>;
 
         // create instruments
@@ -61,6 +65,8 @@ public class ezScorePlayer
     fun void setBpm(float bpm)
     {
         bpm / score.bpm => rate;
+        bpm => _bpm;
+        setEnd(-1);
     }
 
     fun void setInstrument(int partIndex, ezInstrument @ instrument)
@@ -94,6 +100,7 @@ public class ezScorePlayer
         if (!playing)
         {
             true => playing;
+            <<<"sporking tickDriver">>>;
             spork ~ tickDriver();
         }
     }
@@ -110,6 +117,7 @@ public class ezScorePlayer
     {
         // <<< "ezScorePlayer: stop()" >>>;
         false => playing;
+        <<<"sporking stop_listener">>>;
         spork ~ stop_listener();
     }
 
@@ -139,7 +147,7 @@ public class ezScorePlayer
     {
         flushNotes();
         // <<<"moving playhead to position (beats):", beatPosition>>>;
-        60000 / score.bpm => float ms_per_beat;
+        60000 / _bpm => float ms_per_beat;
         ms_per_beat * (4 / score.time_sig_denominator) => ms_per_beat;
         (beatPosition * ms_per_beat)::ms => playhead;
         playhead => previous_playhead;
@@ -149,7 +157,7 @@ public class ezScorePlayer
     {
         flushNotes();
         // <<<"moving playhead to position (measure, beats):", measures, beats>>>;
-        60000 / score.bpm => float ms_per_beat;
+        60000 / _bpm => float ms_per_beat;
         (measures * (ms_per_beat * score.time_sig_numerator * (4 / score.time_sig_denominator)) + beats * ms_per_beat)::ms => playhead;
         playhead => previous_playhead;
     }
@@ -236,6 +244,7 @@ public class ezScorePlayer
         {
             for(int i; i < currentNotes.size(); i++)
             {
+                <<<"sporking note", currentNotes[i].pitch, "on voice", i, "for part", partIndex>>>;
                 spork ~ playNote(partIndex, currentNotes[i]);
             }
         }
