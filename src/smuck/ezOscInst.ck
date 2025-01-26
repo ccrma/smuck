@@ -1,11 +1,10 @@
 public class ezOscInst extends ezInstrument
 {
-    // Public variables
-    false => int log_output;
-
     // Private variables
     "localhost" => string _hostname;
     8888 => int _port;
+    false => int _logOutput;
+
     OscOut xmit;
 
     // Constructors
@@ -30,6 +29,11 @@ public class ezOscInst extends ezInstrument
         <<< "opening OSC connection to host", _hostname, "on port", _port >>>;
     }
 
+    fun string hostname()
+    {
+        return _hostname;
+    }
+
     fun void port(int port)
     {
         port => _port;
@@ -37,28 +41,38 @@ public class ezOscInst extends ezInstrument
         <<< "opening OSC connection to host", _hostname, "on port", _port >>>;
     }
 
+    fun int port()
+    {
+        return _port;
+    }
+
+    fun void logOutput(int log)
+    {
+        log => _logOutput;
+    }
+
     // User-overriden functions
     fun void noteOn(ezNote note, int voice)
     {
         xmit.start("/smuck/noteOn");
-        note.pitch => xmit.add;
-        note.velocity => xmit.add;
+        note.pitch() => xmit.add;
+        note.velocity() => xmit.add;
         xmit.send();
-        if(log_output)
+        if(_logOutput)
         {
-            <<< "sending noteOn: pitch = ", note.pitch, " velocity = ", note.velocity >>>;
+            <<< "sending noteOn: pitch = ", note.pitch(), " velocity = ", note.velocity() >>>;
         }
     }
 
     fun void noteOff(ezNote note, int voice)
     {
         xmit.start("/smuck/noteOff");
-        note.pitch => xmit.add;
+        note.pitch() => xmit.add;
         xmit.send();
 
-        if(log_output)
+        if(_logOutput)
         {
-            <<<"sending noteOff: pitch = ", note.pitch >>>;
+            <<<"sending noteOff: pitch = ", note.pitch() >>>;
         }
     }
 }

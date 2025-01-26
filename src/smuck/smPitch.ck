@@ -117,15 +117,15 @@ public class smPitch
             copy.substring(1) => string suffix;
             if(suffix.find("s") != -1 || suffix.find("#") != -1)
             {
-                smUtils.count_substring(suffix, "s") => int num_s;
-                smUtils.count_substring(suffix, "#") => int num_sharp;
+                smUtils.countSubstring(suffix, "s") => int num_s;
+                smUtils.countSubstring(suffix, "#") => int num_sharp;
 
                 return num_s + num_sharp;
             }
             if(suffix.find("f") != -1 || suffix.find("b") != -1)
             {
-                smUtils.count_substring(suffix, "f") => int num_f;
-                smUtils.count_substring(suffix, "b") => int num_flat;
+                smUtils.countSubstring(suffix, "f") => int num_f;
+                smUtils.countSubstring(suffix, "b") => int num_flat;
 
                 return -1 * (num_f + num_flat);
             }
@@ -150,7 +150,7 @@ public class smPitch
             // If explicit octave number present, use that
             if(smUtils.findInt(suffix) != -1)
             {
-                return smUtils.find_int_from_index(copy, smUtils.findInt(copy));
+                return smUtils.findIntFromIndex(copy, smUtils.findInt(copy));
             }
 
             // Use proximity from last note to determine octave
@@ -164,11 +164,11 @@ public class smPitch
             }
 
             // If direction flags 'd'/'u' present, use those
-            for(int i; i < smUtils.count_substring(suffix, "d"); i++)
+            for(int i; i < smUtils.countSubstring(suffix, "d"); i++)
             {
                 octave--;
             }
-            for(int i; i < smUtils.count_substring(suffix, "u"); i++)
+            for(int i; i < smUtils.countSubstring(suffix, "u"); i++)
             {
                 octave++;
             }

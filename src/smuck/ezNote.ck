@@ -1,41 +1,59 @@
 public class ezNote
 {
     // Onset in beats, relative to start of measure (float)
-    0.0 => float onset;
+    0.0 => float _onset;
     // Duration in beats (float) 
-    1.0 => float beats;
+    1.0 => float _beats;
     // Pitch as a MIDI note number (int)
-    60 => int pitch;
+    60 => int _pitch;
     // Velocity 0-127 (int)
-    100 => int velocity;
-
-    int CC[128];
+    100 => int _velocity;
 
     fun ezNote(float o, float b, int p, int v)
     {
-        o => onset;
-        b => beats;
-        p => pitch;
-        v => velocity;
+        o => _onset;
+        b => _beats;
+        p => _pitch;
+        v => _velocity;
     }
 
-    fun void set_onset(float o)
+    fun float onset()
     {
-        o => onset;
+        return _onset;
     }
 
-    fun void set_beats(float b) 
+    fun void onset(float o)
     {
-        b => beats;
+        o => _onset;
     }
 
-    fun void set_pitch(int p)
+    fun float beats()
     {
-        p => pitch;
+        return _beats;
     }
 
-    fun void set_velocity(int v)
+    fun void beats(float b) 
     {
-        v => velocity;
+        b => _beats;
+    }
+
+    fun int pitch()
+    {
+        return _pitch;
+    }
+
+    fun void pitch(int p)
+    {
+        p => _pitch;
+    }
+
+    fun int velocity()
+    {
+        return _velocity;
+    }
+
+    fun void velocity(int v)
+    {
+        v => _velocity;
     }
 }

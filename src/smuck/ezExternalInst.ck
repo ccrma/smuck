@@ -1,13 +1,11 @@
 public class ezExternalInst extends ezInstrument
 {
-    // Public variables
-    false => int log_output;
-
     // Private variables
     int _device;
     int _channel;
     "localhost" => string _hostname;
     8888 => int _port;
+    false => int _logOutput;
 
     MidiOut mout;
     OscOut xmit;
@@ -50,6 +48,11 @@ public class ezExternalInst extends ezInstrument
         <<< "opening OSC connection to host", _hostname, "on port", _port >>>;
     }
 
+    fun string hostname()
+    {
+        return _hostname;
+    }
+
     fun void port(int port)
     {
         port => _port;
@@ -57,15 +60,35 @@ public class ezExternalInst extends ezInstrument
         <<< "opening OSC connection to host", _hostname, "on port", _port >>>;
     }
 
+    fun int port()
+    {
+        return _port;
+    }
+
     fun void device(int device)
     {
         device => _device;
         mout.open(device);
     }
-    
+
+    fun int device()
+    {
+        return _device;
+    }
+
     fun void channel(int channel)
     {
         channel => _channel;
+    }
+
+    fun int channel()
+    {
+        return _channel;
+    }
+
+    fun void logOutput(int log)
+    {
+        log => _logOutput;
     }
 
     fun void flushMIDI()
@@ -89,17 +112,17 @@ public class ezExternalInst extends ezInstrument
         if(_useOSC)
         {
             xmit.start("/smuck/noteOn");
-            note.pitch => xmit.add;
-            note.velocity => xmit.add;
+            note.pitch() => xmit.add;
+            note.velocity() => xmit.add;
             xmit.send();
         }
         if(_useMIDI)
         {
-            mout.noteOn(0, note.pitch, note.velocity);
+            mout.noteOn(0, note.pitch(), note.velocity());
         }
-        if(log_output)
+        if(_logOutput)
         {
-            <<< "sending noteOn: pitch = ", note.pitch, " velocity = ", note.velocity >>>;
+            <<< "sending noteOn: pitch = ", note.pitch(), " velocity = ", note.velocity() >>>;
         }
     }
 
@@ -109,16 +132,16 @@ public class ezExternalInst extends ezInstrument
         if(_useOSC)
         {
             xmit.start("/smuck/noteOff");
-            note.pitch => xmit.add;
+            note.pitch() => xmit.add;
             xmit.send();
         }
         if(_useMIDI)
         {
-            mout.noteOff(0, note.pitch, 0);
+            mout.noteOff(0, note.pitch(), 0);
         }
-        if(log_output)
+        if(_logOutput)
         {
-            <<<"sending noteOff: pitch = ", note.pitch >>>;
+            <<<"sending noteOff: pitch = ", note.pitch() >>>;
         }
     }
 }

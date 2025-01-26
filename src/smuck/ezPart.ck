@@ -2,10 +2,28 @@
 
 public class ezPart
 {
-    ezMeasure measures[0];
-    int maxPolyphony;
+    // Private variables
+    int _maxPolyphony;
 
-    fun void add_measure(ezMeasure @ measure)
+    // Public variables
+    ezMeasure measures[0];
+
+    // Constructors
+    fun ezPart(string input)
+    {
+        ezMeasure measure(input);
+        addMeasure(measure);
+    }
+
+    fun ezPart(string input, int fill_mode)
+    {
+        ezMeasure measure(input, fill_mode);
+        addMeasure(measure);
+    }
+
+    // Public functions
+
+    fun void addMeasure(ezMeasure @ measure)
     {
         if(measures.size() == 0)
         {
@@ -13,187 +31,177 @@ public class ezPart
         }
         else
         {
-            measures[-1].length + measures[-1].onset => measure.onset;
+            measures[-1].length() + measures[-1].onset() => measure.onset;
         }
         measures << measure;
     }
 
-    fun ezPart(string input)
-    {
-        ezMeasure measure(input);
-        add_measure(measure);
-    }
+    // SMucKish input functions
 
-    fun ezPart(string input, int fill_mode)
-    {
-        ezMeasure measure(input, fill_mode);
-        add_measure(measure);
-    }
-
-    fun void set_pitches(string input)
+    fun void setPitches(string input)
     {
         if(measures.size() == 0)
         {
             ezMeasure measure;
-            measure.set_pitches(input);
-            add_measure(measure);
+            measure.setPitches(input);
+            addMeasure(measure);
         }
         else
         {
-            measures[-1].set_pitches(input);
+            measures[-1].setPitches(input);
         }
     }
-    fun void set_pitches(string input[])
+    fun void setPitches(string input[])
     {
         if(measures.size() == 0)
         {
             ezMeasure measure;
-            measure.set_pitches(input);
-            add_measure(measure);
+            measure.setPitches(input);
+            addMeasure(measure);
         }
         else
         {
-            measures[-1].set_pitches(input);
-        }
-    }
-
-    fun void set_pitches(int input[][])
-    {
-        if(measures.size() == 0)
-        {
-            ezMeasure measure;
-            measure.set_pitches(input);
-            add_measure(measure);
-        }
-        else
-        {
-            measures[-1].set_pitches(input);
+            measures[-1].setPitches(input);
         }
     }
 
-    fun void set_pitches(string input, int fill_mode)
+    fun void setPitches(int input[][])
     {
         if(measures.size() == 0)
         {
             ezMeasure measure;
-            measure.set_pitches(input, fill_mode);
-            add_measure(measure);
+            measure.setPitches(input);
+            addMeasure(measure);
         }
         else
         {
-            measures[-1].set_pitches(input, fill_mode);
+            measures[-1].setPitches(input);
         }
     }
 
-    fun void set_rhythms(string input)
+    fun void setPitches(string input, int fill_mode)
     {
         if(measures.size() == 0)
         {
             ezMeasure measure;
-            measure.set_rhythms(input);
-            add_measure(measure);
+            measure.setPitches(input, fill_mode);
+            addMeasure(measure);
         }
         else
         {
-            measures[-1].set_rhythms(input);
+            measures[-1].setPitches(input, fill_mode);
         }
     }
 
-    fun void set_rhythms(string input[])
+    fun void setRhythms(string input)
     {
         if(measures.size() == 0)
         {
             ezMeasure measure;
-            measure.set_rhythms(input);
-            add_measure(measure);
+            measure.setRhythms(input);
+            addMeasure(measure);
         }
         else
         {
-            measures[-1].set_rhythms(input);
+            measures[-1].setRhythms(input);
         }
     }
 
-    fun void set_rhythms(float input[])
+    fun void setRhythms(string input[])
     {
         if(measures.size() == 0)
         {
             ezMeasure measure;
-            measure.set_rhythms(input);
-            add_measure(measure);
+            measure.setRhythms(input);
+            addMeasure(measure);
         }
         else
         {
-            measures[-1].set_rhythms(input);
+            measures[-1].setRhythms(input);
         }
     }
 
-    fun void set_rhythms(string input, int fill_mode)
+    fun void setRhythms(float input[])
     {
         if(measures.size() == 0)
         {
             ezMeasure measure;
-            measure.set_rhythms(input, fill_mode);
-            add_measure(measure);
+            measure.setRhythms(input);
+            addMeasure(measure);
         }
         else
         {
-            measures[-1].set_rhythms(input, fill_mode);
+            measures[-1].setRhythms(input);
         }
     }
 
-    fun void set_velocities(string input)
+    fun void setRhythms(string input, int fill_mode)
     {
         if(measures.size() == 0)
         {
             ezMeasure measure;
-            measure.set_velocities(input);
-            add_measure(measure);
+            measure.setRhythms(input, fill_mode);
+            addMeasure(measure);
         }
         else
         {
-            measures[-1].set_velocities(input);
+            measures[-1].setRhythms(input, fill_mode);
         }
     }
 
-    fun void set_velocities(string input[])
+    fun void setVelocities(string input)
     {
         if(measures.size() == 0)
         {
             ezMeasure measure;
-            measure.set_velocities(input);
-            add_measure(measure);
+            measure.setVelocities(input);
+            addMeasure(measure);
         }
         else
         {
-            measures[-1].set_velocities(input);
+            measures[-1].setVelocities(input);
         }
     }
 
-    fun void set_velocities(int input[])
+    fun void setVelocities(string input[])
     {
         if(measures.size() == 0)
         {
             ezMeasure measure;
-            measure.set_velocities(input);
-            add_measure(measure);
+            measure.setVelocities(input);
+            addMeasure(measure);
         }
         else
         {
-            measures[-1].set_velocities(input);
+            measures[-1].setVelocities(input);
         }
     }
 
-    fun void set_velocities(string input, int fill_mode)
+    fun void setVelocities(int input[])
     {
         if(measures.size() == 0)
         {
             ezMeasure measure;
-            measure.set_velocities(input, fill_mode);
-            add_measure(measure);
+            measure.setVelocities(input);
+            addMeasure(measure);
         }
         else
         {
-            measures[-1].set_velocities(input, fill_mode);
+            measures[-1].setVelocities(input);
+        }
+    }
+
+    fun void setVelocities(string input, int fill_mode)
+    {
+        if(measures.size() == 0)
+        {
+            ezMeasure measure;
+            measure.setVelocities(input, fill_mode);
+            addMeasure(measure);
+        }
+        else
+        {
+            measures[-1].setVelocities(input, fill_mode);
         }
     }
 }
