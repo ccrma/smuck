@@ -1,36 +1,55 @@
 @import "ezNote.ck"
 @import "smuckish.ck"
 
+@doc "SMucK measure object. An ezMeasure object contains one or more ezNotes. Note contents can be set using the SMucKish input syntax."
 public class ezMeasure
 {
     // Private variables
+    @doc "(hidden)"
     int _pitches[0][0];
+    @doc "(hidden)"
     float _rhythms[0];
+    @doc "(hidden)"
     int _velocities[0];
 
+    @doc "(hidden)"
     float _length;
+    @doc "(hidden)"
     float _onset;
 
     // Public variables
+    @doc "The ezNote objects in the measure"
     ezNote notes[0];
     
     // Constructors
+
+    @doc "Default constructor, creates an empty measure"
+    fun ezMeasure()
+    {
+
+    }
+
+    @doc "Create an ezMeasure from a SMucKish input string"
     fun ezMeasure(string input)
     {
         setInterleaved(input);
     }
 
+    //"Create an ezMeasure from a SMucKish input string, with fill mode"
+    @doc "(hidden)" 
     fun ezMeasure(string input, int fill_mode)
     {
         setInterleaved(input, fill_mode);
     }
 
     // Public functions
+    @doc "Add an ezNote to the measure"
     fun void addNote(ezNote note)
     {
         notes << note;
     }
 
+    @doc "Print the parameters for each note in the measure"
     fun void printNotes()
     {
         chout <= "There are " <= notes.size() <= " notes in this measure:" <= IO.newline();
@@ -47,89 +66,89 @@ public class ezMeasure
 
     // Member variable get/set functions
 
-    // Set the onset of the measure in beats, relative to the start of the score
-    fun void onset(float o)
+    @doc "Set the onset of the measure in beats, relative to the start of the score"
+    fun void onset(float value)
     {
-        o => _onset;
+        value => _onset;
     }
 
-    // Get the onset of the measure in beats, relative to the start of the score
+    @doc "Get the onset of the measure in beats, relative to the start of the score"
     fun float onset()
     {
         return _onset;
     }
 
-    // Set the length of the measure in beats
-    fun void length(float l)
+    @doc "Set the length of the measure in beats"
+    fun void length(float value)
     {
-        l => _length;
+        value => _length;
     }
 
-    // Get the length of the measure in beats
+    @doc "Get the length of the measure in beats"
     fun float length()
     {
         return _length;
     }
 
-    // SMucKish parsing function
+    // SMucKish parsing functions
 
-    // Set pitches from a single string
+    @doc "Set the pitches of the notes in the measure, using a SMucKish input string"
     fun void setPitches(string input)
     {
         smPitch.parse_pitches(input) @=> _pitches;
         compile_notes(_pitches, _rhythms, _velocities, 1);
     }
     
-    // Set pitches from an array of individual string tokens
+    @doc "Set the pitches of the notes in the measure, using an array of SMucKish string tokens"
     fun void setPitches(string input[])
     {
         smPitch.parse_tokens(input) @=> _pitches;
         compile_notes(_pitches, _rhythms, _velocities, 1);
     }
 
-    // Set pitches directly from an a 2D array of ints
+    @doc "Set the pitches of the notes in the measure directly from a 2D array of ints"
     fun void setPitches(int input[][])
     {
         input @=> _pitches;
         compile_notes(_pitches, _rhythms, _velocities, 1);
     }
 
-    // Set rhythms from a single string
+    @doc "Set the rhythms of the notes in the measure, using a SMucKish input string"
     fun void setRhythms(string input)
     {
         smRhythm.parse_rhythms(input) @=> _rhythms;
         compile_notes(_pitches, _rhythms, _velocities, 1);
     }
 
-    // Set rhythms from an array of individual string tokens
+    @doc "Set the rhythms of the notes in the measure, using an array of SMucKish string tokens"
     fun void setRhythms(string input[])
     {
         smRhythm.parse_tokens(input) @=> _rhythms;
         compile_notes(_pitches, _rhythms, _velocities, 1);
     }
 
-    // Set rhythms from an array of floats
+    @doc "Set the rhythms of the notes in the measure directly from an array of floats"
     fun void setRhythms(float input[])
     {
         input @=> _rhythms;
         compile_notes(_pitches, _rhythms, _velocities, 1);
     }
 
-    // Set velocities from a single string
+    @doc "Set the velocities of the notes in the measure, using a SMucKish input string"
     fun void setVelocities(string input)
     {
         smVelocity.parse_velocities(input) @=> _velocities;
         compile_notes(_pitches, _rhythms, _velocities, 1);
     }
 
-    // Set velocities from an array of individual string tokens
+    @doc "Set the velocities of the notes in the measure, using an array of SMucKish string tokens"
     fun void setVelocities(string input[])
     {
         smVelocity.parse_tokens(input) @=> _velocities;
         compile_notes(_pitches, _rhythms, _velocities, 1);
     }
 
-    // Set velocities from an array of ints
+    @doc "Set the velocities of the notes in the measure directly from an array of ints"
     fun void setVelocities(int input[])
     {
         input @=> _velocities;
@@ -137,6 +156,7 @@ public class ezMeasure
     }
 
     // Set pitches from a string, with fill mode
+    @doc "(hidden)"
     fun void setPitches(string input, int fill_mode)
     {
         smPitch.parse_pitches(input) @=> _pitches;
@@ -144,6 +164,7 @@ public class ezMeasure
     }
 
     // Set rhythms from a string, with fill mode
+    @doc "(hidden)"
     fun void setRhythms(string input, int fill_mode)
     {
         smRhythm.parse_rhythms(input) @=> _rhythms;
@@ -151,6 +172,7 @@ public class ezMeasure
     }
 
     // Set velocities from a string, with fill mode
+    @doc "(hidden)"
     fun void setVelocities(string input, int fill_mode)
     {
         smVelocity.parse_velocities(input) @=> _velocities;
@@ -158,6 +180,7 @@ public class ezMeasure
     }
 
     // Private functions
+    @doc "(hidden)"
     fun void setInterleaved(string input)
     {
         smScore score;
@@ -165,6 +188,7 @@ public class ezMeasure
         compile_notes(score.pitches, score.rhythms, score.velocities, 1);
     }
 
+    @doc "(hidden)"
     fun void setInterleaved(string input, int fill_mode)
     {
         smScore score;
@@ -172,6 +196,7 @@ public class ezMeasure
         compile_notes(score.pitches, score.rhythms, score.velocities, fill_mode);
     }
 
+    @doc "(hidden)"
     fun void compile_notes(int new_pitches[][], float new_rhythms[], int new_velocities[], int fill_mode)
     {
         ezNote new_notes[0];
