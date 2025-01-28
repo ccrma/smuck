@@ -1,3 +1,4 @@
+@doc "A variety of utility functions for working with SMucKish. Has some useful string handling functions applicable outside of SMucK."
 public class smUtils
 {
     //--------------------------------------------------------
@@ -5,19 +6,20 @@ public class smUtils
     //--------------------------------------------------------
 
     // Split a string by given delimiter, return array of split elements
-    fun static string[] split(string input, string delim)
+    @doc "Split a string into an array of strings, using a given delimiter."
+    fun static string[] split(string input, string delimiter)
     {
         string output[0];
         input => string copy;
 
-        while(copy.find(delim) != -1)
+        while(copy.find(delimiter) != -1)
         {
-            copy.find(delim) => int ix;
+            copy.find(delimiter) => int ix;
             copy.substring(0, ix) => string curr;
             if(curr.length() > 0){output << curr;}
-            if(ix + delim.length() < copy.length())
+            if(ix + delimiter.length() < copy.length())
             {
-                copy.substring(ix + delim.length()) => copy;
+                copy.substring(ix + delimiter.length()) => copy;
             }
             else
             {
@@ -33,6 +35,7 @@ public class smUtils
         return output;
     }
 
+    @doc "Split a string into an array of strings, using whitespace as the delimiter."
     fun static string[] split(string input)
     {
         string output[0];
@@ -64,6 +67,7 @@ public class smUtils
     }
 
     // Count the number of occurences of target substring in string
+    @doc "Count the number of occurences of a target substring in a string."
     fun static int countSubstring(string input, string target)
     {
         input => string copy;
@@ -88,6 +92,7 @@ public class smUtils
     }
 
     // Find leftmost occurence of an integer in a string, return index or -1 if none found
+    @doc "Find the leftmost occurence of an integer in a string, return index or -1 if none found."
     fun static int findInt(string input)
     {
         for(int i; i < input.length(); i++)
@@ -102,6 +107,7 @@ public class smUtils
     }
 
     // Get longest valid integer in string starting at given index
+    @doc "Get the longest valid integer in a string starting at a given index."
     fun static int findIntFromIndex(string input, int index)
     {
         input => string copy;
@@ -129,6 +135,7 @@ public class smUtils
     //
     // Repeated tokens are denoted with 'x' followed by an integer
     // The token will be repeated that many times
+    @doc "(hidden)"
     fun static string[] handle_repeat(string input)
     {
         string expanded[0];
@@ -147,6 +154,7 @@ public class smUtils
     // A sequence is demarcated by brackets '[', ']'
     // Number of repeats is specified with 'x' followed by an integer
     // Everyting within the brackets will be repeated that many times
+    @doc "(hidden)"
     fun static string handle_sequence(string input)
     {
         input => string copy;
@@ -185,6 +193,7 @@ public class smUtils
 
     // Find all bracketed sequences and expand with appropriate number of repeats
     // note: recursive!!
+    @doc "(hidden)"
     fun static string expand_sequences(string input)
     {
         input => string copy;
@@ -210,7 +219,7 @@ public class smUtils
     }
 
     // Expand all repeated tokens, return single string
-
+    @doc "(hidden)"
     fun static string expand_tokens(string input)
     {
         input => string copy;
@@ -242,12 +251,14 @@ public class smUtils
         }
     }
 
+    @doc "(hidden)"
     fun static string expand_repeats(string input)
     {
         return expand_tokens(expand_sequences(input));
     }
 
     // Pad pitch array to match length
+    @doc "(hidden)"
     fun static int[][] pad_length(int array[][], int length, int pad_value[])
     {
         int output[0][0];
@@ -267,6 +278,7 @@ public class smUtils
     }
 
     // Pad rhythm array to match length
+    @doc "(hidden)"
     fun static float[] pad_length(float array[], int length, float pad_value)
     {
         float output[0];
@@ -286,6 +298,7 @@ public class smUtils
     }
 
     // Pad velocity array to match length
+    @doc "(hidden)"
     fun static int[] pad_length(int array[], int length, int pad_value)
     {
         int output[0];
@@ -309,7 +322,10 @@ public class smUtils
     //--------------------------------------------------------
 
     // midi note to pitch
+    @doc "(hidden)"
     ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"] @=> static string chromatic[];
+
+    @doc "Convert a MIDI note number to a pitch name."
     fun static string mid2str(int note)
     {
         if(note < 0)
@@ -327,6 +343,7 @@ public class smUtils
         }
     }
 
+    @doc "Convert a pitch name to a MIDI note number."
     fun static int str2mid(string note)
     {
 
@@ -396,6 +413,7 @@ public class smUtils
         
     }
 
+    @doc "(hidden)"
     fun static int isKeySigToken(string input)
     {
         if(input.length() == 3 && input.substring(0, 1) == "k")
@@ -408,6 +426,7 @@ public class smUtils
         }
     }
 
+    @doc "(hidden)"
     fun static int isPitchToken(string input)
     {
         for(int i; i < input.length(); i++)
@@ -420,6 +439,7 @@ public class smUtils
         return 1;
     }
 
+    @doc "(hidden)"
     fun static int isRhythmToken(string input)
     {
         for(int i; i < input.length(); i++)
@@ -432,6 +452,7 @@ public class smUtils
         return 1;
     }
 
+    @doc "(hidden)"
     fun static int isVelocityToken(string input)
     {
         for(int i; i < input.length(); i++)
@@ -444,6 +465,7 @@ public class smUtils
         return 1;
     }
 
+    @doc "(hidden)"
     fun static int isCCToken(string input)
     {
         for(int i; i < input.length(); i++)

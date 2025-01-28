@@ -1,18 +1,29 @@
 @import {"ezNote.ck", "ezMeasure.ck", "ezPart.ck"}
 
+@doc "SMucK score object. An ezScore object contains one or more ezParts. Score contents can be set using the SMucKish input syntax, or by importing a MIDI file. ezScore objects can be passed to an ezScorePlayer object for playback."
 public class ezScore
 {
-    
     // Private variables
+    @doc "(hidden)"
     120 => float _bpm;
+    @doc "(hidden)"
     4 => int _time_sig_numerator;
+    @doc "(hidden)"
     4 => int _time_sig_denominator;
 
     // Public variables
+    @doc "The ezPart objects in the score"
     ezPart parts[0];
     
     // Constructors
     // --------------------------------------------------------------------------
+    @doc "Default constructor, creates an empty score"
+    fun ezScore()
+    {
+
+    }
+
+    @doc "Create an ezScore from a SMucKish input string or MIDI file. If the input argument is a MIDI filename (ending in .mid), the MIDI file is imported. Otherwise, the input string is interpreted as a SMucKish input string."
     fun ezScore(string input)
     {
         if(input.length() > 4 && input.substring(input.length() - 4,4) == ".mid")
@@ -25,46 +36,63 @@ public class ezScore
         }
     }
 
-    fun ezScore(string filename, float newBpm)
+    @doc "Create an ezScore from a SMucKish input string or MIDI file, with a specified BPM"
+    fun ezScore(string input, float bpm)
     {
-        newBpm => _bpm;
+        bpm => _bpm;
 
-        if(filename.length() > 4 && filename.substring(filename.length() - 4,4) == ".mid")
+        if(input.length() > 4 && input.substring(input.length() - 4,4) == ".mid")
         {
-            importMIDI(filename);
+            importMIDI(input);
+        }
+        else
+        {
+            setPart(input);
         }
     }
 
     // Public functions
 
     // Member variable get/set functions
-    fun void bpm(float newBpm)
+    @doc "Set the tempo in BPM (beats per minute) for the score"
+    fun void bpm(float value)
     {
-        newBpm => _bpm;
+        value => _bpm;
     }
 
+    @doc "Get the tempo in BPM (beats per minute) for the score"
     fun float bpm()
     {
         return _bpm;
     }
 
+    @doc "Set the time signature for the score"
     fun void setTimeSig(int numerator, int denominator)
     {
         numerator => _time_sig_numerator;
         denominator => _time_sig_denominator;
     }
 
+    @doc "Get the number of parts in the score"
     fun int numParts()
     {
         return parts.size();
     }
 
+    @doc "Add an ezPart to the score"
     fun void addPart(ezPart part)
     {
         parts << part;
     }
 
-    // returns the end of the score in beats (the last note's release point)
+    @doc "Add an ezPart to the score, using a SMucKish input string"
+    fun void addPart(string input)
+    {
+        ezPart part(input);
+        parts << part;
+    }
+
+    @doc "Get the end of the score in beats (the last note's release point)"
     fun float scoreEnd()
     {
         float last_note_offset;
@@ -86,11 +114,13 @@ public class ezScore
         return last_note_offset;
     }
 
+    @doc "Get the duration of the score in milliseconds"
     fun dur scoreDuration()
     {
         return (scoreEnd() * 60000 / _bpm)::ms;
     }
 
+    @doc "Get the maximum polyphony for a given part"
     fun int maxPolyphony(int part)
     {
         return parts[part]._maxPolyphony;
@@ -98,18 +128,21 @@ public class ezScore
     
     // SMucKish input
     // --------------------------------------------------------------------------
+    @doc "(hidden)"
     fun void setPart(string input)
     {
         ezPart part(input);
         addPart(part);
     }
 
+    @doc "(hidden)"
     fun void setPart(string input, int fill_mode)
     {
         ezPart part(input, fill_mode);
         addPart(part);
     }
 
+    @doc "Set the pitches of the notes in the last part, using a SMucKish input string. If the score contains no parts, a new part is created."
     fun void setPitches(string input)
     {
         if(parts.size() == 0)
@@ -124,6 +157,7 @@ public class ezScore
         }
     }
 
+    @doc "Set the pitches of the notes in the last part, using an array of SMucKish string tokens. If the score contains no parts, a new part is created."
     fun void setPitches(string input[])
     {
         if(parts.size() == 0)
@@ -134,6 +168,7 @@ public class ezScore
         }
     }
 
+    @doc "Set the pitches of the notes in the last part, using a 2D array of ints. If the score contains no parts, a new part is created."
     fun void setPitches(int input[][])
     {
         if(parts.size() == 0)
@@ -144,6 +179,7 @@ public class ezScore
         }
     }
 
+    @doc "(hidden)"
     fun void setPitches(string input, int fill_mode)
     {
         if(parts.size() == 0)
@@ -158,6 +194,7 @@ public class ezScore
         }
     }
 
+    @doc "Set the rhythms of the notes in the last part, using a SMucKish input string. If the score contains no parts, a new part is created."
     fun void setRhythms(string input)
     {
         if(parts.size() == 0)
@@ -172,6 +209,7 @@ public class ezScore
         }
     }
 
+    @doc "Set the rhythms of the notes in the last part, using an array of SMucKish string tokens. If the score contains no parts, a new part is created."
     fun void setRhythms(string input[])
     {
         if(parts.size() == 0)
@@ -182,6 +220,7 @@ public class ezScore
         }
     }
 
+    @doc "Set the rhythms of the notes in the last part, using an array of floats. If the score contains no parts, a new part is created."
     fun void setRhythms(float input[])
     {
         if(parts.size() == 0)
@@ -192,6 +231,7 @@ public class ezScore
         }
     }
     
+    @doc "(hidden)"
     fun void setRhythms(string input, int fill_mode)
     {
         if(parts.size() == 0)
@@ -206,6 +246,7 @@ public class ezScore
         }
     }
 
+    @doc "Set the velocities of the notes in the last part, using a SMucKish input string. If the score contains no parts, a new part is created."
     fun void setVelocities(string input)
     {
         if(parts.size() == 0)
@@ -220,6 +261,7 @@ public class ezScore
         }
     }
 
+    @doc "Set the velocities of the notes in the last part, using an array of SMucKish string tokens. If the score contains no parts, a new part is created."
     fun void setVelocities(string input[])
     {
         if(parts.size() == 0)
@@ -230,6 +272,7 @@ public class ezScore
         }
     }
 
+    @doc "Set the velocities of the notes in the last part, using an array of ints. If the score contains no parts, a new part is created."
     fun void setVelocities(int input[])
     {
         if(parts.size() == 0)
@@ -240,6 +283,7 @@ public class ezScore
         }
     }
 
+    @doc "(hidden)"
     fun void setVelocities(string input, int fill_mode)
     {
         if(parts.size() == 0)
@@ -254,6 +298,7 @@ public class ezScore
         }
     }
 
+    @doc "Read a MIDI file into the ezScore object"
     fun void importMIDI(string filename) {
         MidiFileIn min;
         MidiMsg msg;

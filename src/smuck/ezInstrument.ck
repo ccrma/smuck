@@ -1,21 +1,28 @@
 @import "ezNote.ck";
 
+@doc "Base class for user-defined instruments to be used for playback in ezScorePlayer. Users should extend this base class to create their own instruments. Users define the behavior of their instrument by overriding the noteOn and noteOff functions."
 public class ezInstrument extends Chugraph
 {
     // private variables
     // --------------------------------------------------------------------------
     // number of voices
+    @doc "(hidden)"
     int _numVoices;
+
     // array to track which voices are in use
+    @doc "(hidden)"
     int voice_in_use[]; 
+
     // array to track which voice is assigned to which pitch
+    @doc "(hidden)"
     ezNote voice_to_note[];
 
-    numVoices(127);
+    setVoices(127);
 
     // private functions
     // --------------------------------------------------------------------------
     // get the index of the first unused voice
+    @doc "(hidden)"
     fun int get_free_voice()
     {
         for(int i; i < _numVoices; i++)
@@ -29,6 +36,7 @@ public class ezInstrument extends Chugraph
     }
 
     // allocate a voice for a new incoming note
+    @doc "(hidden)"
     fun int allocate_voice(ezNote theNote)
     {
         // get the first free voice 
@@ -50,6 +58,7 @@ public class ezInstrument extends Chugraph
     }
 
     // steal a voice from another note
+    @doc "(hidden)"
     fun int steal_voice()
     {
         // get a random voice index
@@ -64,6 +73,7 @@ public class ezInstrument extends Chugraph
     }
 
     // release a voice (mark it as unused, and call noteOff)
+    @doc "(hidden)"
     fun void release_voice(int voice_index)
     {
         if(voice_in_use[voice_index])
@@ -78,21 +88,23 @@ public class ezInstrument extends Chugraph
 
     // public functions
     // --------------------------------------------------------------------------
-    // set the number of voices
-    fun void numVoices(int n)
+    @doc "Set the number of voices for the instrument if using user-defined signal chain. This tells the ezScorePlayer how many voices to allocate for the instrument. E.g. if you set up 5 SinOscs, you should call setVoices(5) inside your class definition. See ezDefaultInst.ck for an example."
+    fun void setVoices(int n_voices)
     {
-        n => _numVoices;
+        n_voices => _numVoices;
         new int[_numVoices] @=> voice_in_use;
         new ezNote[_numVoices] @=> voice_to_note;
     }
 
     // User-overridden functions
     // --------------------------------------------------------------------------
+    @doc "This function defines behavior that will be executed when a note is played by the ezScorePlayer. Typically, this would include setting frequency, gain, calling .keyOn(), etc. by referencing variables of theNote. The base class function is empty, and should be overridden by the user."
     fun void noteOn(ezNote theNote, int voice_index)
     {
         <<< "Implement this noteOn function" >>>;
     }
 
+    @doc "This function defines behavior that will be executed when a note is released by the ezScorePlayer. This could include calling .keyOff(), etc. or referencing variables of theNote. The base class function is empty, and should be overridden by the user."
     fun void noteOff(ezNote theNote, int voice_index)
     {
         <<< "Implement this noteOff function" >>>;
