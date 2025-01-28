@@ -9,7 +9,7 @@ public class ezInstrument extends Chugraph
     // array to track which voices are in use
     int voice_in_use[]; 
     // array to track which voice is assigned to which pitch
-    int voice_to_pitch[];
+    ezNote voice_to_note[];
 
     numVoices(127);
 
@@ -44,7 +44,7 @@ public class ezInstrument extends Chugraph
         true => voice_in_use[new_voice_index];
 
         // assign the note's pitch to the voice
-        theNote.pitch() => voice_to_pitch[new_voice_index];
+        theNote @=> voice_to_note[new_voice_index];
 
         return new_voice_index;
     }
@@ -68,15 +68,11 @@ public class ezInstrument extends Chugraph
     {
         if(voice_in_use[voice_index])
         {
-            // create a dummy note with the stolen note's pitch
-            ezNote dummyNote;
-            voice_to_pitch[voice_index] => dummyNote.pitch;
-
             // mark the voice as unused
             false => voice_in_use[voice_index];
 
             // call noteOff
-            noteOff(dummyNote, voice_index);
+            noteOff(voice_to_note[voice_index], voice_index);
         }
     }
 
@@ -87,18 +83,18 @@ public class ezInstrument extends Chugraph
     {
         n => _numVoices;
         new int[_numVoices] @=> voice_in_use;
-        new int[_numVoices] @=> voice_to_pitch;
+        new ezNote[_numVoices] @=> voice_to_note;
     }
 
     // User-overridden functions
     // --------------------------------------------------------------------------
     fun void noteOn(ezNote theNote, int voice_index)
     {
-        <<< "noteOn" >>>;
+        <<< "Implement this noteOn function" >>>;
     }
 
     fun void noteOff(ezNote theNote, int voice_index)
     {
-        <<< "noteOff" >>>;
+        <<< "Implement this noteOff function" >>>;
     }
 }
