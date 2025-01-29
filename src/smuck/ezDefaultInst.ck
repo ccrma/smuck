@@ -1,6 +1,6 @@
 @import "ezInstrument.ck"
 
-@doc "Default ezInstrument that uses a simple signal chain of sine oscillators and envelopes. Used as the instrument for ezScorePlayer's .preview() function. Handles up to 128 simultaneous voices. Signal chain is: SinOsc[128] => ADSR[128] => Gain => NRev => dac. Feel free to copy this and modify it for your own use! See full class definition at https://github.com/smuck/smuck/blob/main/src/smuck/ezDefaultInst.ck"
+@doc "Default ezInstrument that uses a simple signal chain of sine oscillators and envelopes. Used as the instrument for ezScorePlayer's .preview() function. Handles up to 128 simultaneous voices. Signal chain is: SinOsc[128] => ADSR[128] => Gain => NRev => dac. See full class definition at https://github.com/smuck/smuck/blob/main/src/smuck/ezDefaultInst.ck"
 public class ezDefaultInst extends ezInstrument
 {
     // define sound chain
