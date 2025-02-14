@@ -21,12 +21,12 @@ public class smScale
     [0, 2, 4, 5, 7, 9, 11] @=> scaleDict["major"];
     [0, 2, 3, 5, 7, 8, 10] @=> scaleDict["minor"];
     [0, 2, 3, 5, 7, 9, 11] @=> scaleDict["melodic_minor"];
-    [0, 2, 3, 5, 7, 8, 11] @=> scaleDict["harmonic_cminor"];
+    [0, 2, 3, 5, 7, 8, 11] @=> scaleDict["harmonic_minor"];
 
     // greek modes
     [0, 2, 4, 5, 7, 9, 11] @=> scaleDict["ionian"];
     [0, 2, 3, 5, 7, 9, 10] @=> scaleDict["dorian"];
-    [0, 1, 3, 5, 7, 8, 10] @=> scaleDict["phyrgian"];
+    [0, 1, 3, 5, 7, 8, 10] @=> scaleDict["phrygian"];
     [0, 2, 4, 6, 7, 9, 11] @=> scaleDict["lydian"];
     [0, 2, 4, 5, 7, 9, 10] @=> scaleDict["mixolydian"];
     [0, 2, 3, 5, 7, 8, 10] @=> scaleDict["aeolian"];
