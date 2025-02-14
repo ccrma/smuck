@@ -346,7 +346,6 @@ public class smUtils
     @doc "Convert a pitch name to a MIDI note number."
     fun static int str2mid(string note)
     {
-
         int step;
         int alter;
         int octave;

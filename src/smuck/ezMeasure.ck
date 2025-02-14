@@ -1,5 +1,5 @@
 @import "ezNote.ck"
-@import "smuckish.ck"
+@import "Smuckish.ck" // for recursive imports
 
 @doc "SMucK measure object. An ezMeasure object contains one or more ezNotes. Note contents can be set using the SMucKish input syntax."
 public class ezMeasure

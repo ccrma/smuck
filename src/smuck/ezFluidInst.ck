@@ -1,33 +1,28 @@
-@doc "ezInstrument that uses the FluidSynth chugin to play back ezScore data with FluidSynth SoundFont files. By default, uses the 'TimGM6mb.sf2' file which ships with SMucK. Note: using this instrument requires the FluidSynth chugin to be installed. See full class definition at https://github.com/smuck/smuck/blob/main/src/smuck/ezFluidInst.ck"
+@import "FluidSynth"
+
+@doc "ezInstrument that uses the FluidSynth chugin to play back ezScore data with FluidSynth SoundFont files. Note: using this instrument requires the FluidSynth chugin to be installed."
 public class ezFluidInst extends ezInstrument
 {
     @doc "(hidden)"
     FluidSynth fs => outlet;
     
     @doc "(hidden)"
-    "./TimGM6mb.sf2" => string _filename;
+    // "./TimGM6mb.sf2" => 
+    string _filename;
 
     @doc "(hidden)"
     0 => int _instrument;
 
-    @doc "Create a new ezFluidInst. By default, uses the 'TimGM6mb.sf2' SoundFont file (which ships with SMucK) and program 0 (Acoustic Grand Piano)."
+    @doc "Create a new ez-fluidsynth instrument; (hint: use .open() to load a SoundFont file; use .progChange() to set an instrument)"
     fun ezFluidInst()
-    {
-        fs.open(_filename);
-        fs.progChange(_instrument);
-    }
-    @doc "Create a new ezFluidInst with a specific instrument program number"
-    fun ezFluidInst(int instrument)
-    {
-        instrument => _instrument;
-        fs.progChange(_instrument);
-    }
+    { }
 
-    @doc "Create a new ezFluidInst with a specific SoundFont file"
+    @doc "Create a new ezFluidInst with a specific SoundFont file; program number will default to 0 (Grand Piano)"
     fun ezFluidInst(string filename)
     {
         filename => _filename;
         fs.open(_filename);
+        fs.progChange(_instrument);
     }
 
     @doc "Create a new ezFluidInst with a specific SoundFont file and instrument program number"
@@ -39,8 +34,8 @@ public class ezFluidInst extends ezInstrument
         fs.progChange(_instrument);
     }
 
-    @doc "Set the SoundFont file to use"
-    fun void filename(string filename)
+    @doc "Load a SoundFont file to use"
+    fun void open( string filename )
     {
         filename => _filename;
         fs.open(_filename);
@@ -53,14 +48,15 @@ public class ezFluidInst extends ezInstrument
     }
 
     @doc "Set the instrument program number to use"
-    fun void instrument(int instrument)
+    fun int progChange(int instrument)
     {
         instrument => _instrument;
         fs.progChange(_instrument);
+        return instrument;
     }
 
     @doc "Get the instrument program number currently in use"
-    fun int instrument()
+    fun int progChange()
     {
         return _instrument;
     }

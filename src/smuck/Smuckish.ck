@@ -1,7 +1,7 @@
 @import {"smUtils.ck", "smPitch.ck", "smRhythm.ck", "smVelocity.ck", "smScore.ck", "smChord.ck", "smScale.ck"}
 
 @doc "A collection of static functions for parsing and manipulating symbolic music notation into ChucK data structures. For more information on SMucKish, see https://chuck.stanford.edu/smuck/doc/cheatsheet.html"
-public class smuckish
+public class Smuckish
 {
     @doc "Parse a SMucKish string representing pitches into a 2D array of MIDI note numbers. Indexed first by position in sequence, second by polyphonic voice. A monophonic sequence will always have a second dimension size of 1."
     fun static int[][] pitches(string input)

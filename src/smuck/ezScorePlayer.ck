@@ -399,7 +399,7 @@ public class ezScorePlayer
         theNote.beats() * ms_per_beat => float duration_ms;
         Math.sgn(_rate) => float direction;
 
-        while((_playhead/ms - onset_ms)*direction < duration_ms) 
+        while((_playhead/ms - onset_ms)*direction < duration_ms) // <= ?
         {
             _tick => now;
         }
