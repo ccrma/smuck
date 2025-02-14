@@ -194,6 +194,10 @@ public class ezScorePlayer
     fun void preview()
     {
         setInstrument(previewInsts);
+        for(int i; i < score.numParts(); i++)
+        {
+            previewInsts[i] => dac;
+        }
         play();
     }
 

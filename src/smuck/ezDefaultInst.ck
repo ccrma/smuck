@@ -5,24 +5,19 @@ public class ezDefaultInst extends ezInstrument
 {
     // define sound chain
     @doc "(hidden)"
-    128 => int n_voices;
+    10 => int n_voices;
 
-    @doc "Array of sine oscillators"
-    SinOsc oscs[n_voices]; 
+    @doc "Array of triangle oscillators"
+    TriOsc oscs[n_voices]; 
 
     @doc "Array of ADSR amplitude envelopes. Envelopes are set to attack = 4ms, decay = 7000ms, sustain = 0.0, release = 200ms by default"
     ADSR envs[n_voices]; 
 
     @doc "Post-envelope bus for gain control of all voices. Gain set to .1 by default"
     Gain bus;
-
-    @doc "Reverb at end of signal chain. Mix set to .01 by default"
-    NRev reverb => dac;
-
-    bus => reverb;
     bus.gain(0.1);
-    reverb.mix(.01);
-
+    bus => outlet;
+    
     for(int i; i < n_voices; i++)
     {
         oscs[i] => envs[i] => bus;
