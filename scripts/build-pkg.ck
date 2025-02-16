@@ -31,7 +31,7 @@ PackageVersion ver("Smuck", version);
 
 "1.5.4.5" => ver.languageVersionMin; // what version?
 
-"all" => ver.os;
+"any" => ver.os;
 "all" => ver.arch;
 
 // all the files
