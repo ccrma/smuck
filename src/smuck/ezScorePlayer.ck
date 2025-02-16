@@ -403,9 +403,12 @@ public class ezScorePlayer
         theNote.beats() * ms_per_beat => float duration_ms;
         Math.sgn(_rate) => float direction;
 
-        while((_playhead/ms - onset_ms)*direction < duration_ms) // <= ?
+        (_playhead/ms - onset_ms)*direction => float elapsed_ms;
+
+        while(elapsed_ms >= 0 && elapsed_ms < duration_ms)
         {
             _tick => now;
+            (_playhead/ms - onset_ms)*direction => elapsed_ms;
         }
 
         instruments[partIndex].release_voice(voice_index);
