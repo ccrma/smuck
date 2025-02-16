@@ -9,4 +9,15 @@ player.loop(true);
 
 player.preview();
 
-eon => now;
+
+10::second => now;
+
+player.rate(-1.0);
+
+10::second => now;
+
+player.rate(1.0);
+
+10::second => now;
+
+
