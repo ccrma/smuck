@@ -405,7 +405,7 @@ public class ezScorePlayer
 
         (_playhead/ms - onset_ms)*direction => float elapsed_ms;
 
-        while(elapsed_ms >= 0 && elapsed_ms < duration_ms)
+        while(elapsed_ms >= 0 && elapsed_ms <= duration_ms)
         {
             _tick => now;
             (_playhead/ms - onset_ms)*direction => elapsed_ms;
