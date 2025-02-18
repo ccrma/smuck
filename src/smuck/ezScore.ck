@@ -305,7 +305,8 @@ public class ezScore
         
         if( !min.open(filename) ) me.exit();
         // min.beatsPerMinute() => bpm; // DOESN'T WORK TO RETRIEVE BPM FROM MIDI FILE
-
+        // <<<"EXTRACTED BPM: ", min.beatsPerMinute()>>>;
+        // <<<"TICKS PER QUARTER: ", min.ticksPerQuarter()>>>;
         for (0 => int track; track < min.numTracks(); track++) {
             ezPart part;
             0 => int currPolyCount;
@@ -321,12 +322,13 @@ public class ezScore
             
             while (min.read(msg, track)) {
                 // update the accumulated time for the measure to present moment
+                // <<< "TIME", msg.when/ms >>>;
                 accumulated_time_ms + msg.when/ms => accumulated_time_ms;
                 part.measures[-1] @=> ezMeasure current_measure;
 
                 // Note On
                 if ((msg.data1 & 0xF0) == 0x90 && msg.data2 > 0 && msg.data3 > 0) {
-                    // <<< "NOTE ON!!", msg.data2 >>>;
+                    // <<< "NOTE ON!!", msg.data2, msg.data3 >>>;
                     msg.data2 => int pitch;
                     msg.data3 => int velocity;
 
@@ -352,7 +354,8 @@ public class ezScore
                 }
 
                 // Note Off
-                if ((msg.data1 & 0xF0) == 0x80 && msg.data2 > 0 && msg.data3 > 0) {
+                if (((msg.data1 & 0xF0) == 0x80 && msg.data2 > 0 && msg.data3 > 0) || ((msg.data1 & 0xF0) == 0x90 && msg.data3 == 0)) 
+                {
                     // <<< "NOTE OFF", msg.data2 >>>;
                     msg.data2 => int pitch;
                     msg.data3 => int velocity;
