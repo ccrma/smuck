@@ -1,4 +1,4 @@
-@doc "ezInstrument that sends note data to an external MIDI and/or OSC device. Meant for sending data to external devices/software.See full class definition at https://github.com/smuck/smuck/blob/main/src/smuck/ezExternalInst.ck"
+@doc "ezInstrument that sends note data to an external MIDI and/or OSC device. Meant for sending data to external devices/software."
 public class ezExternalInst extends ezInstrument
 {
     // Private variables

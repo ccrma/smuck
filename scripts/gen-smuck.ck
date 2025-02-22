@@ -1,6 +1,6 @@
-@import "smuck.ck"
+@import "../src/smuck.ck"
 // NOTE: requires FluidSynth.chug to be installed
-@import "smuck/ezFluidInst.ck"
+@import "../src/smuck/ezFluidInst.ck"
 
 // instantiate a CKDoc object
 CKDoc doc; // documentation orchestra
@@ -48,8 +48,8 @@ doc.addGroup(
 doc.addGroup(
     // class names
     [
-        "Smuck",
-        "Smuckish"
+        "Smuck"
+        // "Smuckish"
     ],
     // group name
     "Utilities",

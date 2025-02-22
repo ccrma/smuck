@@ -1,6 +1,6 @@
 @import "FluidSynth"
 
-@doc "ezInstrument that uses the FluidSynth chugin to play back ezScore data with FluidSynth SoundFont files. Note: using this instrument requires the FluidSynth chugin to be installed."
+@doc "ezInstrument that uses the FluidSynth chugin to play back ezScore data with FluidSynth SoundFont files. NOTE: using this instrument requires the FluidSynth chugin to be installed. It is not imported by default. If you have the FluidSynth chugin installed, you can import smuck/ezFluidInst.ck to use this class"
 public class ezFluidInst extends ezInstrument
 {
     @doc "(hidden)"

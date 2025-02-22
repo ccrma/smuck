@@ -1,4 +1,4 @@
-@import "ezNote.ck";
+@import "ezNote.ck"
 
 public class NoteEvent extends Event
 {
