@@ -73,7 +73,7 @@ ver.addFile("../src/smuck/smVelocity.ck", "smuck");
 
 // wrap up all our files into a zip file, and tell Chumpinate what URL
 // this zip file will be located at.
-ver.generateVersion("./", "Smuck", "https://ccrma.stanford.edu/~alexhan/" + path);
+ver.generateVersion("./", "Smuck", "https://chuck.stanford.edu/release/chump/" + path);
 
 chout <= "Use the following commands to upload the package to CCRMA's servers:" <= IO.newline();
 chout <= "ssh alexhan@ccrma-gate.stanford.edu \"mkdir -p ~/Library/Web/Smuck/"
