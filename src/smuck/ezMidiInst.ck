@@ -1,4 +1,4 @@
-@doc "ezInstrument that uses the MidiOut class to send ezNote data as MIDI messages. See full class definition at https://github.com/smuck/smuck/blob/main/src/smuck/ezMidiInst.ck"
+@doc "ezInstrument that uses the MidiOut class to send ezNote data as MIDI messages."
 public class ezMidiInst extends ezInstrument
 {
     // Private variables

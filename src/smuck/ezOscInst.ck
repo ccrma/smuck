@@ -1,4 +1,4 @@
-@doc "ezInstrument that uses the OscOut class to send ezNote data as OSC messages. See full class definition at https://github.com/smuck/smuck/blob/main/src/smuck/ezOscInst.ck"
+@doc "ezInstrument that uses the OscOut class to send ezNote data as OSC messages"
 public class ezOscInst extends ezInstrument
 {
     // Private variables
