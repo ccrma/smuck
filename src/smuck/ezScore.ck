@@ -328,7 +328,7 @@ public class ezScore
 
                 // Note On
                 if ((msg.data1 & 0xF0) == 0x90 && msg.data2 > 0 && msg.data3 > 0) {
-                    <<< "NOTE ON!!", msg.data2, msg.data3 >>>;
+                    // <<< "NOTE ON!!", msg.data2, msg.data3 >>>;
                     msg.data2 => int pitch;
                     msg.data3 => int velocity;
 
@@ -356,7 +356,7 @@ public class ezScore
                 // Note Off
                 if(((msg.data1 & 0xF0) == 0x80 && msg.data2 > 0) || ((msg.data1 & 0xF0) == 0x90 && msg.data3 == 0))
                 {
-                    <<< "NOTE OFF", msg.data2 >>>;
+                    // <<< "NOTE OFF", msg.data2 >>>;
                     msg.data2 => int pitch;
                     msg.data3 => int velocity;
 
