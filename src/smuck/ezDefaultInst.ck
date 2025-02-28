@@ -26,18 +26,18 @@ public class ezDefaultInst extends ezInstrument
 
     setVoices(n_voices);
 
-    @doc "this noteOn() function uses theNote.pitch() to set the frequency of the oscillator and theNote.velocity() to set the gain. It also calls .keyOn() on the envelope. The variable 'which' determines which oscillator/envelope to use and is passed in by the ezScorePlayer."
-    fun void noteOn(ezNote theNote, int which)
+    @doc "this noteOn() function uses note.pitch() to set the frequency of the oscillator and note.velocity() to set the gain. It also calls .keyOn() on the envelope. The variable 'voice' determines which oscillator/envelope to use and is passed in by the ezScorePlayer."
+    fun void noteOn(ezNote note, int voice)
     {
-        Std.mtof(theNote.pitch()) => oscs[which].freq;
-        (theNote.velocity() / 127.0) => oscs[which].gain;
-        envs[which].keyOn();
+        Std.mtof(note.pitch()) => oscs[voice].freq;
+        (note.velocity() / 127.0) => oscs[voice].gain;
+        envs[voice].keyOn();
     }
 
-    @doc "this noteOff() function calls .keyOff() on the envelope. The variable 'which' determines which oscillator/envelope to use and is passed in by the ezScorePlayer."
-    fun void noteOff(ezNote theNote, int which)
+    @doc "this noteOff() function calls .keyOff() on the envelope. The variable 'voice' determines which oscillator/envelope to use and is passed in by the ezScorePlayer."
+    fun void noteOff(ezNote note, int voice)
     {
-        envs[which].keyOff();
+        envs[voice].keyOff();
     }
 }
 

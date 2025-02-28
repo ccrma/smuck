@@ -62,14 +62,14 @@ public class ezFluidInst extends ezInstrument
     }
 
     @doc "Send a noteOn message to the FluidSynth instrument"
-    fun void noteOn(ezNote theNote, int voice)
+    fun void noteOn(ezNote note, int voice)
     {
-        fs.noteOn(theNote.pitch(), theNote.velocity(), 0);
+        fs.noteOn(note.pitch(), note.velocity(), 0);
     }
 
     @doc "Send a noteOff message to the FluidSynth instrument"
-    fun void noteOff(ezNote theNote, int voice)
+    fun void noteOff(ezNote note, int voice)
     {
-        fs.noteOff(theNote.pitch(), 0);
+        fs.noteOff(note.pitch(), 0);
     }
 }
