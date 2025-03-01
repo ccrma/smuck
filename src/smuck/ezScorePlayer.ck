@@ -1,4 +1,4 @@
-@import {"ezNote.ck", "ezMeasure.ck", "ezPart.ck", "ezScore.ck", "ezNoteEvent.ck", "ezDefaultInst.ck", "ezInstrument.ck"}
+@import {"ezNote.ck", "ezMeasure.ck", "ezPart.ck", "ezScore.ck", "ezDefaultInst.ck", "ezInstrument.ck"}
 
 @doc "Class used for playing back ezScore objects. Users should set an ezScore object to be played, as well as ezInstrument objects specifying sound synthesis for each part. See https://chuck.stanford.edu/smuck/doc/walkthru.html for more information"
 public class ezScorePlayer
