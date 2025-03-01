@@ -406,13 +406,15 @@ public class ezScorePlayer
 
         (_playhead/ms - onset_ms)*direction => float elapsed_ms;
 
-        while(elapsed_ms >= 0 && elapsed_ms <= duration_ms)
+        while(elapsed_ms >= 0 && elapsed_ms < duration_ms && _playing) // ! NOTE: potentially remove _playing check if better solution
         {
+            // <<<"playing">>>;
             _tick => now;
             (_playhead/ms - onset_ms)*direction => elapsed_ms;
         }
-
-        instruments[partIndex].release_voice(voice_index);
+        // <<<"stopping">>>;
+        instruments[partIndex].noteOff(theNote, voice_index);
+        instruments[partIndex].release_voice(voice_index); // NOTE (2/27): this was making noteOffs not work properly, as next noteOn would immediately happen and cut off the noteOff
     }
 }
 
