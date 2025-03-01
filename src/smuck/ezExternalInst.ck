@@ -149,7 +149,7 @@ public class ezExternalInst extends ezInstrument
         }
         if(_useMIDI)
         {
-            mout.noteOn(0, note.pitch() $ int, note.velocity());
+            mout.noteOn(0, note.pitch() $ int, (note.velocity() * 127) $ int);
         }
         if(_logOutput)
         {
