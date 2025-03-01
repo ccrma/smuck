@@ -20,7 +20,7 @@ public class ezInstrument extends Chugraph
     // array to track order of voices used
     int voice_order[0];
 
-    setVoices(127);
+    setVoices(16);
 
     // private functions
     // --------------------------------------------------------------------------
