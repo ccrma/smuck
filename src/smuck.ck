@@ -12,7 +12,7 @@ public class Smuck
     @doc "retrieve smuck version as a string"
     fun static string version()
     {
-        return "0.0.1";
+        return "0.1.0";
     }
 
     @doc "convert a MIDI note number to a pitch name"
