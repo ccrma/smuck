@@ -10,7 +10,7 @@ public class ezMeasure
     @doc "(hidden)"
     float _rhythms[0];
     @doc "(hidden)"
-    int _velocities[0];
+    float _velocities[0];
 
     @doc "(hidden)"
     float _length;
@@ -148,8 +148,8 @@ public class ezMeasure
         compile_notes(_pitches, _rhythms, _velocities, 1);
     }
 
-    @doc "Set the velocities of the notes in the measure directly from an array of ints"
-    fun void setVelocities(int input[])
+    @doc "Set the velocities of the notes in the measure directly from an array of floats"
+    fun void setVelocities(float input[])
     {
         input @=> _velocities;
         compile_notes(_pitches, _rhythms, _velocities, 1);
@@ -197,17 +197,17 @@ public class ezMeasure
     }
 
     @doc "(hidden)"
-    fun void compile_notes(float new_pitches[][], float new_rhythms[], int new_velocities[], int fill_mode)
+    fun void compile_notes(float new_pitches[][], float new_rhythms[], float new_velocities[], int fill_mode)
     {
         ezNote new_notes[0];
 
         float temp_pitches[0][0];
         float temp_rhythms[0];
-        int temp_velocities[0];
+        float temp_velocities[0];
 
         60 => float current_pitch;
         1.0 => float current_rhythm;
-        100 => int current_velocity;
+        1.0 => float current_velocity;
         0.0 => float current_onset;
 
         Math.max(new_pitches.size(), Math.max(new_rhythms.size(), new_velocities.size())) => int max_length;
@@ -278,11 +278,11 @@ public class ezMeasure
                             {
                                 note.velocity(current_velocity);
                             }
-                            // otherwise, fill with default velocity of 100
+                            // otherwise, fill with default velocity of 1.0
                             else
                             {
-                                note.velocity(100);
-                                100 => current_velocity;
+                                note.velocity(1.0);
+                                1.0 => current_velocity;
                             }
                         }
 
@@ -365,11 +365,11 @@ public class ezMeasure
                     {
                         note.velocity(current_velocity);
                     }
-                    // otherwise, fill with default velocity of 100
+                    // otherwise, fill with default velocity of 1.0
                     else
                     {
-                        note.velocity(100);
-                        100 => current_velocity;
+                        note.velocity(1.0);
+                        1.0 => current_velocity;
                     }
                 }
 

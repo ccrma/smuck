@@ -203,7 +203,7 @@ public class ezPart
     }
 
     @doc "Set the velocities of the notes in the last measure, using an array of ints. If the part contains no measures, a new measure is created."
-    fun void setVelocities(int input[])
+    fun void setVelocities(float input[])
     {
         if(measures.size() == 0)
         {

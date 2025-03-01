@@ -272,8 +272,8 @@ public class ezScore
         }
     }
 
-    @doc "Set the velocities of the notes in the last part, using an array of ints. If the score contains no parts, a new part is created."
-    fun void setVelocities(int input[])
+    @doc "Set the velocities of the notes in the last part, using an array of floats. If the score contains no parts, a new part is created."
+    fun void setVelocities(float input[])
     {
         if(parts.size() == 0)
         {
@@ -337,7 +337,7 @@ public class ezScore
 
                     // 2. Add temporary note (undetermined duration) to the measure
                     accumulated_time_ms / ms_per_beat => float onset_time_beats;
-                    ezNote tempNote(onset_time_beats, 0, pitch, velocity);           // 0 as temporary duration, will update when the note ends
+                    ezNote tempNote(onset_time_beats, 0, pitch, velocity/127.0);           // 0 as temporary duration, will update when the note ends
                     current_measure.notes << tempNote;
                     
                     // 3. Store the index in the measure for that pitch, so we can find it's associated note when we need to update duration
