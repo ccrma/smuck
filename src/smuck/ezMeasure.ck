@@ -222,6 +222,13 @@ public class ezMeasure
         {
             if(new_pitches.size() > i)
             {
+                // No pitch token present for this index, so it's a rest. If rhythm token present, set the current rhythm so rest has appropriate duration
+                if(new_pitches[i].size() == 0 && new_rhythms.size() > i)
+                {
+                    // <<<"Rest token present for this index", i>>>;
+                    new_rhythms[i] => current_rhythm;
+                }
+
                 int temp_chord[0];
                 for(int j; j < new_pitches[i].size(); j++)
                 {
@@ -282,6 +289,13 @@ public class ezMeasure
                         temp_chord << note.pitch();
                         // Add the note to the list
                         new_notes << note;
+                    }
+                    else // the pitch is less than 0, so it's a rest
+                    {
+                        if(new_rhythms.size() > i)
+                        {
+                            new_rhythms[i] => current_rhythm;
+                        }
                     }
                 }
 
