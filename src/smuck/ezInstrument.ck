@@ -18,6 +18,7 @@ public class ezInstrument extends Chugraph
     ezNote voice_to_note[];
 
     // array to track order of voices used
+    @doc "(hidden)"
     int voice_order[0];
 
     setVoices(16);
@@ -118,13 +119,13 @@ public class ezInstrument extends Chugraph
 
     // User-overridden functions
     // --------------------------------------------------------------------------
-    @doc "This function defines behavior that will be executed when a note is played by the ezScorePlayer. Typically, this would include setting frequency, gain, calling .keyOn(), etc. by referencing variables of theNote. The base class function is empty, and should be overridden by the user."
+    @doc "This function defines behavior that will be executed when a note is played by the ezScorePlayer. Typically, this would include setting frequency, gain, calling .keyOn(), etc. by referencing variables of the ezNote. The base class function is empty, and should be overridden by the user."
     fun void noteOn(ezNote note, int voice)
     {
         <<< "Implement this noteOn function" >>>;
     }
 
-    @doc "This function defines behavior that will be executed when a note is released by the ezScorePlayer. This could include calling .keyOff(), etc. or referencing variables of theNote. The base class function is empty, and should be overridden by the user."
+    @doc "This function defines behavior that will be executed when a note is released by the ezScorePlayer. This could include calling .keyOff(), etc. or referencing variables of the ezNote. The base class function is empty, and should be overridden by the user."
     fun void noteOff(ezNote note, int voice)
     {
         <<< "Implement this noteOff function" >>>;
