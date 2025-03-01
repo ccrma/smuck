@@ -7,9 +7,9 @@ public class ezNote
     // Duration in beats (float) 
     @doc "(hidden)"
     1.0 => float _beats;
-    // Pitch as a MIDI note number (int)
+    // Pitch as a MIDI note number (float)
     @doc "(hidden)"
-    60 => int _pitch;
+    60 => float _pitch;
     // Velocity 0-127 (int)
     @doc "(hidden)"
     100 => int _velocity;
@@ -23,7 +23,7 @@ public class ezNote
     }
     
     @doc "Constructor for ezNote specifying onset, beats, pitch, and velocity"
-    fun ezNote(float onset, float beats, int pitch, int velocity)
+    fun ezNote(float onset, float beats, float pitch, int velocity)
     {
         onset => _onset;
         beats => _beats;
@@ -55,14 +55,14 @@ public class ezNote
         value => _beats;
     }
 
-    @doc "get the pitch of the note as a MIDI note number"
-    fun int pitch()
+    @doc "get the pitch of the note as a MIDI note number. NOTE: this is a float, not an int"
+    fun float pitch()
     {
         return _pitch;
     }
 
-    @doc "set the pitch of the note as a MIDI note number"
-    fun void pitch(int value)
+    @doc "set the pitch of the note as a MIDI note number. NOTE: this is a float, not an int"
+    fun void pitch(float value)
     {
         value => _pitch;
     }

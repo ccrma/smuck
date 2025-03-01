@@ -3,7 +3,7 @@
 
 public class smScore
 {
-    int pitches[0][0];
+    float pitches[0][0];
     float rhythms[0];
     int velocities[0];
 
