@@ -15,8 +15,8 @@ public class Smuckish
         return smRhythm.parse_rhythms(input);
     }
 
-    @doc "Parse a SMucKish string representing velocities into an array of MIDI velocity values (0-127). Indexed by position in sequence."
-    fun static int[] velocities(string input)
+    @doc "Parse a SMucKish string representing velocities into an array of float values (0.0-1.0). Indexed by position in sequence."
+    fun static float[] velocities(string input)
     {
         return smVelocity.parse_velocities(input);
     }

@@ -1,11 +1,10 @@
 @import {"smUtils.ck", "smPitch.ck", "smRhythm.ck", "smVelocity.ck"}
-// @import {"ezScore.ck"}
 
 public class smScore
 {
     float pitches[0][0];
     float rhythms[0];
-    int velocities[0];
+    float velocities[0];
 
     fun void set_pitches(string input)
     {
@@ -60,7 +59,7 @@ public class smScore
         // Set current values, to be updated at each step
         "c4" => string current_pitch;
         "q" => string current_rhythm;
-        "v100" => string current_velocity;
+        "v1.0" => string current_velocity;
 
         for(int i; i < tokens.size(); i++)
         {
@@ -76,7 +75,7 @@ public class smScore
                     {
                         if(!smUtils.isPitchToken(sub_tokens[i]))
                         {
-                            <<<"ERROR: First token must be a pitch token">>>;
+                            <<<"ERROR: First token must be a pitch token. Received: " + sub_tokens[i] >>>;
                         }
                         else
                         {
