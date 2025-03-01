@@ -73,26 +73,47 @@ public class smScale
 
     fun smScale(string name) 
     {
-        scaleDict[name] @=> notes;
+        if(scaleDict.isInMap(name))
+        {
+            scaleDict[name] @=> notes;
+        }
+        else
+        {
+            <<<"Invalid scale name. Received: " + name >>>;
+        }
     }
 
     fun smScale(string name, int root) 
     {
-        scaleDict[name] @=> notes;
-        for(int i; i < notes.size(); i++)
+        if(scaleDict.isInMap(name))
         {
-            root +=> notes[i];
+            scaleDict[name] @=> notes;
+            for(int i; i < notes.size(); i++)
+            {
+                root +=> notes[i];
+            }
+        }
+        else
+        {
+            <<<"Invalid scale name. Received: " + name >>>;
         }
     }
 
     fun smScale(string name, string rootName) 
     {
-        scaleDict[name] @=> notes;
-        parseRoot(rootName) => int root;
-
-        for(int i; i < notes.size(); i++)
+        if(scaleDict.isInMap(name))
         {
-            root +=> notes[i];
+            scaleDict[name] @=> notes;
+            parseRoot(rootName) => int root;
+
+            for(int i; i < notes.size(); i++)
+            {
+                root +=> notes[i];
+            }
+        }
+        else
+        {
+            <<<"Invalid scale name. Received: " + name >>>;
         }
     }
 
@@ -137,26 +158,48 @@ public class smScale
 
     fun int[] lookup(string name)
     {
-        return scaleDict[name];
+        if(scaleDict.isInMap(name))
+        {
+            return scaleDict[name];
+        }
+        else
+        {
+            <<<"Invalid scale name. Received: " + name >>>;
+        }
     }
     fun int[] lookup(string name, int root)
     {
         int ans[];
-        scaleDict[name] @=> ans;
-        for(int i; i < ans.size(); i++)
+        if(scaleDict.isInMap(name))
         {
-            root +=> ans[i];
+            scaleDict[name] @=> ans;
+            for(int i; i < ans.size(); i++)
+            {
+                root +=> ans[i];
+            }
         }
+        else
+        {
+            <<<"Invalid scale name. Received: " + name >>>;
+        }
+
         return ans;
     }
     fun int[] lookup(string name, string rootName)
     {
         int ans[];
-        scaleDict[name] @=> ans;
-        parseRoot(rootName) => int root;
-        for(int i; i < ans.size(); i++)
+        if(scaleDict.isInMap(name))
         {
-            root +=> ans[i];
+            scaleDict[name] @=> ans;
+            parseRoot(rootName) => int root;
+            for(int i; i < ans.size(); i++)
+            {
+                root +=> ans[i];
+            }
+        }
+        else
+        {
+            <<<"Invalid scale name. Received: " + name >>>;
         }
         return ans;
     }
