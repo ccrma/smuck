@@ -4,10 +4,10 @@
 // Our package version
 Smuck.version() => string version;
 
-<<< "Generating Smuck package release..." >>>;
+<<< "Generating SMucK package release..." >>>;
 
 // instantiate a Chumpinate package
-Package pkg("Smuck");
+Package pkg("smuck");
 
 // Add our metadata...
 ["Alex Han", "Kiran Bhat"] => pkg.authors;
@@ -27,7 +27,7 @@ Package pkg("Smuck");
 <<< "Defining version " + version >>>;;
 
 // Now we need to define a specific PackageVersion for test-pkg
-PackageVersion ver("Smuck", version);
+PackageVersion ver("smuck", version);
 
 "1.5.4.5" => ver.languageVersionMin; // what version?
 
@@ -52,7 +52,6 @@ ver.addFile("../src/smuck/ezMidiInst.ck", "smuck");
 ver.addFile("../src/smuck/smScale.ck", "smuck");
 ver.addFile("../src/smuck/ezNote.ck", "smuck");
 ver.addFile("../src/smuck/smScore.ck", "smuck");
-ver.addFile("../src/smuck/ezNoteEvent.ck", "smuck");
 ver.addFile("../src/smuck/smUtils.ck", "smuck");
 ver.addFile("../src/smuck/ezOscInst.ck", "smuck");
 ver.addFile("../src/smuck/smVelocity.ck", "smuck");
@@ -69,16 +68,16 @@ ver.addFile("../src/smuck/smVelocity.ck", "smuck");
 // ver.addDocsFile("./chumpinate.html");
 // ver.addDocsFile("./ckdoc.css");
 
-"Smuck/" + ver.version() + "/Smuck.zip" => string path; // path?
+"smuck/" + ver.version() + "/smuck.zip" => string path; // path?
 
 // wrap up all our files into a zip file, and tell Chumpinate what URL
 // this zip file will be located at.
-ver.generateVersion("./", "Smuck", "https://chuck.stanford.edu/release/chump/" + path);
+ver.generateVersion("./", "smuck", "https://chuck.stanford.edu/release/chump/" + path);
 
 chout <= "Use the following commands to upload the package to CCRMA's servers:" <= IO.newline();
-chout <= "ssh alexhan@ccrma-gate.stanford.edu \"mkdir -p ~/Library/Web/Smuck/"
+chout <= "ssh alexhan@ccrma-gate.stanford.edu \"mkdir -p ~/Library/Web/smuck/"
       <= ver.version() <= "/\"" <= IO.newline();
-chout <= "scp Smuck.zip alexhan@ccrma-gate.stanford.edu:~/Library/Web/" <= path <= IO.newline();
+chout <= "scp smuck.zip alexhan@ccrma-gate.stanford.edu:~/Library/Web/" <= path <= IO.newline();
 
 // Generate a version definition json file, stores this in "chumpinate/<VerNo>/Smuck.json"
-ver.generateVersionDefinition("Smuck", "./" );
+ver.generateVersionDefinition("smuck", "./" );
