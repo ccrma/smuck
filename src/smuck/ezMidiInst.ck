@@ -70,7 +70,7 @@ public class ezMidiInst extends ezInstrument
     @doc "this noteOn() function sends a MIDI noteOn message carrying pitch and velocity data from incoming ezNotes. Note that here, 'voice' is passed by ezScorePlayer, but is not necessary for this kind of instrument."
     fun void noteOn(ezNote note, int voice)
     {
-        mout.noteOn(_channel, note.pitch(), note.velocity());
+        mout.noteOn(_channel, note.pitch() $ int, note.velocity());
         if(_logOutput)
         {
             <<< "noteOn: pitch = ", note.pitch(), " velocity = ", note.velocity() >>>;
@@ -80,7 +80,7 @@ public class ezMidiInst extends ezInstrument
     @doc "this noteOff() function sends a MIDI noteOff message carrying pitch data from incoming ezNotes. Note that here, 'voice' is passed by ezScorePlayer, but is not necessary for this kind of instrument."
     fun void noteOff(ezNote note, int voice)
     {
-        mout.noteOff(_channel, note.pitch(), 0);
+        mout.noteOff(_channel, note.pitch() $ int, 0);
         if(_logOutput)
         {
             <<<"noteOff: pitch = ", note.pitch() >>>;
