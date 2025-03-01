@@ -124,7 +124,7 @@ public class smChord
         }
         else
         {
-            <<<"Invalid root note">>>;
+            <<<"Invalid root note. Received: " + first >>>;
             -999 => root_temp;
         }
         raw.erase(0, 1);

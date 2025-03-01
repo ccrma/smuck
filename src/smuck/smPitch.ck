@@ -17,12 +17,12 @@ public class smPitch
 
             if(n > 7)
             {
-                <<<"ERROR: Not a valid key signature--must have at most 7 sharps/flats">>>;
+                <<<"ERROR: Not a valid key signature--must have at most 7 sharps/flats. Received: " + key_token >>>;
                 return keyVector;
             }
             if(type != "s" && type != "f" && type != "b" && type != "#")
             {
-                <<<"ERROR: Not a valid key signature--signature type must be either 'f' / 'b' (flats) or 's' / '#' (sharps)">>>;
+                <<<"ERROR: Not a valid key signature--signature type must be either 'f' / 'b' (flats) or 's' / '#' (sharps). Received: " + key_token >>>;
                 return keyVector;
             }
             if(type == "s" || type == "#")
@@ -42,7 +42,7 @@ public class smPitch
         }
         else
         {
-            <<<"ERROR: Not a valid key signature. Token must be 3 characters long, e.g. 'k3f' or 'k1#'">>>;
+            <<<"ERROR: Not a valid key signature. Token must be 3 characters long, e.g. 'k3f' or 'k1#'. Received: " + key_token >>>;
         }
 
         return keyVector;
@@ -66,12 +66,12 @@ public class smPitch
 
         if(char.length() != 1)
         {
-            <<<"ERROR: Invalid input. Must pass a single character string representing the pitch step">>>;
+            <<<"ERROR: Invalid input. Must pass a single character string representing the pitch step. Received: " + char >>>;
             return -1;
         }
         if("abcdefgr".find(char.lower()) == -1)
         {
-            <<<"ERROR: not a valid pitch token. First character must be single character representing the pitch step ('a', 'b', 'c', etc.) or 'r' for rest" >>>;
+            <<<"ERROR: not a valid pitch token. First character must be single character representing the pitch step ('a', 'b', 'c', etc.) or 'r' for rest. Received: " + char >>>;
             return -1;
         }
 
@@ -103,7 +103,7 @@ public class smPitch
             {
                 if(copy.substring(0,1) != "r")
                 {
-                    <<<"ERROR: Cannot get accidental. First character must represent a valid pitch step e.g. 'a', 'b', 'c'">>>;
+                    <<<"ERROR: Cannot get accidental. First character must represent a valid pitch step e.g. 'a', 'b', 'c'. Received: " + copy >>>;
                 }
                 return 0;
             }
