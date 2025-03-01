@@ -17,6 +17,9 @@ public class ezInstrument extends Chugraph
     @doc "(hidden)"
     ezNote voice_to_note[];
 
+    // array to track order of voices used
+    int voice_order[0];
+
     setVoices(127);
 
     // private functions
@@ -51,6 +54,9 @@ public class ezInstrument extends Chugraph
         // mark the voice as in use
         true => voice_in_use[new_voice_index];
 
+        // add voice index to voice order tracker
+        voice_order << new_voice_index;
+
         // assign the note's pitch to the voice
         theNote @=> voice_to_note[new_voice_index];
 
@@ -61,12 +67,15 @@ public class ezInstrument extends Chugraph
     @doc "(hidden)"
     fun int steal_voice()
     {
-        // get a random voice index
-        // NOTE: could be changed to pick the oldest voice
-        Math.random2(0, _numVoices - 1) => int stolen_voice_index;
+        // get a random voice index (NOTE: deprecated)
+        // Math.random2(0, _numVoices - 1) => int stolen_voice_index;
+
+        // Get the oldest voice
+        voice_order[0] => int stolen_voice_index;
+        voice_order.popFront();
 
         // release the voice from use
-        // NOTE: This causes the stolen note to be released and noteOff to be called
+        // NOTE: This causes the stolen note to be released (noteOff is not called)
         release_voice(stolen_voice_index);
 
         return stolen_voice_index;
@@ -76,13 +85,24 @@ public class ezInstrument extends Chugraph
     @doc "(hidden)"
     fun void release_voice(int voice_index)
     {
+        // noteOff(voice_to_note[voice_index], voice_index);
+
         if(voice_in_use[voice_index])
         {
             // mark the voice as unused
             false => voice_in_use[voice_index];
 
             // call noteOff
-            noteOff(voice_to_note[voice_index], voice_index);
+            // noteOff(voice_to_note[voice_index], voice_index);
+        }
+
+        // Update the voice order queue
+        for(int i; i < voice_order.size(); i++)
+        {
+            if(voice_order[i] == voice_index)
+            {
+                voice_order.erase(i);
+            }
         }
     }
 
@@ -99,13 +119,13 @@ public class ezInstrument extends Chugraph
     // User-overridden functions
     // --------------------------------------------------------------------------
     @doc "This function defines behavior that will be executed when a note is played by the ezScorePlayer. Typically, this would include setting frequency, gain, calling .keyOn(), etc. by referencing variables of theNote. The base class function is empty, and should be overridden by the user."
-    fun void noteOn(ezNote theNote, int voice_index)
+    fun void noteOn(ezNote note, int voice)
     {
         <<< "Implement this noteOn function" >>>;
     }
 
     @doc "This function defines behavior that will be executed when a note is released by the ezScorePlayer. This could include calling .keyOff(), etc. or referencing variables of theNote. The base class function is empty, and should be overridden by the user."
-    fun void noteOff(ezNote theNote, int voice_index)
+    fun void noteOff(ezNote note, int voice)
     {
         <<< "Implement this noteOff function" >>>;
     }
