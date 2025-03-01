@@ -21,7 +21,7 @@ public class ezDefaultInst extends ezInstrument
     for(int i; i < n_voices; i++)
     {
         oscs[i] => envs[i] => bus;
-        envs[i].set(4::ms, 7000::ms, 0.0, 200::ms);
+        envs[i].set(5::ms, 5000::ms, 0.0, 100::ms);
     }
 
     setVoices(n_voices);
