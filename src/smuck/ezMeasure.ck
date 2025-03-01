@@ -106,7 +106,7 @@ public class ezMeasure
         compile_notes(_pitches, _rhythms, _velocities, 1);
     }
 
-    @doc "Set the pitches of the notes in the measure directly from a 2D array of MIDI note numbers (floats)"
+    @doc "Set the pitches of the notes in the measure directly from a 2D array of MIDI note numbers"
     fun void setPitches(float input[][])
     {
         input @=> _pitches;

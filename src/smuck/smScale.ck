@@ -158,14 +158,17 @@ public class smScale
 
     fun int[] lookup(string name)
     {
+        int ans[];
         if(scaleDict.isInMap(name))
         {
-            return scaleDict[name];
+            scaleDict[name] @=> ans;
         }
         else
         {
             <<<"Invalid scale name. Received: " + name >>>;
         }
+
+        return ans;
     }
     fun int[] lookup(string name, int root)
     {

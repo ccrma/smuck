@@ -64,7 +64,7 @@ doc.addGroup(
 doc.sort(true);
 
 // generate
-doc.outputToDir( ".", "SMucK API Reference (Alpha v0.0.1)" );
+doc.outputToDir( ".", "SMucK API Reference (Alpha 0.1.0)" );
 
 // BUG: class doc not showing up
 // ezNote.help();

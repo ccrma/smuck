@@ -16,7 +16,7 @@ public class ezNote
 
     // Constructors
     // --------------------------------------------------------------------------
-    @doc "Default constructor, creates a note with onset 0, duration 1, pitch 60, and velocity 100"
+    @doc "Default constructor, creates a note with onset 0, duration 1, pitch 60, and velocity 1.0"
     fun ezNote()
     {
 
@@ -55,25 +55,25 @@ public class ezNote
         value => _beats;
     }
 
-    @doc "get the pitch of the note as a MIDI note number. NOTE: this is a float, not an int"
+    @doc "get the pitch of the note as a MIDI note number"
     fun float pitch()
     {
         return _pitch;
     }
 
-    @doc "set the pitch of the note as a MIDI note number. NOTE: this is a float, not an int"
+    @doc "set the pitch of the note as a MIDI note number"
     fun void pitch(float value)
     {
         value => _pitch;
     }
 
-    @doc "get the velocity of the note (float)"
+    @doc "get the velocity of the note"
     fun float velocity()
     {
         return _velocity;
     }
 
-    @doc "set the velocity of the note (float)"
+    @doc "set the velocity of the note"
     fun void velocity(float value)
     {
         value => _velocity;

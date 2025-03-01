@@ -82,7 +82,7 @@ public class ezPart
         }
     }
 
-    @doc "Set the pitches of the notes in the last measure, using a 2D array of MIDI note numbers (floats). If the part contains no measures, a new measure is created."
+    @doc "Set the pitches of the notes in the last measure, using a 2D array of MIDI note numbers. If the part contains no measures, a new measure is created."
     fun void setPitches(float input[][])
     {
         if(measures.size() == 0)
