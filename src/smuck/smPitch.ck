@@ -187,9 +187,9 @@ public class smPitch
         return octave;
     }
     
-    fun static int[][] parse_tokens(string tokens[])
+    fun static float[][] parse_tokens(string tokens[])
     {
-        int output[0][0];
+        float output[0][0];
 
         // Contextual variables
         // ----------------------------------------
@@ -210,7 +210,7 @@ public class smPitch
             }
             
             // Each token is processed as a chord even if it only has one note
-            int chord[0];
+            float chord[0];
             smUtils.split(token, ":") @=> string chord_notes[];
             for(auto note : chord_notes)
             {
@@ -241,9 +241,9 @@ public class smPitch
     }
 
     // Parse a string of pitches into a 2D array of integers
-    fun static int[][] parse_pitches(string input)
+    fun static float[][] parse_pitches(string input)
     {
-        int output[0][0];
+        float output[0][0];
 
         // Contextual variables
         // ----------------------------------------
@@ -269,7 +269,7 @@ public class smPitch
             }
             
             // Each token is processed as a chord even if it only has one note
-            int chord[0];
+            float chord[0];
             smUtils.split(token, ":") @=> string chord_notes[];
             for(auto note : chord_notes)
             {

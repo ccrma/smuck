@@ -168,8 +168,8 @@ public class ezScore
         }
     }
 
-    @doc "Set the pitches of the notes in the last part, using a 2D array of ints. If the score contains no parts, a new part is created."
-    fun void setPitches(int input[][])
+    @doc "Set the pitches of the notes in the last part, using a 2D array of MIDI note numbers (floats). If the score contains no parts, a new part is created."
+    fun void setPitches(float input[][])
     {
         if(parts.size() == 0)
         {

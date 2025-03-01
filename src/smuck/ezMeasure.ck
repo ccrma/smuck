@@ -6,7 +6,7 @@ public class ezMeasure
 {
     // Private variables
     @doc "(hidden)"
-    int _pitches[0][0];
+    float _pitches[0][0];
     @doc "(hidden)"
     float _rhythms[0];
     @doc "(hidden)"
@@ -58,7 +58,7 @@ public class ezMeasure
             chout <= "Note " <= i <= ": ";
             chout <= "onset = " <= notes[i].onset() <= ", ";
             chout <= "beats = " <= notes[i].beats() <= ", ";
-            chout <= "pitch = " <= smUtils.mid2str(notes[i].pitch()) <= ", ";
+            chout <= "pitch = " <= smUtils.mid2str(notes[i].pitch() $ int) <= ", ";
             chout <= "velocity = " <= notes[i].velocity() <= IO.newline();
         }
     }
@@ -106,8 +106,8 @@ public class ezMeasure
         compile_notes(_pitches, _rhythms, _velocities, 1);
     }
 
-    @doc "Set the pitches of the notes in the measure directly from a 2D array of ints"
-    fun void setPitches(int input[][])
+    @doc "Set the pitches of the notes in the measure directly from a 2D array of MIDI note numbers (floats)"
+    fun void setPitches(float input[][])
     {
         input @=> _pitches;
         compile_notes(_pitches, _rhythms, _velocities, 1);
@@ -197,15 +197,15 @@ public class ezMeasure
     }
 
     @doc "(hidden)"
-    fun void compile_notes(int new_pitches[][], float new_rhythms[], int new_velocities[], int fill_mode)
+    fun void compile_notes(float new_pitches[][], float new_rhythms[], int new_velocities[], int fill_mode)
     {
         ezNote new_notes[0];
 
-        int temp_pitches[0][0];
+        float temp_pitches[0][0];
         float temp_rhythms[0];
         int temp_velocities[0];
 
-        60 => int current_pitch;
+        60 => float current_pitch;
         1.0 => float current_rhythm;
         100 => int current_velocity;
         0.0 => float current_onset;
@@ -229,7 +229,7 @@ public class ezMeasure
                     new_rhythms[i] => current_rhythm;
                 }
 
-                int temp_chord[0];
+                float temp_chord[0];
                 for(int j; j < new_pitches[i].size(); j++)
                 {
                     ezNote note;
@@ -314,7 +314,7 @@ public class ezMeasure
                 ezNote note;
 
                 // Temporary array to hold the new pitch
-                int temp_chord[0];
+                float temp_chord[0];
                 temp_chord << current_pitch;
 
                 if(fill_mode == 1)

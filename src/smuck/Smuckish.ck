@@ -3,8 +3,8 @@
 @doc "A collection of static functions for parsing and manipulating symbolic music notation into ChucK data structures. For more information on SMucKish, see https://chuck.stanford.edu/smuck/doc/cheatsheet.html"
 public class Smuckish
 {
-    @doc "Parse a SMucKish string representing pitches into a 2D array of MIDI note numbers. Indexed first by position in sequence, second by polyphonic voice. A monophonic sequence will always have a second dimension size of 1."
-    fun static int[][] pitches(string input)
+    @doc "Parse a SMucKish string representing pitches into a 2D array of MIDI note numbers (floats). Indexed first by position in sequence, second by polyphonic voice. A monophonic sequence will always have a second dimension size of 1."
+    fun static float[][] pitches(string input)
     {
         return smPitch.parse_pitches(input);
     }
@@ -21,35 +21,35 @@ public class Smuckish
         return smVelocity.parse_velocities(input);
     }
 
-    @doc "Parse a chord symbol (e.g. 'Gbmaj7#11') into an array of MIDI note numbers. Assumes octave of 0. See https://chuck.stanford.edu/smuck/doc/chords.html for full list of valid chord symbols."
+    @doc "Parse a chord symbol (e.g. 'Gbmaj7#11') into an array of MIDI note numbers (ints). Assumes octave of 0. See https://chuck.stanford.edu/smuck/doc/chords.html for full list of valid chord symbols."
     fun static int[] chord(string input)
     {
         smChord chord(input);
         return chord.notes;
     }
 
-    @doc "Parse a chord symbol (e.g. 'Gbmaj7#11') into an array of MIDI note numbers. Uses the given octave. See https://chuck.stanford.edu/smuck/doc/chords.html for full list of valid chord symbols."
+    @doc "Parse a chord symbol (e.g. 'Gbmaj7#11') into an array of MIDI note numbers (ints). Uses the given octave. See https://chuck.stanford.edu/smuck/doc/chords.html for full list of valid chord symbols."
     fun static int[] chord(string input, int octave)
     {
         smChord chord(input, octave);
         return chord.notes;
     }
 
-    @doc "Parse a scale name (e.g. 'major') into an array of MIDI note numbers. Assumes root of C0. See https://chuck.stanford.edu/smuck/doc/scales.html for full list of valid scale types."
+    @doc "Parse a scale name (e.g. 'major') into an array of MIDI note numbers (ints). Assumes root of C0. See https://chuck.stanford.edu/smuck/doc/scales.html for full list of valid scale types."
     fun static int[] scale(string name)
     {
         smScale scale(name);
         return scale.notes;
     }
 
-    @doc "Parse a scale name (e.g. 'major') into an array of MIDI note numbers. Uses the given root note. See https://chuck.stanford.edu/smuck/doc/scales.html for full list of valid scale types."
+    @doc "Parse a scale name (e.g. 'major') into an array of MIDI note numbers (ints). Uses the given root note. See https://chuck.stanford.edu/smuck/doc/scales.html for full list of valid scale types."
     fun static int[] scale(string name, int root)
     {
         smScale scale(name, root);
         return scale.notes;
     }
 
-    @doc "Parse a scale name (e.g. 'major') into an array of MIDI note numbers. Uses the given root note name (e.g. 'C4'). See https://chuck.stanford.edu/smuck/doc/scales.html for full list of valid scale types."
+    @doc "Parse a scale name (e.g. 'major') into an array of MIDI note numbers (ints). Uses the given root note name (e.g. 'C4'). See https://chuck.stanford.edu/smuck/doc/scales.html for full list of valid scale types."
     fun static int[] scale(string name, string rootName)
     {
         smScale scale(name, smUtils.str2mid(rootName));

@@ -259,9 +259,9 @@ public class smUtils
 
     // Pad pitch array to match length
     @doc "(hidden)"
-    fun static int[][] pad_length(int array[][], int length, int pad_value[])
+    fun static float[][] pad_length(float array[][], int length, float pad_value[])
     {
-        int output[0][0];
+        float output[0][0];
 
         for(int i; i < length; i++)
         {
