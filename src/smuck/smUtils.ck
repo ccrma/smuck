@@ -256,67 +256,6 @@ public class smUtils
     {
         return expand_tokens(expand_sequences(input));
     }
-
-    // Pad pitch array to match length
-    @doc "(hidden)"
-    fun static float[][] pad_length(float array[][], int length, float pad_value[])
-    {
-        float output[0][0];
-
-        for(int i; i < length; i++)
-        {
-            if(array.size() > i)
-            {
-                output << array[i];
-            }
-            else
-            {
-                output << pad_value;
-            }
-        }
-        return output;
-    }
-
-    // Pad rhythm array to match length
-    @doc "(hidden)"
-    fun static float[] pad_length(float array[], int length, float pad_value)
-    {
-        float output[0];
-
-        for(int i; i < length; i++)
-        {
-            if(array.size() > i)
-            {
-                output << array[i];
-            }
-            else
-            {
-                output << pad_value;
-            }
-        }
-        return output;
-    }
-
-    // Pad velocity array to match length
-    @doc "(hidden)"
-    fun static int[] pad_length(int array[], int length, int pad_value)
-    {
-        int output[0];
-
-        for(int i; i < length; i++)
-        {
-            if(array.size() > i)
-            {
-                output << array[i];
-            }
-            else
-            {
-                output << pad_value;
-            }
-        }
-        return output;
-    }
-
     //--------------------------------------------------------
     // Pitch related functions
     //--------------------------------------------------------
@@ -366,7 +305,7 @@ public class smUtils
         }
         if(!pitch_map.isInMap(note.substring(0,1).lower()))
         {
-            <<<"ERROR: First character must be a valid pitch step (e.g. 'a', 'b', 'c')">>>;
+            <<<"ERROR: First character must be a valid pitch step (e.g. 'a', 'b', 'c'). Received: " + note >>>;
             return 0;
         }
         else
@@ -456,7 +395,7 @@ public class smUtils
     {
         for(int i; i < input.length(); i++)
         {
-            if("pfmv0123456789".find(input.substring(i, 1).lower()) == -1)
+            if("pfmv0123456789.".find(input.substring(i, 1).lower()) == -1)
             {
                 return 0;
             }
