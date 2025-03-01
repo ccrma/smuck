@@ -64,7 +64,7 @@ public class ezFluidInst extends ezInstrument
     @doc "Send a noteOn message to the FluidSynth instrument"
     fun void noteOn(ezNote note, int voice)
     {
-        fs.noteOn(note.pitch() $ int, note.velocity(), 0);
+        fs.noteOn(note.pitch() $ int, (note.velocity() * 127) $ int, 0);
     }
 
     @doc "Send a noteOff message to the FluidSynth instrument"

@@ -30,7 +30,7 @@ public class ezDefaultInst extends ezInstrument
     fun void noteOn(ezNote note, int voice)
     {
         Std.mtof(note.pitch()) => oscs[voice].freq;
-        (note.velocity() / 127.0) => oscs[voice].gain;
+        Std.clampf(note.velocity(), 0.0, 1.0) => oscs[voice].gain;
         envs[voice].keyOn();
     }
 
