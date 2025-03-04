@@ -10,15 +10,15 @@ Smuck.version() => string version;
 Package pkg("smuck");
 
 // Add our metadata...
-["Alex Han", "Kiran Bhat"] => pkg.authors;
+["Alex Han", "Kiran Bhat", "Ge Wang"] => pkg.authors;
 
-"https://chuck.stanford.edu/smuck" => pkg.homepage;
-"https://github.com/ccrma/smuck" => pkg.repository;
+"https://chuck.stanford.edu/smuck/" => pkg.homepage;
+"https://github.com/ccrma/smuck/" => pkg.repository;
 
-"tbd" => pkg.license;
-"SMucK is a framework for writing music in ChucK with symbolic music notation." => pkg.description;
+"MIT" => pkg.license;
+"A framework for symbolic music notation and playback in ChucK" => pkg.description;
 
-["notation", "symbolic", "music"] => pkg.keywords;
+["notation", "symbolic", "smuckish", "music"] => pkg.keywords;
 
 // generate a package-definition.json
 // This will be stored in "Smuck/package.json"
@@ -68,7 +68,7 @@ ver.addFile("../src/smuck/smVelocity.ck", "smuck");
 // ver.addDocsFile("./chumpinate.html");
 // ver.addDocsFile("./ckdoc.css");
 
-"smuck/" + ver.version() + "/smuck.zip" => string path; // path?
+"smuck/files/" + ver.version() + "/smuck.zip" => string path; // path?
 
 // wrap up all our files into a zip file, and tell Chumpinate what URL
 // this zip file will be located at.
