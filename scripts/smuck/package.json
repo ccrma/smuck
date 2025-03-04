@@ -1,16 +1,18 @@
 {
     "authors": [
         "Alex Han",
-        "Kiran Bhat"
+        "Kiran Bhat",
+        "Ge Wang"
     ],
-    "description": "SMucK is a framework for writing music in ChucK with symbolic music notation.",
-    "homepage": "https://chuck.stanford.edu/smuck",
+    "description": "A framework for symbolic music notation and playback in ChucK",
+    "homepage": "https://chuck.stanford.edu/smuck/",
     "keywords": [
         "notation",
         "symbolic",
+        "smuckish",
         "music"
     ],
-    "license": "tbd",
+    "license": "MIT",
     "name": "smuck",
-    "repository": "https://github.com/ccrma/smuck"
+    "repository": "https://github.com/ccrma/smuck/"
 }
