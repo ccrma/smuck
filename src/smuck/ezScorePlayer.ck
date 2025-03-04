@@ -232,10 +232,8 @@ public class ezScorePlayer
     @doc "Stop playback of the score."
     fun void stop()
     {
-        // <<< "ezScorePlayer: stop()" >>>;
-        false => _playing;
-        // <<<"sporking stop_listener">>>;
-        spork ~ stop_listener();
+        pause();
+        pos(0);
     }
 
     // Set the end position of the score
@@ -323,14 +321,6 @@ public class ezScorePlayer
         tick_driver_end.signal();
     }
 
-    // Stop listener to reset playhead position when playback stops, preventing hanging notes
-    @doc "(hidden)"
-    fun void stop_listener()
-    {
-        tick_driver_end => now;
-        pos(0);
-    }
-
     // Kill all notes across all parts
     @doc "(hidden)"
     fun void flushNotes()
@@ -341,6 +331,8 @@ public class ezScorePlayer
             for(int voice; voice < instruments[part]._numVoices; voice++)
             {
                 // <<<"releasing voice", voice, "for part", part>>>;
+                ezNote dummyNote;
+                instruments[part].noteOff(dummyNote, voice);
                 instruments[part].release_voice(voice);
             }
         }
