@@ -59,16 +59,23 @@ ver.addFile("../src/smuck/smVelocity.ck", "smuck");
 // "SMuck/_examples"
 
 // // These build files are examples as well
-// ver.addExampleFile("build-pkg-win.ck");
-// ver.addExampleFile("build-pkg-mac.ck");
-// ver.addExampleFile("build-pkg-linux.ck");
+ver.addExampleFile("../src/examples/basic/basic-instrument.ck", "basic");
+ver.addExampleFile("../src/examples/basic/playback.ck", "basic");
+ver.addExampleFile("../src/examples/basic/preview.ck", "basic");
+ver.addExampleFile("../src/examples/basic/setscore.ck", "basic");
+ver.addExampleFile("../src/examples/basic/smuckish-pitch.ck", "basic");
+ver.addExampleFile("../src/examples/basic/smuckish-rhythm.ck", "basic");
+ver.addExampleFile("../src/examples/data/bwv772.mid", "data");
+ver.addExampleFile("../src/examples/instruments/flangerInst.ck", "instruments");
+ver.addExampleFile("../src/examples/instruments/releaseInst.ck", "instruments");
+ver.addExampleFile("../src/examples/instruments/samplerInst.ck", "instruments");
 
 // // Documentation files
 // ver.addDocsFile("./index.html");
 // ver.addDocsFile("./chumpinate.html");
 // ver.addDocsFile("./ckdoc.css");
 
-"smuck/files/" + ver.version() + "/smuck.zip" => string path; // path?
+"smuck/" + ver.version() + "/smuck.zip" => string path; // path?
 
 // wrap up all our files into a zip file, and tell Chumpinate what URL
 // this zip file will be located at.
