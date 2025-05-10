@@ -3,7 +3,7 @@
 // desc: the simplest possible SMucK program with score creation and playback
 // author: Kiran Bhat (https://ccrma.stanford.edu/~kvbhat/)
 //-----------------------------------------------------------------------------
-@import "smuck"
+@import "../../smuck.ck"
 
 // create simple score
 ezScore score("a b c d e f g a");

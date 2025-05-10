@@ -5,7 +5,7 @@
 // author: Alex Han (https://ccrma.stanford.edu/~alexhan/)
 //-----------------------------------------------------------------------------
 
-@import "smuck"
+@import "../../smuck.ck"
 
 string inputs[0];
 

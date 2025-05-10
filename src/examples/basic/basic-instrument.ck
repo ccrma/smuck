@@ -4,7 +4,7 @@
 //
 // author: Kiran Bhat (https://ccrma.stanford.edu/~kvbhat/), Alex Han (https://ccrma.stanford.edu/~alexhan/)
 //-----------------------------------------------------------------------------
-@import "smuck"
+@import "../../smuck.ck"
 
 // Create instrument(s) for playback
 class basicInst extends ezInstrument

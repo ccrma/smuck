@@ -7,7 +7,7 @@
 // author: Alex Han (https://ccrma.stanford.edu/~alexhan/)
 //-----------------------------------------------------------------------------
 
-@import "smuck"
+@import "../../smuck.ck"
 
 public class samplerInst extends ezInstrument
 {

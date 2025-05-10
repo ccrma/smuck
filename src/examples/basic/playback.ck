@@ -4,7 +4,7 @@
 //
 // author: Kiran Bhat (https://ccrma.stanford.edu/~kvbhat/)
 //-----------------------------------------------------------------------------
-@import "/Users/alexhan/Desktop/ChucK/smuck/src/smuck.ck"
+@import "../../smuck.ck"
 
 ezScore score(me.dir() + "../data/bwv772.mid"); // Load a score from MIDI file
 

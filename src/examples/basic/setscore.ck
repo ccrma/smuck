@@ -5,7 +5,7 @@
 // author: Kiran Bhat (https://ccrma.stanford.edu/~kvbhat/), Alex Han (https://ccrma.stanford.edu/~alexhan/)
 //-----------------------------------------------------------------------------
 
-@import "smuck"
+@import "../../smuck.ck"
 
 // Create an ezMeasure
 ezMeasure measure1;

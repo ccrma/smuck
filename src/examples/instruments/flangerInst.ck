@@ -7,7 +7,7 @@
 // author: Alex Han (https://ccrma.stanford.edu/~alexhan/)
 //-----------------------------------------------------------------------------
 
-@import "/Users/alexhan/Desktop/ChucK/smuck/src/smuck.ck"
+@import "../../smuck.ck"
 
 // This ezInstrument repitches one-shot audio samples and applies a flanger effect using comb filtering
 public class flangerInst extends ezInstrument
