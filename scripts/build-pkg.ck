@@ -75,7 +75,7 @@ ver.addExampleFile("../src/examples/instruments/samplerInst.ck", "instruments");
 // ver.addDocsFile("./chumpinate.html");
 // ver.addDocsFile("./ckdoc.css");
 
-"smuck/" + ver.version() + "/smuck.zip" => string path; // path?
+"smuck/files/" + ver.version() + "/smuck.zip" => string path; // path?
 
 // wrap up all our files into a zip file, and tell Chumpinate what URL
 // this zip file will be located at.

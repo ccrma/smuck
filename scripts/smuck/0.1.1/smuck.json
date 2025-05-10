@@ -2,10 +2,10 @@
     "arch": "all",
     "files": [
         {
-            "checksum": "b74012bc8ce01c17070a40d62a98223a688e82b5a3bc0d713037ffaa60895a90",
+            "checksum": "c4b00ec98c4b1e17bd44554c0ea6b79fb6fa52f53cf7d9d471b46466d493eae8",
             "file_type": "zip",
             "local_dir": "./",
-            "url": "https://chuck.stanford.edu/release/chump/smuck/0.1.1/smuck.zip"
+            "url": "https://chuck.stanford.edu/release/chump/smuck/files/0.1.1/smuck.zip"
         }
     ],
     "language_version_min": {
