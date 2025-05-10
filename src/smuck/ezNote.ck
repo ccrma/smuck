@@ -14,6 +14,14 @@ public class ezNote
     @doc "(hidden)"
     1.0 => float _velocity;
 
+    // Text annotation (string) - optional
+    @doc "(hidden)"
+    string _text;
+
+    // User-defined data (float array) - optional
+    @doc "(hidden)"
+    float _data[];
+
     // Constructors
     // --------------------------------------------------------------------------
     @doc "Default constructor, creates a note with onset 0, duration 1, pitch 60, and velocity 1.0"
@@ -78,4 +86,76 @@ public class ezNote
     {
         value => _velocity;
     }
+
+    @doc "get the text annotation associated with the note"
+    fun string text()
+    {
+        return _text;
+    }
+
+    @doc "set the text annotation associated with the note"
+    fun void text(string value)
+    {
+        value => _text;
+    }
+    
+    @doc "get the user-defined data associated with the note"
+    fun float[] data()
+    {
+        if(_data == null)
+        {
+            float newData[0];
+            newData @=> _data;
+        }
+        return _data;
+    }
+
+    @doc "set the user-defined data associated with the note, using a float array"
+    fun void data(float value[])
+    {
+        value @=> _data;
+    }
+    
+    @doc "get the user-defined data associated with the note, using an index"
+    fun float data(int index)
+    {
+        if(_data == null)
+        {
+            float newData[0];
+            newData @=> _data;
+        }
+        
+        if(index >= _data.size())
+        {
+            cherr <= "ezNote: data index out of bounds" <= IO.newline();
+            return -999;
+        }
+        return _data[index];
+    }
+
+    @doc "set the user-defined data associated with the note, using an index"
+    fun void data(int index, float value)
+    {
+        _data.size() => int size;
+        
+        // If index is beyond current size, resize array
+        if(index >= size)
+        {
+            float newData[index + 1];
+            // Copy existing data
+            for(0 => int i; i < size; i++)
+            {
+                _data[i] => newData[i];
+            }
+            // Set new value
+            value => newData[index];
+            newData @=> _data;
+        }
+        else
+        {
+            // Index is within bounds, just set the value
+            value => _data[index];
+        }
+    }
+    
 }
