@@ -174,13 +174,19 @@ public class ezScorePlayer
         instrument @=> instruments[partIndex];
     }
 
+    @doc "(hidden)"
+    fun void setInstrument(ezInstrument @ instrument)
+    {
+        instrument @=> instruments[0];
+    }
+
     // Set the instrument for all parts
     @doc "Set the ezInstrument objects to be used for all parts. The array must be the same size as the number of parts in the score."
-    fun void setInstrument(ezInstrument @ insts[])
+    fun void setInstruments(ezInstrument @ insts[])
     {
         if (insts.size() != parts.size())
         {
-            <<< "ezScorePlayer: setInstrument() - provided instrument array size does not match the number of parts. size:", insts.size(), "| parts size:", parts.size() >>>;
+            <<< "ezScorePlayer: setInstruments() - provided instrument array size does not match the number of parts. size:", insts.size(), "| parts size:", parts.size() >>>;
             return;
         }
 
@@ -194,7 +200,7 @@ public class ezScorePlayer
     @doc "Preview the score by playing back using default instruments. Can be used to quickly preview the score without having to set instruments for each part."
     fun void preview()
     {
-        setInstrument(previewInsts);
+        setInstruments(previewInsts);
         for(int i; i < score.numParts(); i++)
         {
             previewInsts[i] => dac;
@@ -277,17 +283,6 @@ public class ezScorePlayer
         _playhead => previous_playhead;
     }
 
-    // Set the playhead position by measure and beat position
-    @doc "(hidden)"
-    fun void pos(int measures, float beats) // CHANGE THIS TO USE ACTUAL MEASURES AND BEATS
-    {
-        flushNotes();
-        // <<<"moving playhead to position (measure, beats):", measures, beats>>>;
-        60000 / _bpm => float ms_per_beat;
-        (measures * (ms_per_beat * score._time_sig_numerator * (4 / score._time_sig_denominator)) + beats * ms_per_beat)::ms => _playhead;
-        _playhead => previous_playhead;
-    }
-
     // Private functions
 
     // Tick driver to advance time
@@ -353,6 +348,7 @@ public class ezScorePlayer
         60000 / score.bpm() => float ms_per_beat;
 
         ezNote currentNotes[0];
+        float measure_onset_ms;
 
         for(int i; i < thePart.measures.size(); i++)
         {
@@ -360,15 +356,17 @@ public class ezScorePlayer
 
             for(int j; j < theMeasure.notes.size(); j++)
             {
-                theMeasure.onset() * ms_per_beat => float theMeasure_onset_ms;
+                // theMeasure.onset() * ms_per_beat => float theMeasure_onset_ms;
                 theMeasure.notes[j] @=> ezNote theNote;
-                theMeasure_onset_ms + theNote.onset() * ms_per_beat => float theNote_onset_ms;
+                measure_onset_ms + theNote.onset() * ms_per_beat => float theNote_onset_ms;
+                // theMeasure_onset_ms + theNote.onset() * ms_per_beat => float theNote_onset_ms;
                 
                 if(playheadPassedTime(theNote_onset_ms))
                 {
                     currentNotes << theNote;
                 }
             }
+            theMeasure.length() * ms_per_beat +=> measure_onset_ms;
         }
         if(currentNotes.size() > 0)
         {
@@ -383,12 +381,17 @@ public class ezScorePlayer
     @doc "(hidden)"
     fun void playNote(int partIndex, ezNote theNote)
     {
-        instruments[partIndex].allocate_voice(theNote) => int voice_index;
-        instruments[partIndex].noteOn(theNote, voice_index);
+        int voice_index;
 
-        if(_logPlayback)
+        if (!theNote.isRest())
         {
-            chout <= "playing note " <= theNote.pitch() <= " on voice " <= voice_index <= " for part " <= partIndex <= " at time " <= _playhead/ms <= "ms," <= " at beat onset " <= theNote.onset() <= " for " <= theNote.beats() <= " beats, with velocity " <= theNote.velocity() <= IO.newline();
+            instruments[partIndex].allocate_voice(theNote) => voice_index;
+            instruments[partIndex].noteOn(theNote, voice_index);
+
+            if(_logPlayback)
+            {
+                chout <= "playing note " <= theNote.pitch() <= " on voice " <= voice_index <= " for part " <= partIndex <= " at time " <= _playhead/ms <= "ms," <= " at beat onset " <= theNote.onset() <= " for " <= theNote.beats() <= " beats, with velocity " <= theNote.velocity() <= IO.newline();
+            }
         }
 
         _playhead/ms => float onset_ms;
@@ -398,15 +401,19 @@ public class ezScorePlayer
 
         (_playhead/ms - onset_ms)*direction => float elapsed_ms;
 
-        while(elapsed_ms >= 0 && elapsed_ms < duration_ms && _playing) // ! NOTE: potentially remove _playing check if better solution
+        while(elapsed_ms >= 0 && elapsed_ms < duration_ms && _playing)
         {
             // <<<"playing">>>;
             _tick => now;
             (_playhead/ms - onset_ms)*direction => elapsed_ms;
         }
-        // <<<"stopping">>>;
-        instruments[partIndex].noteOff(theNote, voice_index);
-        instruments[partIndex].release_voice(voice_index); // NOTE (2/27): this was making noteOffs not work properly, as next noteOn would immediately happen and cut off the noteOff
+
+        if (!theNote.isRest())
+        {
+            // <<<"stopping">>>;
+            instruments[partIndex].noteOff(theNote, voice_index);
+            instruments[partIndex].release_voice(voice_index); // NOTE (2/27): this was making noteOffs not work properly, as next noteOn would immediately happen and cut off the noteOff
+        }
     }
 }
 
