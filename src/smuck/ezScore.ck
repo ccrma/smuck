@@ -51,6 +51,11 @@ public class ezScore
         }
     }
 
+    fun ezScore(ezPart new_parts[])
+    {
+        new_parts @=> parts;
+    }
+
     // Public functions
 
     // Member variable get/set functions
@@ -95,23 +100,19 @@ public class ezScore
     @doc "Get the end of the score in beats (the last note's release point)"
     fun float scoreEnd()
     {
-        float last_note_offset;
+        float score_end;
         for (int i; i < numParts(); i++)
         {
+            float part_length;
             parts[i] @=> ezPart part;
             for (int j; j < part.measures.size(); j++)
             {
                 part.measures[j] @=> ezMeasure measure;
-                for (int k; k < measure.notes.size(); k++)
-                {
-                    
-                    measure.notes[k] @=> ezNote note;
-                    measure.onset() + note.onset() + note.beats() => float offset;
-                    if (offset > last_note_offset) offset => last_note_offset;
-                }
+                measure.length() +=> part_length;
             }
+            if (part_length > score_end) part_length => score_end;
         }
-        return last_note_offset;
+        return score_end;
     }
 
     @doc "Get the duration of the score in milliseconds"
