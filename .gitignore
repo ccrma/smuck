@@ -7,3 +7,6 @@
 
 # Test directory
 test/
+
+*.html
+*.css
