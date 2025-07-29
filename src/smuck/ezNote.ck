@@ -20,7 +20,11 @@ public class ezNote
 
     // User-defined data (float array) - optional
     @doc "(hidden)"
-    float _data[];
+    float _data[0];
+
+    // Rest flag (boolean)
+    @doc "(hidden)"
+    0 => int _isRest;
 
     // Constructors
     // --------------------------------------------------------------------------
@@ -37,6 +41,22 @@ public class ezNote
         beats => _beats;
         pitch => _pitch;
         velocity => _velocity;
+    }
+
+    @doc "Return a copy of the ezNote"
+    fun ezNote copy()
+    {
+        ezNote newNote;
+
+        _onset => newNote._onset;
+        _beats => newNote._beats;
+        _pitch => newNote._pitch;
+        _velocity => newNote._velocity;
+        _text => newNote._text;
+        _data @=> newNote._data;
+        _isRest => newNote._isRest;
+
+        return newNote;
     }
 
     @doc "get the onset of the note in beats, relative to the start of the measure"
@@ -156,6 +176,75 @@ public class ezNote
             // Index is within bounds, just set the value
             value => _data[index];
         }
+    }
+
+    @doc "return whether the note is a rest"
+    fun int isRest()
+    {
+        return _isRest;
+    }
+
+    @doc "set whether the note is a rest"
+    fun void isRest(int value)
+    {
+        value => _isRest;
+    }
+
+    @doc "print the note parameters"
+    fun void print()
+    {
+        chout <= "--------------------------------" <= IO.newline();
+        chout <= "   Onset: " <= _onset <= IO.newline();
+        chout <= "   Beats: " <= _beats <= IO.newline();
+        chout <= "   Pitch: " <= _pitch <= IO.newline();
+        chout <= "Velocity: " <= _velocity <= IO.newline();
+        chout <= "    Rest: ";
+        if(_isRest)
+        {
+            chout <= "true" <= IO.newline();
+        }
+        else
+        {
+            chout <= "false" <= IO.newline();
+        }
+        if(_text != "")
+        {
+            chout <= "    Text: " <= _text <= IO.newline();
+        }
+        if(_data.size() > 0)
+        {
+            chout <= "    Data: ";
+
+            for(int i; i < _data.size(); i++)
+            {
+                chout <= _data[i] <= " ";
+            }
+            chout <= IO.newline();
+        }
+        chout <= "--------------------------------" <= IO.newline();
+    }
+
+    @doc "(hidden)"
+    fun void printLine()
+    {
+        chout <= "Onset: " <= _onset <= ", ";
+        chout <= "Beats: " <= _beats <= ", ";
+        chout <= "Pitch: " <= _pitch <= ", ";
+        chout <= "Velocity: " <= _velocity <= ", ";
+        chout <= "Rest: " <= _isRest <= "";
+        if(_text != "")
+        {
+            chout <= ", Text: " <= _text;
+        }
+        if(_data.size() > 0)
+        {
+            chout <= ", Data: ";
+            for(int i; i < _data.size(); i++)
+            {
+                chout <= _data[i] <= " ";
+            }
+        }
+        chout <= IO.newline();
     }
     
 }
