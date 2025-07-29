@@ -2,10 +2,14 @@
 public class ezOscInst extends ezInstrument
 {
     // Private variables
+    @doc "(hidden)"
     "localhost" => string _hostname;
+    @doc "(hidden)"
     8888 => int _port;
+    @doc "(hidden)"
     false => int _logOutput;
 
+    @doc "(hidden)"
     OscOut xmit;
 
     // Constructors

@@ -211,6 +211,7 @@ public class ezMeasure
         compile_notes(score.pitches, score.rhythms, score.velocities, fill_mode);
     }
 
+    @doc "(hidden)"
     fun float[] get_new_chord(float new_pitches[][], float context_chord[], int index, int fill_mode)
     {
         if(new_pitches.size() > index)
@@ -230,6 +231,7 @@ public class ezMeasure
         }
     }
 
+    @doc "(hidden)"
     fun float get_new_rhythm(float new_rhythms[], float context_rhythm, int index, int fill_mode)
     {
         if(new_rhythms.size() > index)
@@ -249,6 +251,7 @@ public class ezMeasure
         }
     }
 
+    @doc "(hidden)"
     fun float get_new_velocity(float new_velocities[], float context_velocity, int index, int fill_mode)
     {
         if(new_velocities.size() > index)

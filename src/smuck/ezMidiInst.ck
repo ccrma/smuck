@@ -2,9 +2,13 @@
 public class ezMidiInst extends ezInstrument
 {
     // Private variables
+    @doc "(hidden)"
     MidiOut mout;
+    @doc "(hidden)"
     int _channel;
+    @doc "(hidden)"
     int _device;
+    @doc "(hidden)"
     false => int _logOutput;
 
     // Constructors
