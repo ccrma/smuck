@@ -186,6 +186,11 @@ public class smPitch
         }
         return octave;
     }
+
+    fun static int is_rest(string char)
+    {
+        return char == "r";
+    }
     
     fun static float[][] parse_tokens(string tokens[])
     {
@@ -208,33 +213,32 @@ public class smPitch
                 getKeyVector(token) @=> keyVector;
                 continue;
             }
-            
+
             // Each token is processed as a chord even if it only has one note
             float chord[0];
             smUtils.split(token, ":") @=> string chord_notes[];
             for(auto note : chord_notes)
             {
+                // If the first character is "r", skip adding this pitch (chord array will be empty)
+                if(is_rest(note.substring(0,1)))
+                {
+                    continue;
+                }
+
                 get_step(note.substring(0,1)) => int step;
                 get_alter(note, keyVector) => int alter;
                 get_octave(note, oct_cxt, step + alter, last_pitch) => int octave;
 
-                // If an actual pitch and not a rest
-                if(step >= 0)
-                {
-                    // set context variables
-                    step + alter => last_pitch;
-                    octave => oct_cxt;
+                // set context variables
+                step + alter => last_pitch;
+                octave => oct_cxt;
 
-                    // calculate current pitch and add to chord
-                    Math.max(0, step + alter + 12 * (octave)) => int current_note;
-                    chord << current_note;
-                }
-                // Otherwise, add a rest
-                else
-                {
-                    chord << -999;
-                }
+                // calculate current pitch and add to chord
+                Math.max(0, step + alter + 12 * (octave)) => int current_note;
+                chord << current_note;
             }
+
+            // <<<"appending chord with size: ", chord.size() >>>;
             output << chord;
         }
         return output;
@@ -243,62 +247,13 @@ public class smPitch
     // Parse a string of pitches into a 2D array of integers
     fun static float[][] parse_pitches(string input)
     {
-        float output[0][0];
-
-        // Contextual variables
-        // ----------------------------------------
-        // key signature (can be set multiple times). Defaults to no accidentals.
-        int keyVector[7];
-        // octave can be set explicitly, or inferred by proximity to last note. Defaults to octave 4.
-        4 => int oct_cxt;
-        // last note parsed. Initialized to 999 for proximity calculation
-        999 => int last_pitch;
 
         // Handle repeated sequences and tokens
         smUtils.expand_repeats(input) => string expanded;
         // Split into tokens
         smUtils.split(expanded) @=> string tokens[];
 
-        for(auto token : tokens)
-        {
-            // Parse key signature
-            if(token.find("k") != -1)
-            {
-                getKeyVector(token) @=> keyVector;
-                continue;
-            }
-            
-            // Each token is processed as a chord even if it only has one note
-            float chord[0];
-            smUtils.split(token, ":") @=> string chord_notes[];
-            for(auto note : chord_notes)
-            {
-                get_step(note.substring(0,1)) => int step;
-                get_alter(note, keyVector) => int alter;
-                get_octave(note, oct_cxt, step + alter, last_pitch) => int octave;
-
-                // If an actual pitch and not a rest
-                if(step >= 0)
-                {
-                    // set context variables
-                    step + alter => last_pitch;
-                    octave => oct_cxt;
-
-                    // calculate current pitch and add to chord
-                    Math.max(0, step + alter + 12 * (octave)) => int current_note;
-                    chord << current_note;
-                }
-                // Otherwise, add a rest
-                else
-                {
-                    chord << -999;
-                }
-            }
-            output << chord;
-        }
-
-        return output;
-
+        return parse_tokens(tokens);
     }
 
 }
