@@ -1,4 +1,4 @@
-@import "../src/smuck.ck"
+@import "../../src/smuck.ck"
 
 // Create a bunch of measures
 ezMeasure m1("c");
