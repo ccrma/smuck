@@ -1,0 +1,19 @@
+{
+    "arch": "all",
+    "files": [
+        {
+            "checksum": "7371f42f92a46031468077e021d3fbe25f96b7c68bb7181b66fa659420a1fd6f",
+            "file_type": "zip",
+            "local_dir": "./",
+            "url": "https://chuck.stanford.edu/release/chump/smuck/files/0.1.2/smuck.zip"
+        }
+    ],
+    "language_version_min": {
+        "major": 5,
+        "mega": 1,
+        "minor": 4,
+        "patch": 5
+    },
+    "os": "any",
+    "version": "0.1.2"
+}
