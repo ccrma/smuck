@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// name: setscore.ck
+// name: score-set.ck
 // desc: this example shows how to build a score from the measure level up 
 //
 // author: Kiran Bhat (https://ccrma.stanford.edu/~kvbhat/), Alex Han (https://ccrma.stanford.edu/~alexhan/)

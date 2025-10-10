@@ -1,4 +1,12 @@
 @import "../../src/smuck.ck"
+//-----------------------------------------------------------------------------
+// name: score-edit.ck
+// desc: This example shows how to edit the measure contents of a part, 
+// showing add, delete, insert, and replace functions
+//
+// author: Alex Han (https://ccrma.stanford.edu/~alexhan/)
+//-----------------------------------------------------------------------------
+
 
 // Create a bunch of measures
 ezMeasure m1("c");
