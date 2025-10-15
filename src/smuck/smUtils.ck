@@ -265,8 +265,10 @@ public class smUtils
     ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"] @=> static string chromatic[];
 
     @doc "Convert a MIDI note number to a pitch name."
-    fun static string mid2str(int note)
+    fun static string mid2str(float input)
     {
+        Math.round(input) $ int => int note;
+
         if(note < 0)
         {
             return "rest";

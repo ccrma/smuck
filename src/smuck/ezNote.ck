@@ -1,3 +1,5 @@
+@import "smScore.ck"
+
 @doc "Basic SMucK note object carrying information about the note's onset, duration, pitch, and velocity. To be used in score importing, generating, editing, and playback."
 public class ezNote
 {
@@ -43,6 +45,38 @@ public class ezNote
         velocity => _velocity;
     }
 
+    @doc "Constructor for ezNote using a SMucKish input string"
+    fun ezNote(string sm_input)
+    {
+        smScore score;
+        score.parse_interleaved(sm_input);
+        if(score.pitches[0].size() > 0)
+        {
+            score.pitches[0][0] => _pitch;
+        }
+        else
+        {
+            true => _isRest;
+        }
+
+        if(score.rhythms.size() > 0)
+        {
+            score.rhythms[0] => _beats;
+        }
+        else
+        {
+            <<<"WTF? How did you enter a note with no rhythm?">>>;
+        }
+        if(score.velocities.size() > 0)
+        {
+            score.velocities[0] => _velocity;
+        }
+        else
+        {
+            <<<"WTF? How did you enter a note with no velocity?">>>;
+        }
+    }
+
     @doc "Return a copy of the ezNote"
     fun ezNote copy()
     {
@@ -66,9 +100,10 @@ public class ezNote
     }
 
     @doc "set the onset of the note in beats, relative to the start of the measure"
-    fun void onset(float value)
+    fun float onset(float value)
     {
         value => _onset;
+        return _onset;
     }
 
     @doc "get the duration of the note in beats"
@@ -78,9 +113,10 @@ public class ezNote
     }
 
     @doc "set the duration of the note in beats"
-    fun void beats(float value) 
+    fun float beats(float value) 
     {
         value => _beats;
+        return _beats;
     }
 
     @doc "get the pitch of the note as a MIDI note number"
@@ -90,9 +126,10 @@ public class ezNote
     }
 
     @doc "set the pitch of the note as a MIDI note number"
-    fun void pitch(float value)
+    fun float pitch(float value)
     {
         value => _pitch;
+        return _pitch;
     }
 
     @doc "get the velocity of the note"
@@ -102,9 +139,10 @@ public class ezNote
     }
 
     @doc "set the velocity of the note"
-    fun void velocity(float value)
+    fun float velocity(float value)
     {
         value => _velocity;
+        return _velocity;
     }
 
     @doc "get the text annotation associated with the note"
@@ -114,9 +152,10 @@ public class ezNote
     }
 
     @doc "set the text annotation associated with the note"
-    fun void text(string value)
+    fun string text(string value)
     {
         value => _text;
+        return _text;
     }
     
     @doc "get the user-defined data associated with the note"
@@ -131,51 +170,10 @@ public class ezNote
     }
 
     @doc "set the user-defined data associated with the note, using a float array"
-    fun void data(float value[])
+    fun float[] data(float value[])
     {
         value @=> _data;
-    }
-    
-    @doc "get the user-defined data associated with the note, using an index"
-    fun float data(int index)
-    {
-        if(_data == null)
-        {
-            float newData[0];
-            newData @=> _data;
-        }
-        
-        if(index >= _data.size())
-        {
-            cherr <= "ezNote: data index out of bounds" <= IO.newline();
-            return -999;
-        }
-        return _data[index];
-    }
-
-    @doc "set the user-defined data associated with the note, using an index"
-    fun void data(int index, float value)
-    {
-        _data.size() => int size;
-        
-        // If index is beyond current size, resize array
-        if(index >= size)
-        {
-            float newData[index + 1];
-            // Copy existing data
-            for(0 => int i; i < size; i++)
-            {
-                _data[i] => newData[i];
-            }
-            // Set new value
-            value => newData[index];
-            newData @=> _data;
-        }
-        else
-        {
-            // Index is within bounds, just set the value
-            value => _data[index];
-        }
+        return _data;
     }
 
     @doc "return whether the note is a rest"
@@ -185,9 +183,10 @@ public class ezNote
     }
 
     @doc "set whether the note is a rest"
-    fun void isRest(int value)
+    fun int isRest(int value)
     {
         value => _isRest;
+        return _isRest;
     }
 
     @doc "print the note parameters"
@@ -196,7 +195,7 @@ public class ezNote
         chout <= "--------------------------------" <= IO.newline();
         chout <= "   Onset: " <= _onset <= IO.newline();
         chout <= "   Beats: " <= _beats <= IO.newline();
-        chout <= "   Pitch: " <= _pitch <= IO.newline();
+        chout <= "   Pitch: " <= _pitch <= " (" <= smUtils.mid2str(_pitch) <= ")" <= IO.newline();
         chout <= "Velocity: " <= _velocity <= IO.newline();
         chout <= "    Rest: ";
         if(_isRest)
@@ -229,7 +228,7 @@ public class ezNote
     {
         chout <= "Onset: " <= _onset <= ", ";
         chout <= "Beats: " <= _beats <= ", ";
-        chout <= "Pitch: " <= _pitch <= ", ";
+        chout <= "Pitch: " <= _pitch <= " (" <= smUtils.mid2str(_pitch) <= ")" <= ", ";
         chout <= "Velocity: " <= _velocity <= ", ";
         chout <= "Rest: " <= _isRest <= "";
         if(_text != "")

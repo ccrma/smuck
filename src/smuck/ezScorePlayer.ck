@@ -2,22 +2,15 @@
 
 @doc "Class used for playing back ezScore objects. Users should set an ezScore object to be played, as well as ezInstrument objects specifying sound synthesis for each part. See https://chuck.stanford.edu/smuck/doc/walkthru.html for more information"
 public class ezScorePlayer
-{
-    // public member variables
-    @doc "The ezScore object to be played back"
-    ezScore score;
-
-    @doc "The ezPart objects in the score. Set automatically when a score is set for the player."
-    ezPart parts[];
-
-    @doc "The ezInstrument objects to be used in playback. Need to set manually for each part."
-    ezInstrument instruments[];
-
-    @doc "Gain object to control volume of the playback in preview mode"
-    Gain previewGain => dac;
-    
+{   
     // private member variables
     // Settable variables
+    @doc "(hidden)"
+    ezScore _score;
+
+    @doc "(hidden)"
+    ezInstrument _instruments[];
+
     @doc "(hidden)"
     false => int _logPlayback;
 
@@ -39,12 +32,13 @@ public class ezScorePlayer
 
     @doc "(hidden)"
     dur _playhead;
+    
+    @doc "(hidden)"
+    false => int _playing;
+
 
     @doc "(hidden)"
     dur previous_playhead;
-
-    @doc "(hidden)"
-    false => int _playing;
 
     @doc "(hidden)"
     dur start_of_score;
@@ -66,7 +60,7 @@ public class ezScorePlayer
     @doc "Create an ezScorePlayer from an ezScore object"
     fun ezScorePlayer(ezScore s)
     {
-        setScore(s);
+        score(s);
     }
 
     // Public functions
@@ -74,9 +68,10 @@ public class ezScorePlayer
     // Member variable get/set functions
     // --------------------------------------------------------------------------
     @doc "Set the tick duration for the ezScorePlayer. This represents the update rate of the player's internal clock."
-    fun void tick(dur value)
+    fun dur tick(dur value)
     {
         value => _tick;
+        return _tick;
     }
 
     @doc "Get the tick update rate for the ezScorePlayer. This represents the update rate of the player's internal clock."
@@ -86,9 +81,10 @@ public class ezScorePlayer
     }
 
     @doc "Set the loop mode. If true, the player will loop back to the start of the score when it reaches the end."
-    fun void loop(int loop)
+    fun int loop(int loop)
     {
         loop => _loop;
+        return _loop;
     }
 
     @doc "Get the loop mode. If true, the player will loop back to the start of the score when it reaches the end."
@@ -98,9 +94,10 @@ public class ezScorePlayer
     }
 
     @doc "Set the playback rate for the ezScorePlayer. Defalut value of 1.0. Used to speed up or slow down playback. Negative values play the score in reverse."
-    fun void rate(float value)
+    fun float rate(float value)
     {
         value => _rate;
+        return _rate;
     }
 
     @doc "Get the playback rate for the ezScorePlayer. Defalut value of 1.0. Used to speed up or slow down playback. Negative values play the score in reverse."
@@ -110,11 +107,12 @@ public class ezScorePlayer
     }
 
     @doc "Set the tempo for the ezScorePlayer in BPM (beats per minute). Can be changed dynamically during playback."
-    fun void bpm(float value)
+    fun float bpm(float value)
     {
         value => _bpm;
-        value / score.bpm() => _rate;
+        value / _score.bpm() => _rate;
         setEnd(-1);
+        return _bpm;
     }
 
     @doc "Get the tempo for the ezScorePlayer in BPM (beats per minute). Can be changed dynamically during playback."
@@ -124,9 +122,10 @@ public class ezScorePlayer
     }
 
     @doc "Toggle on/off logging of playback events. If true, current note events are logged to the console as they are played."
-    fun void logPlayback(int value)
+    fun int logPlayback(int value)
     {
         value => _logPlayback;
+        return _logPlayback;
     }
 
     @doc "Get the current playhead position for the ezScorePlayer. This represents the current position in the score in ms."
@@ -144,20 +143,19 @@ public class ezScorePlayer
     // Set the score to play
     // --------------------------------------------------------------------------
     @doc "Set the ezScore object to be played back. If the player is currently playing, it will be stopped first."
-    fun void setScore(ezScore s)
+    fun ezScore score(ezScore s)
     {
         if (_playing) stop();
         
-        s @=> score;
-        s.parts @=> parts;
+        s @=> _score;
         s.bpm() => _bpm;
 
         // create instruments
-        new ezInstrument[score.numParts()] @=> instruments;
+        new ezInstrument[_score.parts().size()] @=> _instruments;
 
         // create preview instrument
-        new ezDefaultInst[score.numParts()] @=> previewInsts;
-        for(int i; i < score.numParts(); i++)
+        new ezDefaultInst[_score.parts().size()] @=> previewInsts;
+        for(int i; i < _score.parts().size(); i++)
         {
             ezDefaultInst tempInst;
             tempInst @=> previewInsts[i];
@@ -165,43 +163,60 @@ public class ezScorePlayer
 
         // remember the end position of the score
         setEnd(-1);
+
+        return _score;
     }
 
-    // Set the instrument for a part
-    @doc "Set the ezInstrument object to be used for a given part"
-    fun void setInstrument(int partIndex, ezInstrument @ instrument)
+    @doc "Get the ezScore object associated with this ezScorePlayer."
+    fun ezScore score()
     {
-        instrument @=> instruments[partIndex];
+        return _score;
     }
 
-    @doc "(hidden)"
-    fun void setInstrument(ezInstrument @ instrument)
+    // ezInstrument array get/set functions
+    // --------------------------------------------------------------------------
+    @doc "Get the ezInstrument objects associated with this ezScorePlayer, as an ezInstrument array."
+    fun ezInstrument[] instruments()
     {
-        instrument @=> instruments[0];
+        return _instruments;
     }
 
-    // Set the instrument for all parts
-    @doc "Set the ezInstrument objects to be used for all parts. The array must be the same size as the number of parts in the score."
-    fun void setInstruments(ezInstrument @ insts[])
+    @doc "Set the ezInstrument objects to be used for all parts, using an ezInstrument array. The array must be the same size as the number of parts in the score."
+    fun ezInstrument[] instruments(ezInstrument @ insts[])
     {
-        if (insts.size() != parts.size())
+        if (insts.size() != _score.parts().size())
         {
-            <<< "ezScorePlayer: setInstruments() - provided instrument array size does not match the number of parts. size:", insts.size(), "| parts size:", parts.size() >>>;
-            return;
+            <<< "ezScorePlayer: setInstruments() - provided instrument array size does not match the number of parts. input size:", insts.size(), "| parts size:", _score.parts().size() >>>;
+            return _instruments;
         }
 
         for(int i; i < insts.size(); i++)
         {
-            setInstrument(i, insts[i]);
+            instruments(i, insts[i]);
         }
+        return _instruments;
+    }
+
+    @doc "Set the ezInstrument object to be used for a given part"
+    fun ezInstrument instruments(int partIndex, ezInstrument @ instrument)
+    {
+        instrument @=> _instruments[partIndex];
+        return _instruments[partIndex];
+    }
+
+    @doc "(hidden)"
+    fun ezInstrument instruments(ezInstrument @ instrument)
+    {
+        instrument @=> _instruments[0];
+        return _instruments[0];
     }
 
     // Preview the score by playing back using default instruments
     @doc "Preview the score by playing back using default instruments. Can be used to quickly preview the score without having to set instruments for each part."
     fun void preview()
     {
-        setInstruments(previewInsts);
-        for(int i; i < score.numParts(); i++)
+        instruments(previewInsts);
+        for(int i; i < _score.parts().size(); i++)
         {
             previewInsts[i] => dac;
         }
@@ -247,16 +262,16 @@ public class ezScorePlayer
     @doc "Set the end position of the score in beats. If the end position is set to -1, the end position will automatically be set to the score's end position."
     fun void setEnd(float beat)
     {
-        if (beat > score.scoreEnd())
+        if (beat > _score.beats())
         {
-            <<< "ezScorePlayer: setScoreEnd() - provided beat is after the score end. beat:", beat, "| score end:", score.scoreEnd() >>>;
+            <<< "ezScorePlayer: setScoreEnd() - provided beat is after the score end. beat:", beat, "| score end:", _score.beats() >>>;
             return;
         }
         if (beat == -1)
         {
-            score.scoreEnd() => beat;
+            _score.beats() => beat;
         }
-        (beat * 60000 / score.bpm())::ms => end_of_score;     // convert to dur, so playhead can be compared to it
+        (beat * 60000 / _score.bpm())::ms => end_of_score;     // convert to dur, so playhead can be compared to it
     }
 
     // Set the playhead position by absolute time
@@ -278,7 +293,6 @@ public class ezScorePlayer
         flushNotes();
         // <<<"moving playhead to position (beats):", beatPosition>>>;
         60000 / _bpm => float ms_per_beat;
-        ms_per_beat * (4 / score._time_sig_denominator) => ms_per_beat;
         (beatPosition * ms_per_beat)::ms => _playhead;
         _playhead => previous_playhead;
     }
@@ -302,12 +316,12 @@ public class ezScorePlayer
                 else stop();
             }
             
-            for(int i; i < parts.size(); i++)
+            for(int i; i < _score.parts().size(); i++)
             {
                 getNotesAtPlayhead(i);
             }
-
-            _tick * _rate => tatum;
+            // _bpm * ( (_tick * _rate) / 1::minute) => tatum; 
+            _tick * _rate => tatum; // replace with above for dur -> float conversion
             _playhead => previous_playhead;
             tatum +=> _playhead;
 
@@ -321,14 +335,14 @@ public class ezScorePlayer
     fun void flushNotes()
     {
         // <<<"flushing notes">>>;
-        for(int part; part < parts.size(); part++)
+        for(int part; part < _score.parts().size(); part++)
         {
-            for(int voice; voice < instruments[part]._numVoices; voice++)
+            for(int voice; voice < _instruments[part]._numVoices; voice++)
             {
                 // <<<"releasing voice", voice, "for part", part>>>;
                 ezNote dummyNote;
-                instruments[part].noteOff(dummyNote, voice);
-                instruments[part].release_voice(voice);
+                _instruments[part].noteOff(dummyNote, voice);
+                _instruments[part].release_voice(voice);
             }
         }
     }
@@ -344,20 +358,20 @@ public class ezScorePlayer
     @doc "(hidden)"
     fun void getNotesAtPlayhead(int partIndex)
     {
-        parts[partIndex] @=> ezPart thePart;
-        60000 / score.bpm() => float ms_per_beat;
+        _score.parts()[partIndex] @=> ezPart thePart;
+        60000 / _score.bpm() => float ms_per_beat;
 
         ezNote currentNotes[0];
         float measure_onset_ms;
 
-        for(int i; i < thePart.measures.size(); i++)
+        for(int i; i < thePart.measures().size(); i++)
         {
-            thePart.measures[i] @=> ezMeasure theMeasure;
+            thePart.measures()[i] @=> ezMeasure theMeasure;
 
-            for(int j; j < theMeasure.notes.size(); j++)
+            for(int j; j < theMeasure.notes().size(); j++)
             {
                 // theMeasure.onset() * ms_per_beat => float theMeasure_onset_ms;
-                theMeasure.notes[j] @=> ezNote theNote;
+                theMeasure.notes()[j] @=> ezNote theNote;
                 measure_onset_ms + theNote.onset() * ms_per_beat => float theNote_onset_ms;
                 // theMeasure_onset_ms + theNote.onset() * ms_per_beat => float theNote_onset_ms;
                 
@@ -366,7 +380,7 @@ public class ezScorePlayer
                     currentNotes << theNote;
                 }
             }
-            theMeasure.length() * ms_per_beat +=> measure_onset_ms;
+            theMeasure.beats() * ms_per_beat +=> measure_onset_ms;
         }
         if(currentNotes.size() > 0)
         {
@@ -385,8 +399,8 @@ public class ezScorePlayer
 
         if (!theNote.isRest())
         {
-            instruments[partIndex].allocate_voice(theNote) => voice_index;
-            instruments[partIndex].noteOn(theNote, voice_index);
+            _instruments[partIndex].allocate_voice(theNote) => voice_index;
+            _instruments[partIndex].noteOn(theNote, voice_index);
 
             if(_logPlayback)
             {
@@ -395,7 +409,7 @@ public class ezScorePlayer
         }
 
         _playhead/ms => float onset_ms;
-        60000 / score.bpm() => float ms_per_beat;
+        60000 / _score.bpm() => float ms_per_beat;
         theNote.beats() * ms_per_beat => float duration_ms;
         Math.sgn(_rate) => float direction;
 
@@ -411,8 +425,8 @@ public class ezScorePlayer
         if (!theNote.isRest())
         {
             // <<<"stopping">>>;
-            instruments[partIndex].noteOff(theNote, voice_index);
-            instruments[partIndex].release_voice(voice_index); // NOTE (2/27): this was making noteOffs not work properly, as next noteOn would immediately happen and cut off the noteOff
+            _instruments[partIndex].noteOff(theNote, voice_index);
+            _instruments[partIndex].release_voice(voice_index); // NOTE (2/27): this was making noteOffs not work properly, as next noteOn would immediately happen and cut off the noteOff
         }
     }
 }

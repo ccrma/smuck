@@ -1,4 +1,4 @@
-@import "../../src/smuck.ck"
+@import "../../smuck.ck"
 //-----------------------------------------------------------------------------
 // name: score-edit.ck
 // desc: This example shows how to edit the measure contents of a part, 

@@ -1,4 +1,4 @@
-@import "../../src/smuck.ck"
+@import "../../smuck.ck"
 //-----------------------------------------------------------------------------
 // name: note-data.ck
 // desc: This example shows how to set/get the 'data' and 'text' fields of ezNote objects
