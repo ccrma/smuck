@@ -3,7 +3,6 @@
 @doc "SMucK score object. An ezScore object contains one or more ezParts. Score contents can be set using the SMucKish input syntax, or by importing a MIDI file. ezScore objects can be passed to an ezScorePlayer object for playback."
 public class ezScore
 {
-    // Private variables
     @doc "(hidden)"
     120 => float _bpm;
     @doc "(hidden)"

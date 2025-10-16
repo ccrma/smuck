@@ -3,8 +3,8 @@
 @doc "Class used for playing back ezScore objects. Users should set an ezScore object to be played, as well as ezInstrument objects specifying sound synthesis for each part. See https://chuck.stanford.edu/smuck/doc/walkthru.html for more information"
 public class ezScorePlayer
 {   
-    // private member variables
-    // Settable variables
+    // Public 
+    // --------------------------------------------------------------------------
     @doc "(hidden)"
     ezScore _score;
 
@@ -12,45 +12,48 @@ public class ezScorePlayer
     ezInstrument _instruments[];
 
     @doc "(hidden)"
+    2::ms => dur _tick;
+
+    @doc "(hidden)"
+    float _playhead;
+
+    @doc "(hidden)"
+    float _startPos;
+
+    @doc "(hidden)"
+    float _endPos;
+
+    @doc "(hidden)"
+    false => int _playing;
+
+    @doc "(hidden)"
     false => int _logPlayback;
 
     @doc "(hidden)"
-    false => int _loop;
+    120.0 => float _bpm;
 
     @doc "(hidden)"
     1 => float _rate;
 
     @doc "(hidden)"
-    float _bpm;
+    false => int _loop;
 
-    // Internal variables
+    // Private
+    // --------------------------------------------------------------------------
     @doc "(hidden)"
-    2::ms => dur _tick;
-
-    @doc "(hidden)"
-    _tick => dur tatum;
+    _bpm * ( (_tick * _rate) / 1::minute) => float _tatum; // default of .004 beats per tick
 
     @doc "(hidden)"
-    dur _playhead;
-    
-    @doc "(hidden)"
-    false => int _playing;
-
-
-    @doc "(hidden)"
-    dur previous_playhead;
-
-    @doc "(hidden)"
-    dur start_of_score;
-
-    @doc "(hidden)"
-    dur end_of_score;
+    float _previous_playhead;
 
     @doc "(hidden)"
     Event tick_driver_end;
 
     @doc "(hidden)"
     ezDefaultInst previewInsts[];
+
+    @doc "(hidden)"
+    int _previewOn;
 
     // Constructors
     // --------------------------------------------------------------------------
@@ -64,83 +67,9 @@ public class ezScorePlayer
     }
 
     // Public functions
-
-    // Member variable get/set functions
     // --------------------------------------------------------------------------
-    @doc "Set the tick duration for the ezScorePlayer. This represents the update rate of the player's internal clock."
-    fun dur tick(dur value)
-    {
-        value => _tick;
-        return _tick;
-    }
 
-    @doc "Get the tick update rate for the ezScorePlayer. This represents the update rate of the player's internal clock."
-    fun dur tick()
-    {
-        return _tick;
-    }
-
-    @doc "Set the loop mode. If true, the player will loop back to the start of the score when it reaches the end."
-    fun int loop(int loop)
-    {
-        loop => _loop;
-        return _loop;
-    }
-
-    @doc "Get the loop mode. If true, the player will loop back to the start of the score when it reaches the end."
-    fun int loop()
-    {
-        return _loop;
-    }
-
-    @doc "Set the playback rate for the ezScorePlayer. Defalut value of 1.0. Used to speed up or slow down playback. Negative values play the score in reverse."
-    fun float rate(float value)
-    {
-        value => _rate;
-        return _rate;
-    }
-
-    @doc "Get the playback rate for the ezScorePlayer. Defalut value of 1.0. Used to speed up or slow down playback. Negative values play the score in reverse."
-    fun float rate()
-    {
-        return _rate;
-    }
-
-    @doc "Set the tempo for the ezScorePlayer in BPM (beats per minute). Can be changed dynamically during playback."
-    fun float bpm(float value)
-    {
-        value => _bpm;
-        value / _score.bpm() => _rate;
-        setEnd(-1);
-        return _bpm;
-    }
-
-    @doc "Get the tempo for the ezScorePlayer in BPM (beats per minute). Can be changed dynamically during playback."
-    fun float bpm()
-    {
-        return _bpm;
-    }
-
-    @doc "Toggle on/off logging of playback events. If true, current note events are logged to the console as they are played."
-    fun int logPlayback(int value)
-    {
-        value => _logPlayback;
-        return _logPlayback;
-    }
-
-    @doc "Get the current playhead position for the ezScorePlayer. This represents the current position in the score in ms."
-    fun dur playhead()
-    {
-        return _playhead;
-    }
-
-    @doc "Get the current playback state for the ezScorePlayer. If true, the player is currently playing."
-    fun int isPlaying()
-    {
-        return _playing;
-    }
-
-    // Set the score to play
+    // Score initialization
     // --------------------------------------------------------------------------
     @doc "Set the ezScore object to be played back. If the player is currently playing, it will be stopped first."
     fun ezScore score(ezScore s)
@@ -162,7 +91,7 @@ public class ezScorePlayer
         }
 
         // remember the end position of the score
-        setEnd(-1);
+        endPos(_score.beats());
 
         return _score;
     }
@@ -173,7 +102,7 @@ public class ezScorePlayer
         return _score;
     }
 
-    // ezInstrument array get/set functions
+    // Instrument assignment
     // --------------------------------------------------------------------------
     @doc "Get the ezInstrument objects associated with this ezScorePlayer, as an ezInstrument array."
     fun ezInstrument[] instruments()
@@ -194,6 +123,8 @@ public class ezScorePlayer
         {
             instruments(i, insts[i]);
         }
+        // insts @=> _instruments; // 10/14/25: is this not just a better way to do the above?
+
         return _instruments;
     }
 
@@ -201,13 +132,18 @@ public class ezScorePlayer
     fun ezInstrument instruments(int partIndex, ezInstrument @ instrument)
     {
         instrument @=> _instruments[partIndex];
+        if(_previewOn)
+        {
+            disconnectPreview();
+        }
         return _instruments[partIndex];
     }
 
     @doc "(hidden)"
     fun ezInstrument instruments(ezInstrument @ instrument)
     {
-        instrument @=> _instruments[0];
+        // instrument @=> _instruments[0];
+        instruments(0, instrument);
         return _instruments[0];
     }
 
@@ -215,7 +151,10 @@ public class ezScorePlayer
     @doc "Preview the score by playing back using default instruments. Can be used to quickly preview the score without having to set instruments for each part."
     fun void preview()
     {
-        instruments(previewInsts);
+        true => _previewOn;
+        previewInsts @=> _instruments;
+
+        // Connect preview instruments to dac
         for(int i; i < _score.parts().size(); i++)
         {
             previewInsts[i] => dac;
@@ -223,8 +162,9 @@ public class ezScorePlayer
         play();
     }
 
-    // Start playback
+    // Playback control
     // --------------------------------------------------------------------------
+
     @doc "Start playback of the score."
     fun void play()
     {
@@ -237,8 +177,6 @@ public class ezScorePlayer
         }
     }
 
-    // Pause playback
-    // --------------------------------------------------------------------------
     @doc "Pause playback of the score."
     fun void pause()
     {
@@ -248,71 +186,195 @@ public class ezScorePlayer
         flushNotes();
     }
 
-    // Stop playback
-    // --------------------------------------------------------------------------
     @doc "Stop playback of the score."
     fun void stop()
     {
         pause();
-        pos(0);
+        pos(_startPos);
     }
 
-    // Set the end position of the score
-    // --------------------------------------------------------------------------
-    @doc "Set the end position of the score in beats. If the end position is set to -1, the end position will automatically be set to the score's end position."
-    fun void setEnd(float beat)
+    @doc "Get the start position of the score in beats."
+    fun float startPos()
     {
+        return _startPos;
+    }
+
+    @doc "Set the start position of the score in beats."
+    fun float startPos(float beat)
+    {
+        if(beat > _endPos)
+        {
+            <<< "ezScorePlayer: startPos() - provided beat is after the end position. beat:", beat, "| playback end position:", _endPos, "| reverting to start position: ", _startPos >>>;
+            return _startPos;
+        }
+
+        if(_playhead < beat)
+        {
+            beat => _previous_playhead;
+            beat => _playhead;
+        }
+
+        beat => _startPos;
+        return _startPos;
+    }
+
+    @doc "Set the start position of the score in absolute time."
+    fun dur startPos(dur timePosition)
+    {
+         _bpm * (timePosition / minute) => float beatPosition;
+        startPos(beatPosition);
+        return timePosition;
+    }
+
+    @doc "Get the end position of the score in beats."
+    fun float endPos()
+    {
+        return _endPos;
+    }
+
+    @doc "Set the end position of the score in beats. If the end position is set to -1, the end position will automatically be set to the score's end position."
+    fun float endPos(float beat)
+    {
+        if(beat < _startPos)
+        {
+            <<< "ezScorePlayer: endPos() - provided beat is before the start position. beat:", beat, "| playback start position:", _startPos, "| reverting to end position: ", _endPos >>>;
+            return _endPos;
+        }
         if (beat > _score.beats())
         {
-            <<< "ezScorePlayer: setScoreEnd() - provided beat is after the score end. beat:", beat, "| score end:", _score.beats() >>>;
-            return;
+            <<< "ezScorePlayer: endPos() - provided beat is after the score end. beat:", beat, "| playback end position:", _score.beats(), "| reverting to end position: ", _endPos >>>;
+            return _endPos;
         }
-        if (beat == -1)
-        {
-            _score.beats() => beat;
-        }
-        (beat * 60000 / _score.bpm())::ms => end_of_score;     // convert to dur, so playhead can be compared to it
+
+        beat => _endPos;
+        return _endPos;
     }
 
-    // Set the playhead position by absolute time
-    // --------------------------------------------------------------------------
-    @doc "Set the playhead position by absolute time in ms."
-    fun void pos(dur timePosition)
+    @doc "Set the end position of the score in absolute time."
+    fun dur endPos(dur timePosition)
     {
-        flushNotes();
-        // <<<"moving playhead to position (ms):", timePosition/ms>>>;
-        timePosition => _playhead;
-        _playhead => previous_playhead;
+         _bpm * (timePosition / minute) => float beatPosition;
+        endPos(beatPosition);
+        return timePosition;
     }
 
-    // Set the playhead position by beat position
-    // --------------------------------------------------------------------------
+    @doc "Get the playhead position in beats."
+    fun float pos()
+    {
+        return _playhead;
+    }
+
     @doc "Set the playhead position by beat position."
-    fun void pos(float beatPosition)
+    fun float pos(float beatPosition)
     {
-        flushNotes();
-        // <<<"moving playhead to position (beats):", beatPosition>>>;
-        60000 / _bpm => float ms_per_beat;
-        (beatPosition * ms_per_beat)::ms => _playhead;
-        _playhead => previous_playhead;
+        if (beatPosition >= _startPos && beatPosition <= _endPos)
+        {
+            flushNotes();
+            // <<<"moving playhead to position (beats):", beatPosition>>>;
+            beatPosition => _playhead;
+            _playhead => _previous_playhead;
+        }
+        else
+        {
+            <<< "ezScorePlayer: pos() - provided beat position is out of bounds. beat:", beatPosition, "| playback start position:", _startPos, "| playback end position:", _endPos >>>;
+        }
+        return _playhead;
     }
+
+    @doc "Set the playhead position by absolute time."
+    fun dur pos(dur timePosition)
+    {
+        _bpm * (timePosition / minute) => float beatPosition;
+        pos(beatPosition);
+        return timePosition;
+    }
+
+
+    @doc "Set the tick duration for the ezScorePlayer. This represents the update rate of the player's internal clock."
+    fun dur tick(dur value)
+    {
+        value => _tick;
+        return _tick;
+    }
+
+    @doc "Get the tick update rate for the ezScorePlayer. This represents the update rate of the player's internal clock."
+    fun dur tick()
+    {
+        return _tick;
+    }
+
+    @doc "Set the tempo for the ezScorePlayer in BPM (beats per minute). Can be changed dynamically during playback."
+    fun float bpm(float value)
+    {
+        value => _bpm;
+        value / _score.bpm() => _rate;
+        // endPos(_score.beats());
+        return _bpm;
+    }
+
+    @doc "Get the tempo for the ezScorePlayer in BPM (beats per minute). Can be changed dynamically during playback."
+    fun float bpm()
+    {
+        return _bpm;
+    }
+
+    @doc "Set the playback rate for the ezScorePlayer. Defalut value of 1.0. Used to speed up or slow down playback. Negative values play the score in reverse."
+    fun float rate(float value)
+    {
+        value => _rate;
+        return _rate;
+    }
+
+    @doc "Get the playback rate for the ezScorePlayer. Defalut value of 1.0. Used to speed up or slow down playback. Negative values play the score in reverse."
+    fun float rate()
+    {
+        return _rate;
+    }
+
+    @doc "Set the loop mode. If true, the player will loop back to the start of the score when it reaches the end."
+    fun int loop(int loop)
+    {
+        loop => _loop;
+        return _loop;
+    }
+
+    @doc "Get the loop mode. If true, the player will loop back to the start of the score when it reaches the end."
+    fun int loop()
+    {
+        return _loop;
+    }
+
+    @doc "Toggle on/off logging of playback events. If true, current note events are logged to the console as they are played."
+    fun int logPlayback(int value)
+    {
+        value => _logPlayback;
+        return _logPlayback;
+    }
+
+    @doc "Get the current playback state for the ezScorePlayer. If true, the player is currently playing."
+    fun int isPlaying()
+    {
+        return _playing;
+    }
+
 
     // Private functions
-
+    // --------------------------------------------------------------------------
+    
     // Tick driver to advance time
     @doc "(hidden)"
     fun void tickDriver()
     {
         while (_playing)
         {
-            if (_playhead > end_of_score)
+            if (_playhead > _endPos)
             {
-                if (_loop) pos(0);
+                if (_loop) pos(_startPos);
                 else stop();
             }
-            if (_playhead < start_of_score)
+            if (_playhead < _startPos)
             {
-                if (_loop) pos(end_of_score);
+                if (_loop) pos(_endPos);
                 else stop();
             }
             
@@ -320,10 +382,9 @@ public class ezScorePlayer
             {
                 getNotesAtPlayhead(i);
             }
-            // _bpm * ( (_tick * _rate) / 1::minute) => tatum; 
-            _tick * _rate => tatum; // replace with above for dur -> float conversion
-            _playhead => previous_playhead;
-            tatum +=> _playhead;
+            _bpm * ( (_tick * _rate) / 1::minute) => _tatum; 
+            _playhead => _previous_playhead;
+            _tatum +=> _playhead;
 
             _tick => now;
         }
@@ -351,36 +412,33 @@ public class ezScorePlayer
     @doc "(hidden)"
     fun int playheadPassedTime(float timestamp)
     {
-        return (Math.min(previous_playhead/ms, _playhead/ms) <= timestamp && timestamp < Math.max(previous_playhead/ms, _playhead/ms));
+        return (Math.min(_previous_playhead, _playhead) <= timestamp && timestamp < Math.max(_previous_playhead, _playhead));
     }
 
     // Get all notes at the playhead position for a given part
     @doc "(hidden)"
     fun void getNotesAtPlayhead(int partIndex)
     {
-        _score.parts()[partIndex] @=> ezPart thePart;
-        60000 / _score.bpm() => float ms_per_beat;
-
+        _score.parts()[partIndex] @=> ezPart part;
         ezNote currentNotes[0];
-        float measure_onset_ms;
+        float measure_onset;
 
-        for(int i; i < thePart.measures().size(); i++)
+        for(int i; i < part.measures().size(); i++)
         {
-            thePart.measures()[i] @=> ezMeasure theMeasure;
+            part.measures()[i] @=> ezMeasure measure;
 
-            for(int j; j < theMeasure.notes().size(); j++)
+            for(int j; j < measure.notes().size(); j++)
             {
-                // theMeasure.onset() * ms_per_beat => float theMeasure_onset_ms;
-                theMeasure.notes()[j] @=> ezNote theNote;
-                measure_onset_ms + theNote.onset() * ms_per_beat => float theNote_onset_ms;
-                // theMeasure_onset_ms + theNote.onset() * ms_per_beat => float theNote_onset_ms;
+
+                measure.notes()[j] @=> ezNote note;
+                measure_onset + note.onset() => float note_onset;
                 
-                if(playheadPassedTime(theNote_onset_ms))
+                if(playheadPassedTime(note_onset))
                 {
-                    currentNotes << theNote;
+                    currentNotes << note;
                 }
             }
-            theMeasure.beats() * ms_per_beat +=> measure_onset_ms;
+            measure.beats() +=> measure_onset;
         }
         if(currentNotes.size() > 0)
         {
@@ -393,40 +451,47 @@ public class ezScorePlayer
     }
 
     @doc "(hidden)"
-    fun void playNote(int partIndex, ezNote theNote)
+    fun void playNote(int partIndex, ezNote note)
     {
         int voice_index;
 
-        if (!theNote.isRest())
+        if (!note.isRest())
         {
-            _instruments[partIndex].allocate_voice(theNote) => voice_index;
-            _instruments[partIndex].noteOn(theNote, voice_index);
+            _instruments[partIndex].allocate_voice(note) => voice_index;
+            _instruments[partIndex].noteOn(note, voice_index);
 
             if(_logPlayback)
             {
-                chout <= "playing note " <= theNote.pitch() <= " on voice " <= voice_index <= " for part " <= partIndex <= " at time " <= _playhead/ms <= "ms," <= " at beat onset " <= theNote.onset() <= " for " <= theNote.beats() <= " beats, with velocity " <= theNote.velocity() <= IO.newline();
+                chout <= "playing note " <= note.pitch() <= " on voice " <= voice_index <= " for part " <= partIndex <= " at playhead position " <= _playhead <= ", at beat onset " <= note.onset() <= " for " <= note.beats() <= " beats, with velocity " <= note.velocity() <= IO.newline();
             }
         }
 
-        _playhead/ms => float onset_ms;
-        60000 / _score.bpm() => float ms_per_beat;
-        theNote.beats() * ms_per_beat => float duration_ms;
+        _playhead => float onset;
         Math.sgn(_rate) => float direction;
+        (_playhead - onset)*direction => float elapsed_beats;
 
-        (_playhead/ms - onset_ms)*direction => float elapsed_ms;
-
-        while(elapsed_ms >= 0 && elapsed_ms < duration_ms && _playing)
+        while(elapsed_beats >= 0 && elapsed_beats < note.beats() && _playing)
         {
             // <<<"playing">>>;
             _tick => now;
-            (_playhead/ms - onset_ms)*direction => elapsed_ms;
+            (_playhead - onset)*direction => elapsed_beats;
         }
 
-        if (!theNote.isRest())
+        if (!note.isRest())
         {
             // <<<"stopping">>>;
-            _instruments[partIndex].noteOff(theNote, voice_index);
+            _instruments[partIndex].noteOff(note, voice_index);
             _instruments[partIndex].release_voice(voice_index); // NOTE (2/27): this was making noteOffs not work properly, as next noteOn would immediately happen and cut off the noteOff
+        }
+    }
+
+    @doc "(hidden)" 
+    fun void disconnectPreview()
+    {
+        false => _previewOn;
+        for(int i; i < _score.parts().size(); i++)
+        {
+            previewInsts[i] =< dac;
         }
     }
 }
