@@ -13,9 +13,9 @@ public class ezDefaultInst extends ezInstrument
     @doc "Array of ADSR amplitude envelopes. Envelopes are set to attack = 4ms, decay = 7000ms, sustain = 0.0, release = 200ms by default"
     ADSR envs[n_voices]; 
 
-    @doc "Post-envelope bus for gain control of all voices. Gain set to .1 by default"
+    @doc "Post-envelope bus for gain control of all voices. Gain set to .25 by default"
     Gain bus;
-    bus.gain(0.1);
+    bus.gain(0.25);
     bus => outlet;
     
     for(int i; i < n_voices; i++)
