@@ -66,6 +66,13 @@ public class ezScorePlayer
         score(s);
     }
 
+    @doc "Create an ezScorePlayer from an ezScore object and an ezInstrument array"
+    fun ezScorePlayer(ezScore s, ezInstrument insts[])
+    {
+        score(s);
+        instruments(insts);
+    }
+
     // Public functions
     // --------------------------------------------------------------------------
 
@@ -123,7 +130,6 @@ public class ezScorePlayer
         {
             instruments(i, insts[i]);
         }
-        // insts @=> _instruments; // 10/14/25: is this not just a better way to do the above?
 
         return _instruments;
     }
