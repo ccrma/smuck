@@ -176,6 +176,49 @@ public class ezNote
         return _data;
     }
 
+    @doc "get the user-defined data associated with the note, using an index"
+    fun float data(int index)
+    {
+        if(_data == null)
+        {
+            float newData[0];
+            newData @=> _data;
+        }
+
+        if(index >= _data.size())
+        {
+            cherr <= "ezNote: data index out of bounds" <= IO.newline();
+            return -999;
+        }
+        return _data[index];
+    }
+
+    @doc "set the user-defined data associated with the note, using an index"
+    fun float data(int index, float value)
+    {
+        _data.size() => int size;
+
+        // If index is beyond current size, resize array
+        if(index >= size)
+        {
+            float newData[index + 1];
+            // Copy existing data
+            for(0 => int i; i < size; i++)
+            {
+                _data[i] => newData[i];
+            }
+            // Set new value
+            value => newData[index];
+            newData @=> _data;
+        }
+        else
+        {
+            // Index is within bounds, just set the value
+            value => _data[index];
+        }
+        return _data[index];
+    }
+
     @doc "return whether the note is a rest"
     fun int isRest()
     {
