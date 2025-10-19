@@ -16,7 +16,7 @@ public class Smuck
     }
 
     @doc "convert a MIDI note number to a pitch name"
-    fun static string mid2str( int note )
+    fun static string mid2str( float note )
     {
         return smUtils.mid2str( note );
     }
