@@ -9,13 +9,12 @@
 
 public class releaseInst extends ezInstrument
 {
-    16 => int n_voices;
-    setVoices(n_voices);
-    TriOsc oscs[n_voices] => ADSR envs[n_voices] => LPF lpf => outlet;
+    numVoices(16);
+    TriOsc oscs[numVoices()] => ADSR envs[numVoices()] => LPF lpf => outlet;
 
     2200 => lpf.freq;
 
-    for(int i; i < n_voices; i++)
+    for(int i; i < numVoices(); i++)
     {
         envs[i].set(50::ms, 450::ms, 0.9, 2500::ms); // Set up an ADSR envelope with a 2.5 second release time
     }

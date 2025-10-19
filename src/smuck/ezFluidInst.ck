@@ -13,7 +13,7 @@ public class ezFluidInst extends ezInstrument
     @doc "(hidden)"
     0 => int _instrument;
 
-    @doc "Create a new ez-fluidsynth instrument; (hint: use .open() to load a SoundFont file; use .progChange() to set an instrument)"
+    @doc "Create a new ez-fluidsynth instrument; (hint: use .read() to load a SoundFont file; use .progChange() to set an instrument)"
     fun ezFluidInst()
     { }
 
@@ -21,7 +21,7 @@ public class ezFluidInst extends ezInstrument
     fun ezFluidInst(string filename)
     {
         filename => _filename;
-        fs.open(_filename);
+        fs.read(_filename);
         fs.progChange(_instrument);
     }
 
@@ -30,15 +30,16 @@ public class ezFluidInst extends ezInstrument
     {
         filename => _filename;
         instrument => _instrument;
-        fs.open(_filename);
+        fs.read(_filename);
         fs.progChange(_instrument);
     }
 
     @doc "Load a SoundFont file to use"
-    fun void open( string filename )
+    fun string read( string filename )
     {
         filename => _filename;
-        fs.open(_filename);
+        fs.read(_filename);
+        return _filename;
     }
 
     @doc "Get the SoundFont file currently in use"

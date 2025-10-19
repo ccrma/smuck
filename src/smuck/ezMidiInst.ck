@@ -27,10 +27,11 @@ public class ezMidiInst extends ezInstrument
 
     // Public functions
     @doc "Set the MIDI device to use."
-    fun void device(int device)
+    fun int device(int device)
     {
         device => _device;
         mout.open(device);
+        return device;
     }
 
     @doc "Get the MIDI device currently in use."
@@ -40,9 +41,10 @@ public class ezMidiInst extends ezInstrument
     }
 
     @doc "Set the MIDI channel to use."
-    fun void channel(int channel)
+    fun int channel(int channel)
     {
         channel => _channel;
+        return channel;
     }
 
     @doc "Get the MIDI channel currently in use."
@@ -52,9 +54,16 @@ public class ezMidiInst extends ezInstrument
     }
 
     @doc "Set whether to log outgoing note data to the console."
-    fun void logOutput(int log)
+    fun int logOutput(int log)
     {
         log => _logOutput;
+        return _logOutput;
+    }
+
+    @doc "Returns true if logging is enabled, false otherwise."
+    fun int logOutput()
+    {
+        return _logOutput;
     }
     
     @doc "Flush the MIDI device by sending a noteOn and noteOff message for each MIDI channel and note."

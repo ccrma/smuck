@@ -49,51 +49,68 @@ public class ezExternalInst extends ezInstrument
         <<< "opening OSC connection to host ", _hostname, " on port ", _port >>>;
     }
 
+    @doc "Returns true if MIDI is enabled, false otherwise."
+    fun int useMIDI()
+    {
+        return _useMIDI;
+    }
+
+    @doc "Returns true if OSC is enabled, false otherwise."
+    fun int useOSC()
+    {
+        return _useOSC;
+    }
+
     @doc "Set whether to send note data via MIDI."
-    fun void useMIDI(int toggle)
+    fun int useMIDI(int toggle)
     {
         toggle => _useMIDI;
+        return _useMIDI;
     }
 
     @doc "Set whether to send note data via OSC."
-    fun void useOSC(int toggle)
+    fun int useOSC(int toggle)
     {
         toggle => _useOSC;
+        return _useOSC;
     }
     
-    @doc "Set the OSC hostname to use."
-    fun void hostname(string hostname)
+    @doc "Set the OSC hostname to use. Default value is 'localhost'."
+    fun string hostname(string hostname)
     {
         hostname => _hostname;
         xmit.dest(_hostname, _port);
         <<< "opening OSC connection to host", _hostname, "on port", _port >>>;
+        return _hostname;
     }
 
-    @doc "Get the OSC hostname currently in use."
+    @doc "Returns the OSC hostname currently in use. Default value is 'localhost'."
     fun string hostname()
     {
         return _hostname;
     }
 
-    @doc "Set the OSC port to use."
-    fun void port(int port)
+    @doc "Set the OSC port to use. Default value is 8888."
+    fun int port(int port)
     {
         port => _port;
         xmit.dest(_hostname, _port);
         <<< "opening OSC connection to host", _hostname, "on port", _port >>>;
+        return _port;
     }
 
-    @doc "Get the OSC port currently in use."
+    @doc "Returns the OSC port currently in use. Default value is 8888."
     fun int port()
     {
         return _port;
     }
 
     @doc "Set the MIDI device to use."
-    fun void device(int device)
+    fun int device(int device)
     {
         device => _device;
         mout.open(device);
+        return device;
     }
 
     @doc "Get the MIDI device currently in use."
@@ -103,9 +120,10 @@ public class ezExternalInst extends ezInstrument
     }
 
     @doc "Set the MIDI channel to use."
-    fun void channel(int channel)
+    fun int channel(int channel)
     {
         channel => _channel;
+        return channel;
     }
 
     @doc "Get the MIDI channel currently in use."
@@ -115,9 +133,10 @@ public class ezExternalInst extends ezInstrument
     }
 
     @doc "Set whether to log outgoing note data to the console."
-    fun void logOutput(int log)
+    fun int logOutput(int log)
     {
         log => _logOutput;
+        return _logOutput;
     }
 
     @doc "Flush the MIDI device by sending a noteOn and noteOff message for each MIDI channel and note."

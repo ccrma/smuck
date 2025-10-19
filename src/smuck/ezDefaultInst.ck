@@ -24,7 +24,7 @@ public class ezDefaultInst extends ezInstrument
         envs[i].set(5::ms, 5000::ms, 0.0, 100::ms);
     }
 
-    setVoices(n_voices);
+    numVoices(n_voices);
 
     @doc "this noteOn() function uses note.pitch() to set the frequency of the oscillator and note.velocity() to set the gain. It also calls .keyOn() on the envelope. The variable 'voice' determines which oscillator/envelope to use and is passed in by the ezScorePlayer."
     fun void noteOn(ezNote note, int voice)

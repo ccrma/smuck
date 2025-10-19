@@ -12,8 +12,8 @@
 public class samplerInst extends ezInstrument
 {
     // Set up signal chain
-    16 => int _n_voices;
-    SndBuf bufs[_n_voices] => outlet;
+    numVoices(16);
+    SndBuf bufs[numVoices()] => outlet;
 
     // Private variables
     string _filename;

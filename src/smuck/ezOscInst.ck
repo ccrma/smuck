@@ -30,38 +30,47 @@ public class ezOscInst extends ezInstrument
     }
 
     // Public functions
-    @doc "Set the hostname to use for outgoing OSC messages."
-    fun void hostname(string hostname)
+    @doc "Set the hostname to use for outgoing OSC messages. Default value is 'localhost'."
+    fun string hostname(string hostname)
     {
         hostname => _hostname;
         xmit.dest(_hostname, _port);
         <<< "opening OSC connection to host", _hostname, "on port", _port >>>;
+        return _hostname;
     }
 
-    @doc "Get the hostname currently in use for outgoing OSC messages."
+    @doc "Returns the hostname currently in use for outgoing OSC messages. Default value is 'localhost'."
     fun string hostname()
     {
         return _hostname;
     }
 
-    @doc "Set the port to use for outgoing OSC messages."
-    fun void port(int port)
+    @doc "Set the port to use for outgoing OSC messages. Default value is 8888."
+    fun int port(int port)
     {
         port => _port;
         xmit.dest(_hostname, _port);
         <<< "opening OSC connection to host", _hostname, "on port", _port >>>;
+        return _port;
     }
 
-    @doc "Get the port currently in use for outgoing OSC messages."
+    @doc "Returns the port currently in use for outgoing OSC messages. Default value is 8888."
     fun int port()
     {
         return _port;
     }
 
     @doc "Set whether to log outgoing note data to the console."
-    fun void logOutput(int log)
+    fun int logOutput(int log)
     {
         log => _logOutput;
+        return _logOutput;
+    }
+
+    @doc "Returns true if logging is enabled, false otherwise."
+    fun int logOutput()
+    {
+        return _logOutput;
     }
 
     // User-overriden functions

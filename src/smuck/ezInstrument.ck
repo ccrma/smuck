@@ -21,7 +21,7 @@ public class ezInstrument extends Chugraph
     @doc "(hidden)"
     int voice_order[0];
 
-    setVoices(16);
+    numVoices(16);
 
     // private functions
     // --------------------------------------------------------------------------
@@ -109,12 +109,19 @@ public class ezInstrument extends Chugraph
 
     // public functions
     // --------------------------------------------------------------------------
-    @doc "Set the number of voices for the instrument if using user-defined signal chain. This tells the ezScorePlayer how many voices to allocate for the instrument. E.g. if you set up 5 SinOscs, you should call setVoices(5) inside your class definition. See ezDefaultInst.ck for an example."
-    fun void setVoices(int n_voices)
+    @doc "Set the number of voices for the instrument if using user-defined signal chain. This tells the ezScorePlayer how many voices to allocate for the instrument. E.g. if you set up 5 SinOscs, you should call numVoices(5) inside your class definition. See ezDefaultInst.ck for an example."
+    fun int numVoices(int n_voices)
     {
         n_voices => _numVoices;
         new int[_numVoices] @=> voice_in_use;
         new ezNote[_numVoices] @=> voice_to_note;
+        return _numVoices;
+    }
+
+    @doc "Returns the number of voices allocated for the instrument."
+    fun int numVoices()
+    {
+        return _numVoices;
     }
 
     // User-overridden functions
