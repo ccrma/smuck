@@ -11,14 +11,11 @@ class basicInst extends ezInstrument
 {
     // Set up signal chain
     //--------------------------------
-
-    // How many voices our instrument has (for polyphony)
-    10 => int n_voices;
-    setVoices(n_voices); // Note: calling this function is important to tell the score player how many voices are available during playback
-    SinOsc oscs[n_voices];
+    numVoices(10); // Allocate 10 voice polyphony for this instrument. Note: calling this function is important to tell the score player how many voices are available during playback
+    SinOsc oscs[numVoices()];
     Gain g => outlet;                       // Chucking to outlet lets us connect our instrument to other signal chains after instantiation
     g.gain(0.1);
-    for (0 => int i; i < n_voices; i++)
+    for (0 => int i; i < numVoices(); i++)
     {
         oscs[i].gain(0);          // We want each osc to be silent before a note is played
         oscs[i] => g;
@@ -44,9 +41,8 @@ class basicInst extends ezInstrument
 // Create simple score
 ezPart part0("a3 b c d e f g a");
 ezPart part1("c5 d e f g a b c");
-ezScore score();
-score.addPart(part0);
-score.addPart(part1);
+ezScore score;
+score.add([part0, part1]);
 
 // Create our instruments (1 for each part)
 basicInst bass => dac;
@@ -54,13 +50,10 @@ basicInst treble => dac;
 
 // Set the instruments for each part
 ezScorePlayer player(score);
-player.setInstrument([bass, treble]);
+player.instruments([bass, treble]);
 
 // Play the score
 player.play();
 
 // Let time pass until the score is finished playing
-while(player.isPlaying())
-{
-    second => now;
-}
+score.duration() => now;

@@ -6,32 +6,15 @@
 //-----------------------------------------------------------------------------
 @import "../../smuck.ck"
 
-ezScore score(me.dir() + "../data/bwv772.mid"); // Load a score from MIDI file
+// Load a score from MIDI file
+ezScore score(me.dir() + "../data/bwv772.mid");
 
+// Create a score player
 ezScorePlayer player(score);
-//player.logPlayback(true); // Uncomment this line to log playback events to console
-player.loop(true); // Enable looping of the score
-player.preview(); // Play the score with the default "preview" instrument
 
-// Let the score play for 5 seconds
-<<<"Playing score...">>>;
-5::second => now;
-
-// Set the playback position with a time (dur)
-repeat(3)
-{
-    <<<"Setting playback position to 10 seconds">>>;
-    player.pos(10::second); 
-    2::second => now;
-}
-
-// Set the playback position with a number of beats (float)
-repeat(3)
-{
-    <<<"Setting playback position to 60.5 beats">>>;
-    player.pos(60.5);
-    2::second => now;
-}
+// Set some playback options
+player.loop(true);
+player.preview();
 
 // Set the playback rate using a bpm (default is 120)
 player.bpm(60);
