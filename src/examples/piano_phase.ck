@@ -81,37 +81,37 @@ class basicInst extends ezInstrument
 {
     // How many voices our instrument has (for polyphony)
     10 => int n_voices;
-    numVoices(n_voices); 
+    numVoices(n_voices);
     Blit oscs[n_voices] => ADSR adsrs[n_voices];
     Impulse imp[n_voices];
     Gain g => outlet;
     g.gain(0.1);
     for (0 => int i; i < n_voices; i++)
     {
-	4 => oscs[i].harmonics;
-	Math.randomf() => oscs[i].phase; // Randomize the phase to add some variety to attacks
+        4 => oscs[i].harmonics;
+        Math.randomf() => oscs[i].phase; // Randomize the phase to add some variety to attacks
         oscs[i].gain(0);          // We want each osc to be silent before a note is played
         adsrs[i] => g;
-	imp[i] => g;
+        imp[i] => g;
 
-	adsrs[i].set( 10::ms, 8::ms, .5, 100::ms );
+        adsrs[i].set( 10::ms, 8::ms, .5, 100::ms );
     }
-    
+
     // Implement required noteOn and noteOff functions
     //--------------------------------
     fun void noteOn(ezNote note, int voice) // noteOn and noteOff must have these arguments!
     {
         Std.mtof(note.pitch()) => oscs[voice].freq; // pitches are MIDI note numbers (e.g. 60 is middle C)
         note.velocity() => oscs[voice].gain; // ezNote velocities are float values 0.0-1.0
-	adsrs[voice].keyOn();
-	1.0 => imp[voice].next;
+        adsrs[voice].keyOn();
+        1.0 => imp[voice].next;
     }
 
     // What our instrument does when a note is released (this function is called automatically by the score player)
     fun void noteOff(ezNote note,int voice)
     {
         // 0 => oscs[voice].gain;
-	adsrs[voice].keyOff();
+        adsrs[voice].keyOff();
     }
 }
 
@@ -136,7 +136,7 @@ fun run_phase(int repetitions) {
     *  player should be *just* slightly faster. This change in BPM
     *  can be calculated with this formula:
     *
-    *                                  1        
+    *                                  1
     *  proportion(numbeats) = ──────────────────
     *                             ⎛      1     ⎞
     *                         1 - ⎜────────────⎟
@@ -153,7 +153,7 @@ fun run_phase(int repetitions) {
     // properly align the phase player's position a sample before the note attack
     // so that it won't be skipped
     num_beats * (minute/tempo) - samp => now;
-    
+
     // Round to the nearest 0.25 beat and modulo it to stay within bounds
     (Math.round(player_phase.pos() * 4.) / 4.) % player_phase.endPos() => player_phase.pos;
     samp => now; // sync up
