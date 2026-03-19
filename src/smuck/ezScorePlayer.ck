@@ -1,4 +1,4 @@
-@import {"ezNote.ck", "ezMeasure.ck", "ezPart.ck", "ezScore.ck", "ezDefaultInst.ck", "ezInstrument.ck"}
+@import {"ezNote.ck", "ezMeasure.ck", "ezPart.ck", "ezScore.ck", "ezDefaultInst.ck", "ezInstrument.ck", "ezCC.ck"}
 
 @doc "Class used for playing back ezScore objects. Users should set an ezScore object to be played, as well as ezInstrument objects specifying sound synthesis for each part. See https://chuck.stanford.edu/smuck/doc/walkthru.html for more information"
 public class ezScorePlayer
@@ -387,6 +387,11 @@ public class ezScorePlayer
             for(int i; i < _score.parts().size(); i++)
             {
                 getNotesAtPlayhead(i);
+                getCCsAtPlayhead(i) @=> ezCC ccsAtPlayhead[];
+                for(int k; k < ccsAtPlayhead.size(); k++)
+                {
+                    playCC(i, ccsAtPlayhead[k]);
+                }
             }
             _bpm * ( (_tick * _rate) / 1::minute) => _tatum; 
             _playhead => _previous_playhead;
@@ -427,24 +432,44 @@ public class ezScorePlayer
     {
         _score.parts()[partIndex] @=> ezPart part;
         ezNote currentNotes[0];
-        float measure_onset;
+        Math.min(_previous_playhead, _playhead) => float window_lo;
+        Math.max(_previous_playhead, _playhead) => float window_hi;
 
         for(int i; i < part.measures().size(); i++)
         {
             part.measures()[i] @=> ezMeasure measure;
+            measure.onset() => float measure_start;
+            measure.onset() + measure.beats() => float measure_end;
+
+            // Early-exit: skip/break based on playhead direction
+            if (_previous_playhead < _playhead)
+            {
+                // Forward: skip if measure ends at or before window start
+                if (measure_end <= window_lo) continue;
+                // Break if measure starts after window end
+                if (measure_start > window_hi) break;
+            }
+            else
+            {
+                if (_previous_playhead > _playhead)
+                {
+                    // Reverse: skip if measure starts after window end
+                    if (measure_start > window_hi) continue;
+                    // Break if measure ends before window start
+                    if (measure_end < window_lo) break;
+                }
+            }
 
             for(int j; j < measure.notes().size(); j++)
             {
-
                 measure.notes()[j] @=> ezNote note;
-                measure_onset + note.onset() => float note_onset;
+                measure_start + note.onset() => float note_onset;
                 
                 if(playheadPassedTime(note_onset))
                 {
                     currentNotes << note;
                 }
             }
-            measure.beats() +=> measure_onset;
         }
         if(currentNotes.size() > 0)
         {
@@ -452,6 +477,74 @@ public class ezScorePlayer
             {
                 // <<<"sporking note", currentNotes[i].pitch(), "on voice", i, "for part", partIndex>>>;
                 spork ~ playNote(partIndex, currentNotes[i]);
+            }
+        }
+    }
+
+    // Get all CCs at the playhead position for a given part (same time window as notes)
+    @doc "(hidden)"
+    fun ezCC[] getCCsAtPlayhead(int partIndex)
+    {
+        _score.parts()[partIndex] @=> ezPart part;
+        ezCC result[0];
+        Math.min(_previous_playhead, _playhead) => float window_lo;
+        Math.max(_previous_playhead, _playhead) => float window_hi;
+
+        for(int i; i < part.measures().size(); i++)
+        {
+            part.measures()[i] @=> ezMeasure measure;
+            measure.onset() => float measure_start;
+            measure.onset() + measure.beats() => float measure_end;
+
+            if (_previous_playhead < _playhead)
+            {
+                if (measure_end <= window_lo) continue;
+                if (measure_start > window_hi) break;
+            }
+            else
+            {
+                if (_previous_playhead > _playhead)
+                {
+                    if (measure_start > window_hi) continue;
+                    if (measure_end < window_lo) break;
+                }
+            }
+
+            for(int j; j < measure.ccs().size(); j++)
+            {
+                measure.ccs()[j] @=> ezCC cc;
+                measure_start + cc.onset() => float cc_onset;
+
+                if(playheadPassedTime(cc_onset))
+                {
+                    result << cc;
+                }
+            }
+        }
+        return result;
+    }
+
+    @doc "(hidden)"
+    fun void playCC(int partIndex, ezCC cc)
+    {
+        _instruments[partIndex].cc(cc);
+        if(_logPlayback)
+        {
+            if(cc.isCC())
+            {
+                chout <= "cc: " <= cc.data1() <= " " <= cc.data2() <= " at " <= cc.onset() <= IO.newline();
+            }
+            if(cc.isPitchBend())
+            {
+                chout <= "pitch bend: " <= cc.normalize2Byte() <= " at " <= cc.onset() <= IO.newline();
+            }
+            if(cc.isAftertouch())
+            {
+                chout <= "aftertouch: " <= cc.data1() <= " " <= cc.data2() <= " at " <= cc.onset() <= IO.newline();
+            }
+            if(cc.isChannelPressure())
+            {
+                chout <= "channel pressure: " <= cc.data1() <= " " <= cc.data2() <= " at " <= cc.onset() <= IO.newline();
             }
         }
     }

@@ -1,4 +1,5 @@
 @import "ezNote.ck"
+@import "ezCC.ck"
 @import "Smuckish.ck" // for recursive imports
 
 @doc "SMucK measure object. An ezMeasure object contains one or more ezNotes. Note contents can be set using the SMucKish input syntax."
@@ -14,7 +15,16 @@ public class ezMeasure
 
     @doc "(hidden)"
     ezNote _notes[0];
-    
+
+    @doc "(hidden)"
+    ezCC _ccs[0];
+
+    @doc "(hidden)"
+    0.0 => float _onset;
+
+    @doc "(hidden)"
+    string _text;
+
     // Constructors
     @doc "Default constructor, creates an empty measure"
     fun ezMeasure()
@@ -35,15 +45,29 @@ public class ezMeasure
         setInterleaved(input, fill_mode);
     }
 
+    @doc "Create an ezMeasure from an array of ezNote objects"
+    fun ezMeasure(ezNote notes[])
+    {
+        this.notes(notes);
+    }
+
     @doc "Return a copy of the ezMeasure"
     fun ezMeasure copy()
     {
         ezMeasure newMeasure;
+        _onset => newMeasure._onset;
+        _text => newMeasure._text;
 
         for(int i; i < _notes.size(); i++)
         {
             _notes[i].copy() @=> ezNote newNote;
             newMeasure._notes << newNote;
+        }
+
+        for(int i; i < _ccs.size(); i++)
+        {
+            _ccs[i].copy() @=> ezCC newCC;
+            newMeasure._ccs << newCC;
         }
 
         return newMeasure;
@@ -65,19 +89,48 @@ public class ezMeasure
         }
     }
 
-    @doc "Sort the notes array in place by onset time"
+    @doc "Add an ezCC to the measure"
+    fun void add(ezCC cc)
+    {
+        _ccs << cc;
+    }
+
+    @doc "Add an array of ezCCs to the measure"
+    fun void add(ezCC ccs[])
+    {
+        for(int i; i < ccs.size(); i++)
+        {
+            _ccs << ccs[i];
+        }
+    }
+
+    @doc "Sort the notes and CCs arrays in place by onset time"
     fun void sort()
     {
-        // Quicksort implementation
+        // Quicksort for notes
         if(_notes.size() > 1)
         {
             quicksort(_notes, 0, _notes.size()-1);
+        }
+        // Insertion sort for CCs (typically few per measure)
+        for(int i; i < _ccs.size(); i++)
+        {
+            _ccs[i] @=> ezCC key;
+            i - 1 => int j;
+            while(j >= 0 && _ccs[j].onset() > key.onset())
+            {
+                _ccs[j] @=> _ccs[j+1];
+                j--;
+            }
+            key @=> _ccs[j+1];
         }
     }
     
     @doc "Print the parameters for each note in the measure"
     fun void print()
     {
+        chout <= "onset: " <= _onset <= IO.newline();
+        chout <= "beats: " <= beats() <= IO.newline();
         chout <= "--------------------------------" <= IO.newline();
         for(int i; i < _notes.size(); i++)
         {
@@ -102,6 +155,45 @@ public class ezMeasure
         return _notes;
     }
 
+    @doc "Get the CCs in the measure as an ezCC array"
+    fun ezCC[] ccs()
+    {
+        return _ccs;
+    }
+
+    @doc "Set the CCs of the measure using an ezCC array"
+    fun ezCC[] ccs(ezCC ccs[])
+    {
+        ccs @=> _ccs;
+        return _ccs;
+    }
+
+    @doc "Get the onset of the measure in beats (start time within the part)"
+    fun float onset()
+    {
+        return _onset;
+    }
+
+    @doc "Set the onset of the measure in beats (start time within the part)"
+    fun float onset(float value)
+    {
+        value => _onset;
+        return _onset;
+    }
+
+    @doc "Get the text annotation of the measure"
+    fun string text()
+    {
+        return _text;
+    }
+
+    @doc "Set the text annotation of the measure"
+    fun string text(string value)
+    {
+        value => _text;
+        return _text;
+    }
+
     @doc "Get the length of the measure in beats"
     fun float beats()
     {
@@ -117,11 +209,157 @@ public class ezMeasure
         return length;
     }
 
-    @doc "(hidden)"
-    fun int getPolyphony()
+
+    @doc "Get the max number of concurrent (sounding) voices in the measure. Rest notes are not counted."
+    fun int polyphony()
     {
-        // TODO: Implement this
-        return 0;
+        float eventTimes[0];
+        int eventDeltas[0];
+        for (int i; i < _notes.size(); i++)
+        {
+            if (_notes[i].isRest()) continue;
+            _notes[i].onset() => float start;
+            _notes[i].onset() + _notes[i].beats() => float end;
+            eventTimes << start;
+            eventDeltas << 1;
+            eventTimes << end;
+            eventDeltas << -1;
+        }
+        if (eventTimes.size() == 0)
+        {
+            return 0;
+        }
+        sortEvents(eventTimes, eventDeltas);
+        0 => int count;
+        0 => int maxCount;
+        for (int i; i < eventTimes.size(); i++)
+        {
+            eventDeltas[i] +=> count;
+            if (count > maxCount) count => maxCount;
+        }
+        return maxCount;
+    }
+
+    @doc "Split the measure into multiple measures by constant bar length. Returns an array of ezMeasure. Each resulting measure contains notes whose onset falls in that window; note onsets are relative to the new measure. Remainder at end becomes a shorter final measure. Empty windows create an empty measure."
+    fun ezMeasure[] split(float constantLength)
+    {
+        this.beats() => float measure_end;
+        if (constantLength <= 0 || measure_end <= 0)
+        {
+            ezMeasure empty[0];
+            return empty;
+        }
+
+        (measure_end / constantLength) $ int => int num_windows;
+        if (num_windows * constantLength < measure_end) num_windows++;
+
+        ezMeasure result[num_windows];
+        for(int i; i < num_windows; i++)
+        {
+            ezMeasure m;
+            m @=> result[i];
+        }
+
+        for(int j; j < _notes.size(); j++)
+        {
+            _notes[j] @=> ezNote note;
+            (note.onset() / constantLength) $ int => int window_id;
+            if (window_id >= num_windows) num_windows - 1 => window_id;
+            note.onset() - (window_id * constantLength) => float relative_onset;
+
+            note.copy() @=> ezNote newNote;
+            newNote.onset(relative_onset);
+            result[window_id].add(newNote);
+        }
+
+        for(int j; j < _ccs.size(); j++)
+        {
+            _ccs[j] @=> ezCC cc;
+            (cc.onset() / constantLength) $ int => int window_id;
+            if (window_id >= num_windows) num_windows - 1 => window_id;
+            cc.onset() - (window_id * constantLength) => float relative_onset;
+
+            cc.copy() @=> ezCC newCC;
+            newCC.onset(relative_onset);
+            result[window_id].add(newCC);
+        }
+        return result;
+    }
+
+    // Largest window index i such that boundaries[i] <= t; boundaries[0..num_windows-1] are window starts
+    @doc "(hidden)"
+    fun int findWindowForOnset(float t, float boundaries[], int num_windows)
+    {
+        if (num_windows <= 0) return 0;
+        if (t <= boundaries[0]) return 0;
+        0 => int low;
+        num_windows => int high;
+        while (low < high - 1)
+        {
+            ((low + high) / 2) $ int => int mid;
+            if (boundaries[mid] <= t)
+                mid => low;
+            else
+                mid => high;
+        }
+        return low;
+    }
+
+    @doc "Split the measure into multiple measures by a list of bar lengths. Uses list in order; if list is exhausted, uses the last element for remainder. If list is longer than material, creates only as many measures as needed. Empty windows create an empty measure."
+    fun ezMeasure[] split(float lengths[])
+    {
+        this.beats() => float measure_end;
+        if (lengths.size() == 0 || measure_end <= 0)
+        {
+            ezMeasure empty[0];
+            return empty;
+        }
+
+        float boundaries[0];
+        0.0 => float start;
+        0 => int listIndex;
+        while (start < measure_end)
+        {
+            boundaries << start;
+            lengths[Math.min(listIndex, lengths.size() - 1)] => float L;
+            L => float window_length;
+            if (start + L > measure_end) measure_end - start => window_length;
+            window_length +=> start;
+            listIndex++;
+        }
+        boundaries.size() => int num_windows;
+
+        ezMeasure result[num_windows];
+        for(int i; i < num_windows; i++)
+        {
+            ezMeasure m;
+            m @=> result[i];
+        }
+
+        for(int j; j < _notes.size(); j++)
+        {
+            _notes[j] @=> ezNote note;
+            findWindowForOnset(note.onset(), boundaries, num_windows) => int window_id;
+            if (window_id >= num_windows) num_windows - 1 => window_id;
+            note.onset() - boundaries[window_id] => float relative_onset;
+
+            note.copy() @=> ezNote newNote;
+            newNote.onset(relative_onset);
+            result[window_id].add(newNote);
+        }
+
+        for(int j; j < _ccs.size(); j++)
+        {
+            _ccs[j] @=> ezCC cc;
+            findWindowForOnset(cc.onset(), boundaries, num_windows) => int window_id;
+            if (window_id >= num_windows) num_windows - 1 => window_id;
+            cc.onset() - boundaries[window_id] => float relative_onset;
+
+            cc.copy() @=> ezCC newCC;
+            newCC.onset(relative_onset);
+            result[window_id].add(newCC);
+        }
+        return result;
     }
 
     @doc "Set all notes to rests"
@@ -136,11 +374,15 @@ public class ezMeasure
 
     // SMucKish parsing functions
 
+    // NOTE: Need to add get functions for pitches, rhythms, and velocities that will work if the measure was constructed from ezNotes, not SMucKish input (i.e. if from serialized data)
+
     @doc "Get the pitches of the notes in the measure as a 2D array of MIDI note numbers"
     fun float[][] pitches()
     {
         return _pitches;
     }
+    
+    
 
     @doc "Set the pitches of the notes in the measure, using a SMucKish input string"
     fun float[][] pitches(string input)
@@ -266,6 +508,27 @@ public class ezMeasure
     }
 
     // Private functions
+
+    // Sort (eventTimes, eventDeltas) by time; at same time, end events (-1) before start (1)
+    @doc "(hidden)"
+    fun void sortEvents(float times[], int deltas[])
+    {
+        for (int i; i < times.size() - 1; i++)
+        {
+            for (int j; j < times.size() - 1 - i; j++)
+            {
+                if (times[j] > times[j+1] || (times[j] == times[j+1] && deltas[j] > deltas[j+1]))
+                {
+                    times[j] => float t;
+                    times[j+1] => times[j];
+                    t => times[j+1];
+                    deltas[j] => int d;
+                    deltas[j+1] => deltas[j];
+                    d => deltas[j+1];
+                }
+            }
+        }
+    }
 
     // Helper function for quicksort
     @doc "(hidden)"

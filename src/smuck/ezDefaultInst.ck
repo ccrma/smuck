@@ -39,5 +39,11 @@ public class ezDefaultInst extends ezInstrument
     {
         envs[voice].keyOff();
     }
+
+    @doc "this cc() function just prints CC events to console"
+    fun void cc(ezCC cc)
+    {
+        <<< "CC event: command = ", cc.command(), " channel = ", cc.channel(), " data1 = ", cc.data1(), " data2 = ", cc.data2(), " onset = ", cc.onset() >>>;
+    }
 }
 

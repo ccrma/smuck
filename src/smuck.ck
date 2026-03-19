@@ -1,10 +1,11 @@
-@import {"smuck/ezNote.ck", "smuck/ezMeasure.ck", "smuck/ezPart.ck", "smuck/ezScore.ck"}
+@import {"smuck/ezNote.ck", "smuck/ezCC.ck", "smuck/ezMeasure.ck", "smuck/ezPart.ck", "smuck/ezScore.ck"}
 @import {"smuck/ezInstrument.ck", "smuck/ezScorePlayer.ck"}
 @import {"smuck/ezMidiInst.ck", "smuck/ezOscInst.ck", "smuck/ezExternalInst.ck"}
 @import {"smuck/Smuckish.ck"}
 
 // should be explicitly imported by user
-// @import {"smuck/ezFluidInst.ck"}
+// @import {"smuck/ezFluidInst.ck"} // Depends on FluidSynth chugin to be installed
+// @import {"smuck/smIO.ck"} // Depends on HashMap chugin to be installed
 
 @doc "A collection of SMucK-related high-level functions."
 public class Smuck
@@ -12,7 +13,7 @@ public class Smuck
     @doc "retrieve smuck version as a string"
     fun static string version()
     {
-        return "0.1.3";
+        return "0.1.4";
     }
 
     @doc "convert a MIDI note number to a pitch name"

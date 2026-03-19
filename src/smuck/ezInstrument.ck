@@ -137,4 +137,9 @@ public class ezInstrument extends Chugraph
     {
         <<< "Implement this noteOff function" >>>;
     }
+
+    @doc "This function defines behavior that will be executed when a CC (control change, aftertouch, or pitch bend) is triggered by the ezScorePlayer. The base class function is empty, and can be overridden by the user."
+    fun void cc(ezCC cc)
+    {
+    }
 }

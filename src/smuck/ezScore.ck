@@ -6,6 +6,8 @@ public class ezScore
     @doc "(hidden)"
     120 => float _bpm;
     @doc "(hidden)"
+    string _text;
+    @doc "(hidden)"
     ezPart _parts[0];
     
     // Constructors
@@ -65,6 +67,19 @@ public class ezScore
         return _parts;
     }
 
+    @doc "Get the text annotation of the score"
+    fun string text()
+    {
+        return _text;
+    }
+
+    @doc "Set the text annotation of the score"
+    fun string text(string value)
+    {
+        value => _text;
+        return _text;
+    }
+    
     @doc "Set the tempo in BPM (beats per minute) for the score"
     fun float bpm(float value)
     {
@@ -116,12 +131,13 @@ public class ezScore
         float score_end;
         for (int i; i < _parts.size(); i++)
         {
-            float part_length;
+            0.0 => float part_length;
             _parts[i] @=> ezPart part;
             for (int j; j < part.measures().size(); j++)
             {
                 part.measures()[j] @=> ezMeasure measure;
-                measure.beats() +=> part_length;
+                measure.onset() + measure.beats() => float measure_end;
+                if (measure_end > part_length) measure_end => part_length;
             }
             if (part_length > score_end) part_length => score_end;
         }
@@ -134,10 +150,64 @@ public class ezScore
         return (beats() * 60000 / _bpm)::ms;
     }
 
-    @doc "Get the maximum polyphony for a given part"
-    fun int maxPolyphony(int part)
+    @doc "Impose constant bar length on all measures in all parts. Skips empty measures. Bar length is in beats (quarter = 1). Constant barLength may not align to musical barlines in mixed-meter parts. Errors if barLength <= 0. For large MIDI imports, calling meter() after import improves playback performance by splitting long measures."
+    fun void meter(float barLength)
     {
-        return _parts[part]._maxPolyphony;
+        for (int i; i < _parts.size(); i++)
+        {
+            _parts[i].meter(barLength);
+        }
+    }
+
+    @doc "Impose variable bar lengths on all measures in all parts. Skips empty measures. Errors if lengths array is empty."
+    fun void meter(float lengths[])
+    {
+        for (int i; i < _parts.size(); i++)
+        {
+            _parts[i].meter(lengths);
+        }
+    }
+
+    @doc "Impose time signature on all measures in all parts. num/denom; denominator is note value (4=quarter, 8=eighth). Errors if denom <= 0."
+    fun void meter(float num, float denom)
+    {
+        for (int i; i < _parts.size(); i++)
+        {
+            _parts[i].meter(num, denom);
+        }
+    }
+
+    @doc "Impose variable time signatures on all measures in all parts. Each element is [num, denom]. Errors if array empty or any denom <= 0."
+    fun void meter(float timeSigs[][])
+    {
+        for (int i; i < _parts.size(); i++)
+        {
+            _parts[i].meter(timeSigs);
+        }
+    }
+
+    @doc "Impose time signature from string (e.g. 4/4, 12/8) on all measures in all parts."
+    fun void meter(string sig)
+    {
+        for (int i; i < _parts.size(); i++)
+        {
+            _parts[i].meter(sig);
+        }
+    }
+
+    @doc "Impose variable time signatures from strings (e.g. [4/4, 3/4]) on all measures in all parts."
+    fun void meter(string sigs[])
+    {
+        for (int i; i < _parts.size(); i++)
+        {
+            _parts[i].meter(sigs);
+        }
+    }
+
+    @doc "Get the maximum polyphony for a given part"
+    fun int polyphony(int part)
+    {
+        return _parts[part]._polyphony;
     }
 
     @doc "Read a MIDI file into the ezScore object"
@@ -173,6 +243,7 @@ public class ezScore
             60000 / _bpm => float ms_per_beat;
             
             ezMeasure measure;
+            measure.onset(0);
             part.measures() << measure;
             
             while (min.read(msg, track)) {
@@ -202,9 +273,9 @@ public class ezScore
                     1 +=> currPolyCount;
 
                     // update max polyphony
-                    if (part._maxPolyphony < currPolyCount)
+                    if (part._polyphony < currPolyCount)
                     {
-                        currPolyCount => part._maxPolyphony;
+                        currPolyCount => part._polyphony;
                     }
                 }
 
@@ -224,9 +295,19 @@ public class ezScore
                     // decrease polyphony count by 1;
                     1 -=> currPolyCount;
                 }
+
+                // CC (Control Change), Aftertouch, Channel Pressure, Pitch Bend
+                if ((msg.data1 & 0xF0) == 0xB0 || (msg.data1 & 0xF0) == 0xA0 || (msg.data1 & 0xF0) == 0xD0 || (msg.data1 & 0xF0) == 0xE0)
+                {
+                    (msg.data1 >> 4) & 0xF => int command;
+                    msg.data1 & 0xF => int channel;
+                    accumulated_time_ms / ms_per_beat => float onset_beats;
+                    ezCC cc(command, channel, msg.data2, msg.data3, onset_beats);
+                    current_measure.add(cc);
+                }
             }
 
-            if(part._maxPolyphony > 0)
+            if(part._polyphony > 0)
             {
                 _parts << part;
             }

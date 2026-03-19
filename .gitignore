@@ -4,9 +4,12 @@
 *.wav
 *.mp3
 *.zip
+*.json
+*-plan.md
 
 # Test directory
 test/
+planning/
 
 *.html
 *.css

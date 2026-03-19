@@ -99,4 +99,18 @@ public class ezMidiInst extends ezInstrument
             <<<"noteOff: pitch = ", note.pitch() >>>;
         }
     }
+
+    @doc "Sends CC, aftertouch, or pitch bend from ezScorePlayer as MIDI. Status byte is built from cc.command() and cc.channel(); data1/data2 sent as MIDI data bytes."
+    fun void cc(ezCC cc)
+    {
+        MidiMsg msg;
+        (cc.command() << 4) | cc.channel() => msg.data1;
+        cc.data1() => msg.data2;
+        cc.data2() => msg.data3;
+        mout.send(msg);
+        if(_logOutput)
+        {
+            <<< "cc: ", msg.data1, msg.data2, msg.data3 >>>;
+        }
+    }
 }
