@@ -1,6 +1,6 @@
 @import {"ezNote.ck", "ezMeasure.ck", "ezPart.ck"}
 
-@doc "SMucK score object. An ezScore object contains one or more ezParts. Score contents can be set using the SMucKish input syntax, or by importing a MIDI file. ezScore objects can be passed to an ezScorePlayer object for playback."
+@doc "SMucK score object. An ezScore object contains one or more ezParts. Score contents can be set using the SMucKish input syntax, or by importing a MIDI file (notes, CC data). ezScore objects can be passed to an ezScorePlayer object for playback."
 public class ezScore
 {
     @doc "(hidden)"
@@ -210,7 +210,7 @@ public class ezScore
         return _parts[part]._polyphony;
     }
 
-    @doc "Read a MIDI file into the ezScore object"
+    @doc "Read a MIDI file into the ezScore object. Imports notes and CC events. For large files, call meter() after import to improve playback performance."
     fun void read(string filename)
     {
         if(filename.length() > 4 && filename.substring(filename.length() - 4,4) == ".mid")

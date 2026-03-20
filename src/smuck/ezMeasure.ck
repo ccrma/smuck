@@ -2,7 +2,7 @@
 @import "ezCC.ck"
 @import "Smuckish.ck" // for recursive imports
 
-@doc "SMucK measure object. An ezMeasure object contains one or more ezNotes. Note contents can be set using the SMucKish input syntax."
+@doc "SMucK measure object. An ezMeasure object contains one or more ezNotes, and may contain ezCCs (MIDI control messages). Note contents can be set using the SMucKish input syntax."
 public class ezMeasure
 {
     // Private variables

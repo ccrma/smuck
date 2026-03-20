@@ -1,7 +1,6 @@
 @import "../src/smuck.ck"
-// NOTE: requires FluidSynth.chug to be installed
-@import "../src/smuck/ezFluidInst.ck"
-
+@import "../src/smuck/ezFluidInst.ck" // NOTE: requires FluidSynth.chug to be installed
+@import "../src/smuck/smIO.ck" // NOTE: requires HashMap chugin to be installed
 // instantiate a CKDoc object
 CKDoc doc; // documentation orchestra
 // set the examples root
@@ -14,7 +13,8 @@ doc.addGroup(
         "ezNote",
         "ezMeasure",
         "ezPart",
-        "ezScore"
+        "ezScore",
+        "ezCC"
     ],
     // group name
     "Basic Classes",
@@ -48,7 +48,8 @@ doc.addGroup(
 doc.addGroup(
     // class names
     [
-        "Smuck"
+        "Smuck",
+        "smIO"
         // "Smuckish"
     ],
     // group name
@@ -64,7 +65,7 @@ doc.addGroup(
 doc.sort(true);
 
 // generate
-doc.outputToDir( ".", "SMucK API Reference (Alpha 0.1.3)" );
+doc.outputToDir( ".", "SMucK API Reference (Alpha 0.1.4)" );
 
 // BUG: class doc not showing up
 // ezNote.help();

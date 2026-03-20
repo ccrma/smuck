@@ -75,7 +75,7 @@ public class ezPart
         return _measures;
     }
 
-    @doc "Get the max polyphony needed for the whole part (max over all measures' polyphony). Computes each measure's polyphony and stores the result in _maxPolyphony."
+    @doc "Get the max polyphony needed for the whole part (max over all measures' polyphony)."
     fun int polyphony()
     {
         0 => int maxP;

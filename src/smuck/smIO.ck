@@ -40,7 +40,7 @@ public class SaveHandler {
     }
 }
 
-@doc "Class for reading/writing ezScore objects to/from JSON files"
+@doc "Class for reading/writing ezScore objects to/from JSON files. Requires HashMap chugin."
 public class smIO
 {
     @doc "(hidden)"
@@ -269,7 +269,7 @@ public class smIO
         return score;
     }
 
-    @doc "Save an ezScore object to a JSON file, specifying the filepath"
+    @doc "Save an ezScore object to a JSON file, specifying the filepath. Requires HashMap chugin."
     fun static void scoreToJson(string filepath, ezScore score)
     {
         if(filepath != null)
@@ -298,7 +298,7 @@ public class smIO
         }
     }
 
-    @doc "Load an ezScore object from a JSON file, specifying the filepath"
+    @doc "Load an ezScore object from a JSON file, specifying the filepath. Requires HashMap chugin. Returns empty ezScore if file not found or malformed."
     fun static ezScore jsonToScore(string filepath)
     {
         chout <= "Loading ezScore from: " <= filepath <= IO.newline();
