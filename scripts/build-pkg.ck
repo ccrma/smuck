@@ -1,6 +1,9 @@
 @import "Chumpinate"
 @import "../src/smuck.ck"
 
+// run doc-gen
+Machine.add(me.dir() + "gen-smuck.ck");
+
 // Our package version
 Smuck.version() => string version;
 
@@ -71,9 +74,11 @@ ver.addExampleFile("../src/examples/instruments/releaseInst.ck", "instruments");
 ver.addExampleFile("../src/examples/instruments/samplerInst.ck", "instruments");
 
 // // Documentation files
-// ver.addDocsFile("./index.html");
-// ver.addDocsFile("./chumpinate.html");
-// ver.addDocsFile("./ckdoc.css");
+ver.addDocsFile("./docs/index.html");
+ver.addDocsFile("./docs/ckdoc.css");
+ver.addDocsFile("./docs/smuck-basic.html");
+ver.addDocsFile("./docs/smuck-playback.html");
+ver.addDocsFile("./docs/smuck-utils.html");
 
 "smuck/files/" + ver.version() + "/smuck.zip" => string path; // path?
 
