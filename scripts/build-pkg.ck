@@ -55,16 +55,26 @@ ver.addFile("../src/smuck/smScore.ck", "smuck");
 ver.addFile("../src/smuck/smUtils.ck", "smuck");
 ver.addFile("../src/smuck/ezOscInst.ck", "smuck");
 ver.addFile("../src/smuck/smVelocity.ck", "smuck");
+ver.addFile("../src/smuck/smIO.ck", "smuck");
+ver.addFile("../src/smuck/ezCC.ck", "smuck");
 
 // "SMuck/_examples"
 
-// // These build files are examples as well
+// These build files are examples as well
 ver.addExampleFile("../src/examples/basic/basic-instrument.ck", "basic");
-ver.addExampleFile("../src/examples/basic/playback.ck", "basic");
-ver.addExampleFile("../src/examples/basic/preview.ck", "basic");
-ver.addExampleFile("../src/examples/basic/setscore.ck", "basic");
+ver.addExampleFile("../src/examples/basic/ezcc-basic.ck", "basic");
+ver.addExampleFile("../src/examples/basic/hello-smuck.ck", "basic");
+ver.addExampleFile("../src/examples/basic/note-data.ck", "basic");
+ver.addExampleFile("../src/examples/basic/playback-pos.ck", "basic");
+ver.addExampleFile("../src/examples/basic/playback-rate.ck", "basic");
+ver.addExampleFile("../src/examples/basic/score-edit.ck", "basic");
+ver.addExampleFile("../src/examples/basic/score-set.ck", "basic");
+ver.addExampleFile("../src/examples/basic/smio-json.ck", "basic");
 ver.addExampleFile("../src/examples/basic/smuckish-pitch.ck", "basic");
 ver.addExampleFile("../src/examples/basic/smuckish-rhythm.ck", "basic");
+ver.addExampleFile("../src/examples/basic/smuckish-velocity.ck", "basic");
+ver.addExampleFile("../src/examples/advanced/meter-midi.ck", "advanced");
+ver.addExampleFile("../src/examples/advanced/meter-split.ck", "advanced");
 ver.addExampleFile("../src/examples/data/bwv772.mid", "data");
 ver.addExampleFile("../src/examples/instruments/flangerInst.ck", "instruments");
 ver.addExampleFile("../src/examples/instruments/releaseInst.ck", "instruments");
